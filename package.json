@@ -3,6 +3,11 @@
   "displayName": "onboard-vscode",
   "description": "Onboard AI",
   "version": "0.0.1",
+  "license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/onboardai/onboard-vscode"
+	},
   "engines": {
     "vscode": "^1.75.0"
   },
