@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6",
+    "outDir": "out",
+    "esModuleInterop": true,
+    "lib": ["es6", "dom"],
+    "sourceMap": true,
+    "rootDir": "src",
+    "strict": false
+  },
+  "exclude": ["node_modules", ".vscode-test", "webview-ui"]
+}
