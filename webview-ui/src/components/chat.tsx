@@ -32,7 +32,7 @@ export const Chat = React.memo(
     repoInfo,
     initialMessages,
     className,
-  }: ChatProps)  { 
+  }: ChatProps)  {
     const { session, setSession } = useContext(SessionContext);
 
     const [displayMessages, setDisplayMessages] = useState<Message[]>([]);
@@ -46,7 +46,7 @@ export const Chat = React.memo(
     // vercel's ai useChat
     const {
         messages,
-        append, 
+        append,
         reload,
         stop,
         isLoading,
@@ -55,15 +55,21 @@ export const Chat = React.memo(
         data,
         setMessages
     } = useChat({
-        api: "https://kr5ilqri7mjww373pfuoso676m0kupch.lambda-url.us-east-1.on.aws/",
+        api: "https://mcxeqf7hzekaahjdqpojzf4hya0aflwj.lambda-url.us-east-1.on.aws/",
         initialMessages,
         id: session_id,
+        headers: {
+            "Authorization": "Bearer " + session?.user?.token
+        },
         body: {
-            session_id,
-            mainRepo: repoInfo,
-            chatRepos: Object.values(repoStates), // additional repos
-            token: session?.user?.token,
-            session,
+            repositories: Object.values(repoStates).map((repo) => {
+                return {
+                    name: repo.repository,
+                    branch: repo.branch,
+                    external: repo.external
+                }
+            }),
+            sessionId: session_id,
         },
         async onResponse(response) {
 
@@ -135,7 +141,7 @@ export const Chat = React.memo(
                 return (
                     <>
                         <div>
-                            <ChatList 
+                            <ChatList
                                 messages={displayMessages}
                                 userId="" // todo: populate?
                                 repoStates={repoStates}
@@ -144,7 +150,7 @@ export const Chat = React.memo(
                                 isStreaming={isStreaming}
                             />
                         </div>
-                        <ChatPanel 
+                        <ChatPanel
                             id={session_id}
                             isLoading={isLoading}
                             stop={stop}
@@ -206,7 +212,7 @@ export const Chat = React.memo(
             }).then(async (res) => {
                 // console.log('MEMBERSHIP', res);
                 return res;
-            }); 
+            });
 
             if (response['membership'] !== session?.user?.membership) {
                 // update session
@@ -222,7 +228,7 @@ export const Chat = React.memo(
                 repoInfo.repository,
                 session
             );
-        
+
             switch (repoAuth) {
                 case 402:
                     console.log('Error: Private repo')
@@ -249,7 +255,7 @@ export const Chat = React.memo(
 
         Object.values(repoStates).forEach((repo) => {
             if (!repo.indexId) return;
-            
+
             // unarchive
             fetcher(`https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/repositories/${encode(repo.repository, true)}/unarchive`, {
               method: "POST",
@@ -258,7 +264,7 @@ export const Chat = React.memo(
                 "Authorization": "Bearer " + session?.user?.token
               },
             });
-            
+
         });
 
         checkAuthandMembership();

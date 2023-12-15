@@ -226,21 +226,28 @@ export function cleanMessage(message: Message): Message {
   const sources: Source[] = [];
   let agentStatus = "";
 
-  const segments = message.content.split("\x1e");
+  const segments = message.content.split("\n");
   for (const segment of segments) {
+
+    let type = "";
+    let message: any = "";
     try {
-      if (segment.startsWith("<!-- ONBOARD STATUS: ")) {
-        agentStatus = segment.split("<!-- ONBOARD STATUS: ")[1].slice(0, -4);
-      } else if (segment.startsWith("<!-- ONBOARD SOURCES: ")) {
-        sources.push(
-          JSON.parse(segment.split("<!-- ONBOARD SOURCES: ")[1].slice(0, -4)),
-        );
-      } else {
-        contentChunks.push(segment);
-      }
+      const parsedSegment = JSON.parse(segment);
+      type = parsedSegment.type;
+      message = parsedSegment.message;
     } catch (e) {
-      // there might be a partially loaded or malformed segment
-      // we'll just skip it
+      // can't parse as JSON, so it's probably a string
+      contentChunks.push(segment);
+      continue;
+    }
+
+    // At this point, we have a JSON message
+    if (type === "status") {
+      agentStatus = message;
+    } else if (type === "sources") {
+      sources.push(message);
+    } else if (type === "message") {
+      contentChunks.push(message);
     }
   }
 
