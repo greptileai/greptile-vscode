@@ -100,18 +100,15 @@ export function ChatLoadingStateProvider({ children, initialState }: { children:
         // sleep 2 seconds to let the clone start
         await new Promise((resolve) => setTimeout(resolve, 2000));
       }
-    
-      let metalIndexStatus = undefined;
-      if (chatState.mainRepoInfo.indexId) {
-        metalIndexStatus = await fetcher(`https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/repositories/${encode(chatState.mainRepoInfo.repository, true)}/status`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " +  session?.user?.token
-          },
-        })
-      }
-    
+
+      let metalIndexStatus = await fetcher(`https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/repositories/${encode(chatState.mainRepoInfo.repository, true)}/status`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " +  session?.user?.token
+        },
+      }).then((res) => res.status);
+
       // set status to processing for all, to at least check once
       Object.keys(newRepoStates).forEach((repo) => {
         newRepoStates[repo] = {
@@ -119,7 +116,7 @@ export function ChatLoadingStateProvider({ children, initialState }: { children:
           status: "processing",
         };
       });
-    
+
       let maxTries = 1000000000; // lol
       const repoFailureCount: { [key: string]: number } = {};
       const clonedReposWaitingForUnarchive: string[] = [];
@@ -127,7 +124,6 @@ export function ChatLoadingStateProvider({ children, initialState }: { children:
         // console.log('polling', newRepoStates, isCancelled.current);
         let repos = Object.keys(newRepoStates).filter(
           (repo) =>
-            !newRepoStates[repo].indexId ||
             !newRepoStates[repo].repository ||
             (newRepoStates[repo].status !== "completed" &&
               (repoFailureCount[repo] || 0) < 3 &&
@@ -162,9 +158,6 @@ export function ChatLoadingStateProvider({ children, initialState }: { children:
                 : repoStatus.status,
           };
           // TODO: temporary solution, make this work with all repos
-          if (chatState.mainRepoInfo.repository === repoStatus.repository) {
-            chatState.mainRepoInfo.indexId = repoStatus.indexId;
-          }
           if (
             repoStatus.status === "completed" &&
             !clonedReposWaitingForUnarchive.includes(repoStatus.repository)
@@ -176,7 +169,7 @@ export function ChatLoadingStateProvider({ children, initialState }: { children:
               (repoFailureCount[repoStatus.repository] || 0) + 1;
           }
         }
-    
+
         // console.log('polling set loading repos 1')
         chatLoadingStateDispatch({
           action: "set_loading_repo_states",
@@ -189,7 +182,7 @@ export function ChatLoadingStateProvider({ children, initialState }: { children:
         action: "set_loading_repo_states",
         payload: { ...chatLoadingState.loadingRepoStates, ...newRepoStates},
       });
-    
+
       // check if metal index is live
       while (metalIndexStatus !== "LIVE") {
         // set repository status to processing
@@ -198,49 +191,35 @@ export function ChatLoadingStateProvider({ children, initialState }: { children:
           action: "set_loading_repo_states",
           payload: { ...chatLoadingState.loadingRepoStates, ...newRepoStates},
         });
-    
-        if (metalIndexStatus === "ARCHIVED" && chatState.mainRepoInfo.indexId) {
+
+        if (metalIndexStatus === "ARCHIVED") {
           // if archived, then we need to reindex
-          // const response = fetcher("http://localhost:3001/api/metal/indexId", {
-          //   method: "POST",
-          //   body: JSON.stringify({
-          //     data: JSON.stringify({
-          //       index: chatState.mainRepoInfo.indexId,
-          //       status: "ACTIVE",
-          //     }),
-          //   }),
-          //   headers: {
-          //     "Content-Type": "application/json",
-          //   },
-          // });
           fetcher(`https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/repositories/${encode(chatState.mainRepoInfo.repository, true)}/unarchive`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + session?.user?.token
-              },
-            });
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer " + session?.user?.token
+            },
+          });
           if (isCancelled.current) {
             // console.log('Polling stopped');
             break; // Exit the loop if polling is cancelled
           }
         }
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        if (chatState.mainRepoInfo.indexId) {
-          metalIndexStatus = await fetcher(`https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/repositories/${encode(chatState.mainRepoInfo.repository, true)}/status`, {
+        metalIndexStatus = await fetcher(`https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/repositories/${encode(chatState.mainRepoInfo.repository, true)}/status`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
             "Authorization": "Bearer " +  session?.user?.token,
           },
-        })
-        }
+        }).then((res) => res.status);
         // console.log("metalIndex", metalIndex);
         newRepoStates[chatState.mainRepoInfo.repository] = {
           ...newRepoStates[chatState.mainRepoInfo.repository],
           status: metalIndexStatus === "LIVE" ? "completed" : "processing",
         };
-        // console.log("metal index status:", metalIndex?.status);
+        // console.log("metal index status:", metalIndexStatus);
       }
       // console.log('polling set loading repos 4')
       chatLoadingStateDispatch({
