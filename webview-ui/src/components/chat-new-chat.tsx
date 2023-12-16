@@ -25,13 +25,10 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const updateRepoUrl = () => {
-      const parsedRepo = parseIdentifier(repoUrl);
-      if (parsedRepo) {
-        setRepo(parsedRepo);
-      }
-    };
-    updateRepoUrl();
+    const parsedRepo = parseIdentifier(repoUrl);
+    if (parsedRepo) {
+      setRepo(parsedRepo);
+    }
   }, [repoUrl]);
 
   const handleClone = async () => {
@@ -69,7 +66,7 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
     console.log("Handling clone");
 
     const submitJob = async () => {
-      return fetch('https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/repositories', { 
+      return fetch('https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/repositories', {
         method: "POST",
         body: JSON.stringify({
           repository: repo,
@@ -98,7 +95,7 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
 
     if (repo) {
       // if session user token exists, set repoUrl to include token before github.com and after https:// with user session token + '@'
-    
+
       submitJob().then(async (res) => {
         if (res.ok) {
           console.log("Cloned repo and moving to:", repo);
@@ -166,8 +163,8 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
           or
           <div>
             <p>Enter a Repo:</p>
-              <div className="flex-row"> 
-                <VSCodeTextField 
+              <div className="flex-row">
+                <VSCodeTextField
                   placeholder=""
                   value={repoUrl}
                   onKeyDown={handleKeyDown}
@@ -176,7 +173,7 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
                   Github URL
                 </VSCodeTextField>
                 <VSCodeButton
-                  appearance="primary"  
+                  appearance="primary"
                   aria-label="Submit repo"
                   onClick={handleClone}
                   className="submit"
