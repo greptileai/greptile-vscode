@@ -9,6 +9,7 @@ import type { Session, Membership } from "../types/session";
 import { SessionContext } from "../providers/session-provider";
 
 import "../App.css";
+import mixpanel from "mixpanel-browser";
 import { usePostHog } from "posthog-js/react";
 
 interface NewChatProps {
@@ -35,6 +36,8 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
 
   const handleClone = async () => {
 
+    posthog.capture("Repository cloned", { source: "onboard-vscode", repo: repo });
+    mixpanel.track("Repository cloned", { source: "onboard-vscode", repo: repo });
     console.log("Checking membership");
 
     // checking membership
@@ -153,8 +156,12 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
                   <VSCodeOption
                   key={index}
                   onClick={() => {
-                      navigate(`/chat/${repo.repo}`);
-                  if (setDialogOpen) setDialogOpen(false);
+                    posthog.capture("Sample repo clicked", { source: "onboard-vscode", repo: repo.repo });
+                    mixpanel.track("Sample repo clicked", { source: "onboard-vscode", repo: repo.repo });
+                    navigate(`/chat/${repo.repo}`);
+                    if (setDialogOpen) {
+                      setDialogOpen(false);
+                    }
                   }}
                   >
                       {repo.displayName}
@@ -192,6 +199,7 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
           <VSCodeButton
             onClick={() => {
               posthog.capture("Github Login Clicked", { source: "onboard-vscode" });
+              mixpanel.track("Github Login Clicked", { source: "onboard-vscode" });
               vscode.postMessage({command: "login", text: "github login"});
             }}
           >
