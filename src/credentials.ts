@@ -19,7 +19,7 @@ export class Credentials {
 	private async setOctokit() {
 		/**
 		 * By passing the `createIfNone` flag, a numbered badge will show up on the accounts activity bar icon.
-		 * An entry for the sample extension will be added under the menu to sign in. This allows quietly 
+		 * An entry for the sample extension will be added under the menu to sign in. This allows quietly
 		 * prompting the user to sign in.
 		 * */
 		const session = await vscode.authentication.getSession(GITHUB_AUTH_PROVIDER_ID, SCOPES, { createIfNone: false });
@@ -29,7 +29,11 @@ export class Credentials {
 				auth: session.accessToken
 			});
 
-			await SessionManager.setSession({ user: { token: session.accessToken } } as Session);
+			const email = await this.octokit.users.getAuthenticated().then((res) => {
+				return res.data.email;
+			});
+
+			await SessionManager.setSession({ user: { token: session.accessToken, userId: email } } as Session);
 			// console.log(session.accessToken);
 
 			return;
@@ -63,7 +67,12 @@ export class Credentials {
 			auth: session.accessToken
 		});
 
-		await SessionManager.setSession({ user: { token: session.accessToken } } as Session);
+		const email = await this.octokit.users.getAuthenticated().then((res) => {
+			return res.data.email;
+		});
+
+		await SessionManager.setSession({ user: { token: session.accessToken, userId: email } } as Session);
+		console.log(session);
 
 		return this.octokit;
 	}

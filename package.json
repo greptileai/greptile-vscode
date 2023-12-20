@@ -4,10 +4,10 @@
   "description": "Onboard AI",
   "version": "0.0.2",
   "license": "MIT",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/onboardai/onboard-vscode"
-	},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/onboardai/onboard-vscode"
+  },
   "engines": {
     "vscode": "^1.75.0"
   },
@@ -61,6 +61,7 @@
     "vscode-test": "^1.5.0"
   },
   "dependencies": {
-    "@octokit/rest": "^20.0.2"
+    "@octokit/rest": "^20.0.2",
+    "posthog-js": "^1.96.1"
   }
 }

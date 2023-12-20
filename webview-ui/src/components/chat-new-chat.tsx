@@ -9,6 +9,7 @@ import type { Session, Membership } from "../types/session";
 import { SessionContext } from "../providers/session-provider";
 
 import "../App.css";
+import { usePostHog } from "posthog-js/react";
 
 interface NewChatProps {
   setDialogOpen?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -17,6 +18,7 @@ interface NewChatProps {
 export const NewChat = ({ setDialogOpen }: NewChatProps) => {
 
   const { session, setSession } = useContext(SessionContext);
+  const posthog = usePostHog();
 
   // console.log("session", session);
 
@@ -188,7 +190,10 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
       ) : (
         <div>
           <VSCodeButton
-            onClick={() => vscode.postMessage({command: "login", text: "github login"})}
+            onClick={() => {
+              posthog.capture("Github Login Clicked", { source: "onboard-vscode" });
+              vscode.postMessage({command: "login", text: "github login"});
+            }}
           >
             Login
           </VSCodeButton>

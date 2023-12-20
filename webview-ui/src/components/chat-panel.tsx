@@ -4,6 +4,7 @@ import { VSCodeButton } from "@vscode/webview-ui-toolkit/react";
 import { PromptForm } from "./chat-prompt-form";
 
 import "../App.css";
+import { usePostHog } from "posthog-js/react";
 
 export interface ChatPanelProps
   extends Pick<
@@ -31,12 +32,18 @@ export function ChatPanel({
   messages,
   isStreaming,
 }: ChatPanelProps) {
+  const posthog = usePostHog();
+
   return (
     <div>
       <div>
         <div>
           <PromptForm
             onSubmit={async (value) => {
+              console.log("Chat message sent", value);
+              posthog.capture("Chat message sent", {
+                source: "onboard-vscode"
+              });
               await append({
                 id,
                 content: value,
@@ -49,7 +56,7 @@ export function ChatPanel({
             isStreaming={isStreaming}
             renderButton={() => isLoading ? (
               <VSCodeButton
-                appearance="secondary"  
+                appearance="secondary"
                 aria-label="Stop generating"
                 onClick={() => stop()}
                 className="button"

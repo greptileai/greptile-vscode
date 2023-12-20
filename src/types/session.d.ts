@@ -6,7 +6,7 @@ export enum Membership {
 
 export type Session = {
     user: {
-        userId?: string; 
+        userId?: string;
         membership?: Membership | undefined;
         /** Oauth access token */
         token?: string;

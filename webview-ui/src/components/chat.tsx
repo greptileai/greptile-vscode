@@ -143,7 +143,7 @@ export const Chat = React.memo(
                         <div>
                             <ChatList
                                 messages={displayMessages}
-                                userId="" // todo: populate?
+                                userId={session?.user?.userId || ""}
                                 repoStates={repoStates}
                                 continueLastMessage={continueLastMessage}
                                 isLoading={isLoading}
