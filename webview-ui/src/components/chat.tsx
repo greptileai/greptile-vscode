@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { useChat } from "ai/react";
 import { encode, decode } from "js-base64";
 
@@ -33,11 +33,10 @@ export const Chat = React.memo(
     initialMessages,
     className,
   }: ChatProps)  {
+    console.log("Starting Chat", session_id, repoInfo, initialMessages, className);
     const { session, setSession } = useContext(SessionContext);
 
-    const [displayMessages, setDisplayMessages] = useState<Message[]>([]);
-    const [isStreaming, setIsStreaming] = useState(false);
-
+    const [displayMessages, setDisplayMessages] = React.useState<Message[]>([]);
     const repoStates = useChatRepoState();
     const setRepoStates = useUpdateChatRepoState();
     const { chatStateDispatch } = useChatState();
@@ -76,7 +75,13 @@ export const Chat = React.memo(
             // console.log("Response: ", response);
             // console.log("Messages: ", messages);
 
-            setIsStreaming(true);
+            setSession({
+                ...session,
+                state: {
+                    ...session?.state,
+                    isStreaming: true
+                }
+            });
             if (response.status === 401 || response.status === 500) {
                 console.log("Error");
                 vscode.postMessage({
@@ -89,7 +94,13 @@ export const Chat = React.memo(
             }
         },
         onFinish(message) {
-            setIsStreaming(false);
+            setSession({
+                ...session,
+                state: {
+                    ...session?.state,
+                    isStreaming: false
+                }
+            });
         }
     });
 
@@ -142,12 +153,12 @@ export const Chat = React.memo(
                     <>
                         <div>
                             <ChatList
-                                messages={displayMessages}
+                                messages={displayMessages || []}
                                 userId={session?.user?.userId || ""}
                                 repoStates={repoStates}
                                 continueLastMessage={continueLastMessage}
                                 isLoading={isLoading}
-                                isStreaming={isStreaming}
+                                isStreaming={session?.state?.isStreaming || false}
                             />
                         </div>
                         <ChatPanel
@@ -159,7 +170,7 @@ export const Chat = React.memo(
                             messages={messages}
                             input={input}
                             setInput={setInput}
-                            isStreaming={isStreaming}
+                            isStreaming={session?.state?.isStreaming || false}
                         />
                     </>
                 );
@@ -167,8 +178,29 @@ export const Chat = React.memo(
         }
     };
 
+    // TODO: Fix this so it actually loads full chat context
     useEffect(() => {
-        // console.log("messages", messages);
+        // if (messages !== session?.state?.messages && session?.state?.messages) {
+        //     console.log("updating messages from session");
+        //     setMessages(session?.state?.messages);
+        // }
+        // if (input !== session?.state?.input && session?.state?.input) {
+        //     console.log("updating input from session");
+        //     setInput(session?.state?.input);
+        // }
+        setMessages(initialMessages || []);
+    }, []);
+
+    useEffect(() => {
+        console.log("messages", messages);
+        setSession({
+            ...session,
+            state: {
+                ...session?.state,
+                messages: messages,
+            }
+        });
+
         const newDisplayMessages = messages.map((message) => cleanMessage(message));
         setDisplayMessages(newDisplayMessages);
 
@@ -196,6 +228,7 @@ export const Chat = React.memo(
 
     /** TODO: Check auth and membership */
     useEffect(() => {
+        console.log("Checking auth and membership")
 
          // if (!session?.user) return;
 
@@ -217,9 +250,11 @@ export const Chat = React.memo(
             if (response['membership'] !== session?.user?.membership) {
                 // update session
                 setSession({
+                    ...session,
                     user: {
-                      token: session?.user?.token,
-                      membership: response['membership']
+                        ...session?.user,
+                        token: session?.user?.token,
+                        membership: response['membership']
                     }
                   } as Session);
             }

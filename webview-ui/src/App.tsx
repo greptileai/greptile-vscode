@@ -22,17 +22,28 @@ const router = createMemoryRouter([ // cons to this?
 ]);
 
 function App() {
-  function handleHowdyClick() {
-    vscode.postMessage({
-      command: "hello",
-      text: "Hey there partner! 🤠",
-    });
-  }
+
+  console.log("Starting App")
 
   const [session, setSession] = useState<Session | undefined>(undefined);
   const posthog = usePostHog();
 
   useEffect(() => {
+    console.log("Navigated to", window.location)
+  }, [window?.location]);
+
+  useEffect(() => {
+    // write session to extension
+    console.log("Writing session to extension", session)
+    if (!session) return;
+    vscode.postMessage({
+      command: 'setSession',
+      session
+    });
+  }, [session]);
+
+  useEffect(() => {
+    console.log("Identifying user", session?.user?.userId)
     if (session?.user?.userId) {
       posthog.identify(session?.user?.userId, {
         email: session?.user?.userId,
@@ -45,11 +56,12 @@ function App() {
   }, [posthog, session?.user])
 
   useEffect(() => {
+    console.log("Setting up event listener")
     const eventListener = async (event) => {
       const message = event.data;
       switch(message.command) {
           case 'session':
-            // console.log(message.value)
+            console.log("Loaded session from extension", message.value)
             setSession(message.value);
       }
     }
@@ -57,10 +69,11 @@ function App() {
     // listen for response from extension
     window.addEventListener('message', eventListener);
 
+    console.log("Requesting session from extension")
     // make call to extension
     vscode.postMessage({
-    command: 'getSession',
-    text: ''
+      command: 'getSession',
+      text: ''
     });
 
     // unhook listener

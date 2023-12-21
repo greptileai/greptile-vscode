@@ -10,6 +10,7 @@ const ChatProcessing = ({ repoInfo }: IChatProcessingProps) => {
   const [progress, setProgress] = React.useState(0);
 
   useEffect(() => {
+    console.log("updating progress")
     setProgress(
       (100 * (repoInfo.filesProcessed || 1)) / (repoInfo.numFiles || 1),
     );

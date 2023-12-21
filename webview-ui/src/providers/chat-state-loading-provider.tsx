@@ -3,10 +3,9 @@ import React, {
   useEffect,
   useContext,
   useReducer,
-  useRef,
-  useState
+  useRef
 } from "react";
-import { encode, decode } from "js-base64";
+import { encode } from "js-base64";
 
 import { useChatState } from "./chat-state-provider";
 import { SessionContext } from "./session-provider";
@@ -67,11 +66,11 @@ export function ChatLoadingStateProvider({ children, initialState }: { children:
   });
   const { chatState, chatStateDispatch } = useChatState();
 
-  const { session, setSession } = useContext(SessionContext);
+  const { session } = useContext(SessionContext);
 
   const isCancelled = useRef(false);
   useEffect(() => {
-    // console.log('useEffect for polling', chatState.repoStates);
+    console.log('useEffect for polling', chatState.repoStates);
     isCancelled.current = false;
     const poll = async () => {
       // console.log('polling repo states')

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { VSCodeDropdown, VSCodeOption, VSCodeTextField, VSCodeButton } from "@vscode/webview-ui-toolkit/react";
 
@@ -18,26 +18,33 @@ interface NewChatProps {
 
 export const NewChat = ({ setDialogOpen }: NewChatProps) => {
 
+  console.log("Starting NewChat")
+
   const { session, setSession } = useContext(SessionContext);
   const posthog = usePostHog();
 
   // console.log("session", session);
 
-  const [repoUrl, setRepoUrl] = useState("");
-  const [repo, setRepo] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    const parsedRepo = parseIdentifier(repoUrl);
+    console.log("Parsing repoUrl into repo");
+    const parsedRepo = parseIdentifier(session?.state?.repoUrl || "");
     if (parsedRepo) {
-      setRepo(parsedRepo);
+      setSession({
+        ...session,
+        state: {
+          ...session?.state,
+          repo: parsedRepo
+        }
+      })
     }
-  }, [repoUrl]);
+  }, [session?.state?.repoUrl]);
 
   const handleClone = async () => {
 
-    posthog.capture("Repository cloned", { source: "onboard-vscode", repo: repo });
-    mixpanel.track("Repository cloned", { source: "onboard-vscode", repo: repo });
+    posthog.capture("Repository cloned", { source: "onboard-vscode", repo: session?.state?.repo || "" });
+    mixpanel.track("Repository cloned", { source: "onboard-vscode", repo: session?.state?.repo || "" });
     console.log("Checking membership");
 
     // checking membership
@@ -59,7 +66,9 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
 
         // update session
         setSession({
+          ...session,
           user: {
+            ...session?.user,
             token: session?.user?.token,
             membership: response['membership']
           }
@@ -74,7 +83,7 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
       return fetch('https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/repositories', {
         method: "POST",
         body: JSON.stringify({
-          repository: repo,
+          repository: session?.state?.repo || "",
         }),
         headers: {
           "Content-Type": "application/json",
@@ -98,13 +107,13 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
       });
     };
 
-    if (repo) {
+    if (session?.state?.repo) {
       // if session user token exists, set repoUrl to include token before github.com and after https:// with user session token + '@'
 
       submitJob().then(async (res) => {
         if (res.ok) {
-          console.log("Cloned repo and moving to:", repo);
-          navigate(`/chat/${repo}`);
+          console.log("Cloned repo and moving to:", session?.state?.repo || "");
+          navigate(`/chat/${session?.state?.repo || ""}`);
         } else {
           if (res.status === 402) {
             vscode.postMessage({
@@ -175,9 +184,17 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
               <div className="flex-row">
                 <VSCodeTextField
                   placeholder=""
-                  value={repoUrl}
+                  value={session?.state?.repoUrl || ""}
                   onKeyDown={handleKeyDown}
-                  onChange={(e) => setRepoUrl(e.target.value)}
+                  onChange={(e) => {
+                    setSession({
+                      ...session,
+                      state: {
+                        ...session?.state,
+                        repoUrl: e.target.value
+                      }
+                    } as Session)
+                  }}
                 >
                   Github URL
                 </VSCodeTextField>

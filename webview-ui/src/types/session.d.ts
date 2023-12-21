@@ -1,3 +1,5 @@
+import { Chat, Message, RepositoryInfo } from "./chat";
+
 export enum Membership {
     Free = "free",
     Pro = "pro",
@@ -5,8 +7,18 @@ export enum Membership {
 }
 
 export type Session = {
+    state?: {
+        url: string;
+        repo: string;
+        repoUrl: string;
+        repoInfo?: RepositoryInfo;
+        chat?: Chat;
+        messages: Message[];
+        isStreaming: boolean;
+        input: string;
+    },
     user: {
-        userId?: string; 
+        userId?: string;
         membership?: Membership | undefined;
         /** Oauth access token */
         token?: string;

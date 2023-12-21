@@ -1,14 +1,14 @@
 
-import { useState, useEffect, useContext } from 'react';
+import { useEffect, useContext, useState } from 'react';
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { VSCodeProgressRing, VSCodeButton } from "@vscode/webview-ui-toolkit/react";
 
 import { Chat as ChatComponent } from "../components/chat";
-import { type Chat, RepositoryInfo, Message, ChatInfo } from "../types/chat";
+import { type Chat, RepositoryInfo, Message } from "../types/chat";
 import type { Session } from '../types/session';
 import { getChat, getNewChat, getRepo } from "../lib/actions";
-import { checkRepoAuthorization, fetcher, getDefaultBranch } from "../lib/onboard-utils";
+import { getDefaultBranch } from "../lib/onboard-utils";
 import { vscode } from "../lib/vscode-utils";
 import { ChatLoadingStateProvider } from '../providers/chat-state-loading-provider';
 import { ChatStateProvider } from '../providers/chat-state-provider';
@@ -31,12 +31,26 @@ export default function ChatPage({}: ChatPageProps) {
 
   const repo = [owner, repoName].join("/");
 
-  const [repoInfo, setRepoInfo] = useState<RepositoryInfo | null>();
-  const [repoLoading, setRepoLoading] = useState(true);
-  const [chat, setChat] = useState<Chat | null>();
-  const [chatLoading, setChatLoading] = useState(true);
-
+  const [repoInfo, setRepoInfo] = useState<RepositoryInfo | null>(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!repoInfo) return;
+    console.log("Trying to set session to", {
+      ...session,
+      state: {
+        ...session?.state,
+        repoInfo: {...repoInfo}
+      }
+    } as Session);
+    setSession({
+      ...session,
+      state: {
+        ...session?.state,
+        repoInfo: {...repoInfo}
+      }
+    } as Session);
+  }, [repoInfo]);
 
   // TODO concurrentize these api calls.
   // repoInfo might not exist if it is not processed yet
@@ -44,20 +58,21 @@ export default function ChatPage({}: ChatPageProps) {
 
   useEffect(() => {
     async function fetchInfo() {
+      console.log("Running fetchInfo for", repo, session)
       try {
 
         // check with GitHub if user has access to repo
         // const status = await checkRepoAuthorization(repo, session);
         // if (status !== 200) return;
-        
+
         const repoInfoDataAll: any  = await getRepo(repo, session);
-        // console.log("repo info data all", repoInfoDataAll);
+        console.log("repo info data all", repoInfoDataAll);
 
         let repoInfoData: RepositoryInfo = repoInfoDataAll.responses[0] as RepositoryInfo;
 
         // ---------------------------------------------------------------------------
         if (!repoInfoData) repoInfoData = { repository: repo } as RepositoryInfo;
-        
+
         if (!repoInfoData.branch && !repoInfoData?.external) {
             // console.log("updating branch");
             const branch = await getDefaultBranch(
@@ -85,7 +100,9 @@ export default function ChatPage({}: ChatPageProps) {
             });
         }
         // ---------------------------------------------------------------------------
+        console.log("Setting session with repo info data", repoInfoData);
         setRepoInfo(repoInfoData);
+
       } catch (error) {
         vscode.postMessage({ command: "error", text: "Error fetching repo"});
         console.error("Error fetching repo:", error);
@@ -105,7 +122,13 @@ export default function ChatPage({}: ChatPageProps) {
 
         // console.log(chatData);
 
-        setChat(chatData);
+        setSession({
+          ...session,
+          state: {
+            ...session?.state,
+            chat: chatData
+          }
+        })
       } catch (error) {
         console.error("Error fetching chat:", error);
         // Handle error appropriately
@@ -116,23 +139,23 @@ export default function ChatPage({}: ChatPageProps) {
   }, []);
 
 
-  if (!repoInfo || !chat) {
+  if (!session?.state?.repoInfo || !session?.state?.chat) {
     return <VSCodeProgressRing />
   }
 
   const firstMessage = {
     role: "assistant",
-    content: `Hi! I am an expert on the ${repoInfo.repository} repository. Ask me anything! To share your feedback with our team, click [here](https://calendly.com/dakshgupta/free-coffee).`,
+    content: `Hi! I am an expert on the ${session?.state?.repoInfo?.repository} repository. Ask me anything! To share your feedback with our team, click [here](https://calendly.com/dakshgupta/free-coffee).`,
   } as Message;
 
   let repoStates = {} as { [repo: string]: RepositoryInfo };
-  repoStates[repo.toLowerCase()] = repoInfo;
+  repoStates[repo.toLowerCase()] = session?.state?.repoInfo || null;
 
   // console.log("repo states", repoStates);
 
   return (
     <>
-    <ChatStateProvider initialState={{repoStates: repoStates, mainRepoInfo: repoInfo, disabled:{value:false, reason:''}}}>
+    <ChatStateProvider initialState={{repoStates: repoStates, mainRepoInfo: session?.state?.repoInfo || null, disabled:{value:false, reason:''}}}>
       <ChatLoadingStateProvider initialState={{loadingRepoStates: repoStates}}>
         <VSCodeButton
             aria-label="Back"
@@ -141,10 +164,10 @@ export default function ChatPage({}: ChatPageProps) {
             Back
         </VSCodeButton>
         <ChatComponent
-          repoInfo={repoInfo}
+          repoInfo={session?.state?.repoInfo || null}
           // initialRepoStates={repoStates}
-          session_id={chat.session_id}
-          initialMessages={[firstMessage].concat(chat.chat_log)}
+          session_id={session?.state?.chat?.session_id}
+          initialMessages={[firstMessage].concat(session?.state?.chat?.chat_log)}
           // chatParentId={chat?.parent_id}
         />
       </ChatLoadingStateProvider>

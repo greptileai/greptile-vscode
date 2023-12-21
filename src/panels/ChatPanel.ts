@@ -175,10 +175,10 @@ export class ChatPanel {
             });
             return;
 
-          // case "setSession":
-          //   const session = message.session;
-          //   SessionManager.setSession(session);
-          //   return;
+          case "setSession":
+            const session = message.session;
+            SessionManager.setSession(session);
+            return;
         }
       },
       undefined,

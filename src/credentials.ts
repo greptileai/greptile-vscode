@@ -33,7 +33,15 @@ export class Credentials {
 				return res.data.email;
 			});
 
-			await SessionManager.setSession({ user: { token: session.accessToken, userId: email } } as Session);
+			const existingSession = SessionManager.getSession();
+			await SessionManager.setSession({
+				...existingSession,
+				user: {
+					...existingSession?.user,
+					token: session.accessToken,
+					userId: email
+				}
+			} as Session);
 			// console.log(session.accessToken);
 
 			return;
@@ -71,7 +79,15 @@ export class Credentials {
 			return res.data.email;
 		});
 
-		await SessionManager.setSession({ user: { token: session.accessToken, userId: email } } as Session);
+		const existingSession = SessionManager.getSession();
+		await SessionManager.setSession({
+			...existingSession,
+			user: {
+				...existingSession?.user,
+				token: session.accessToken,
+				userId: email
+			}
+		} as Session);
 		console.log(session);
 
 		return this.octokit;
