@@ -39,14 +39,15 @@ export function ChatPanel({
 
   const messagesEndRef = useRef(null);
 
+  // Scroll to bottom function
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Effect to scroll to bottom on mount
   useEffect(() => {
     scrollToBottom();
-  }, [messages]); // Dependency array includes messages, so it runs on message update
-
+  }, []); 
 
   return (
     <div>
@@ -110,9 +111,9 @@ export function ChatPanel({
               )
             )}
           />
-          <div ref={messagesEndRef} />
         </div>
       </div>
+      {/* <div ref={messagesEndRef} /> */}
     </div>
   );
 }
