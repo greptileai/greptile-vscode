@@ -4,10 +4,21 @@
     "target": "es6",
     "outDir": "out",
     "esModuleInterop": true,
-    "lib": ["es6", "dom"],
+    "lib": ["es6", "dom", "dom.iterable", "esnext"],
     "sourceMap": true,
     "rootDir": "src",
-    "strict": false
+    "strict": false,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "allowJs": true,
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "useDefineForClassFields": true
   },
-  "exclude": ["node_modules", ".vscode-test", "webview-ui"]
+  "exclude": ["node_modules", ".vscode-test", "webview-ui"],
+  "include": ["./src"]
 }
