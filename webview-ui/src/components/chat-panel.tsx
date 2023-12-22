@@ -1,5 +1,7 @@
 import { type UseChatHelpers } from "ai/react";
 import { VSCodeButton } from "@vscode/webview-ui-toolkit/react";
+import React, { useEffect, useRef } from 'react';
+
 
 import { PromptForm } from "./chat-prompt-form";
 
@@ -35,7 +37,16 @@ export function ChatPanel({
 }: ChatPanelProps) {
   const posthog = usePostHog();
 
-  
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]); // Dependency array includes messages, so it runs on message update
+
 
   return (
     <div>
@@ -99,6 +110,7 @@ export function ChatPanel({
               )
             )}
           />
+          <div ref={messagesEndRef} />
         </div>
       </div>
     </div>
