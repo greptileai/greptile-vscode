@@ -28,18 +28,25 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("Parsing repoUrl into repo");
-    const parsedRepo = parseIdentifier(session?.state?.repoUrl || "");
-    if (parsedRepo) {
-      setSession({
-        ...session,
-        state: {
-          ...session?.state,
-          repo: parsedRepo
-        }
-      })
+    // This effect runs when the component mounts and whenever session.state.repoUrl changes
+    const repoUrl = session?.state?.repoUrl;
+    if (repoUrl) {
+      // Parse the repo URL to get the repo identifier
+      const parsedRepo = parseIdentifier(repoUrl);
+      if (parsedRepo) {
+        // If the repo is parsed successfully, update the session state
+        setSession({
+          ...session,
+          state: {
+            ...session?.state,
+            repo: parsedRepo
+          }
+        });
+        // Automatically navigate to the chat page for the parsed repo
+        navigate(`/chat/${parsedRepo}`);
+      }
     }
-  }, [session?.state?.repoUrl]);
+  }, [session?.state?.repoUrl, navigate, setSession]);
 
   const handleClone = async () => {
 

@@ -1,5 +1,5 @@
 import { UseChatHelpers } from "ai/react";
-import { useRef, ReactElement} from "react";
+import { useRef, ReactElement, useEffect} from "react";
 import { VSCodeButton, VSCodeTextArea } from "@vscode/webview-ui-toolkit/react";
 
 import { useEnterSubmit } from "../lib/hooks/use-enter-submit";
@@ -21,7 +21,12 @@ export function PromptForm({
   renderButton
 }: PromptProps) {
   const { formRef, onKeyDown } = useEnterSubmit();
-
+  const textAreaRef = useRef(null);
+  useEffect(() => {
+    if (textAreaRef.current) {
+      textAreaRef.current.focus();
+    }
+  }, []);
   return (
     <form
       onSubmit={async (e) => {
@@ -37,6 +42,7 @@ export function PromptForm({
       <div>
         <VSCodeTextArea
           autofocus
+          ref={textAreaRef}
           defaultValue={null}
           tabIndex={0}
           onKeyDown={onKeyDown}

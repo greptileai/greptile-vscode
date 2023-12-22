@@ -10,6 +10,7 @@ export async function activate(context: ExtensionContext) {
 
   const credentials = new Credentials();
   await credentials.initialize(context);
+  
 
   const openChat = commands.registerCommand("onboard.chat", () => {
     ChatPanel.render(context.extensionUri);
