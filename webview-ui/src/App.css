@@ -178,3 +178,10 @@ a:active {
   align-self: flex-end;
   margin-left: 0.5rem;
 }
+
+.centered-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%; /* or set a specific height */
+}

@@ -159,9 +159,10 @@ export default function ChatPage({}: ChatPageProps) {
       <ChatLoadingStateProvider initialState={{loadingRepoStates: repoStates}}>
         <VSCodeButton
             aria-label="Back"
+            appearance="icon"
             onClick={() => navigate(-1)}
         >
-            Back
+            ←
         </VSCodeButton>
         <ChatComponent
           repoInfo={session?.state?.repoInfo || null}

@@ -219,7 +219,7 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
           </div>
         </div>
       ) : (
-        <div>
+        <div className="centered-container">
           <VSCodeButton
             onClick={() => {
               posthog.capture("Github Login Clicked", { source: "onboard-vscode" });
