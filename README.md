@@ -1,28 +1,32 @@
-## Run The Extension
+# Onboard AI VS Code Extension
 
-```bash
-# Install dependencies for both the extension and webview UI source code
-npm run install:all
+## Overview
+Onboard AI is a developer tool for understanding and navigating codebases in English. 
 
-# Build webview UI source code
-npm run build:webview
+This extension for VS Code brings Onboard AI's capabilities directly into your development environment, enhancing productivity and code comprehension.
 
-# Open sample in VS Code
-code .
-```
+## Features
+- **Natural Language Queries:** Ask questions about your codebase in plain English.
+- **Supports 500+ Languages:** Works with a wide range of programming languages.
+- **Bug Solving:** Describe bugs and find solutions quickly.
+- **Legacy Code Handling:** Easily navigate and understand legacy code.
+- **[COMING SOON] Multi-Repository Search:** Search across multiple repositories simultaneously.
 
-Once inside VS Code, you can run the extension by doing the following:
+## Installation
+1. Open VS Code.
+2. Navigate to Extensions (Ctrl+Shift+X).
+3. Search for "Onboard AI".
+4. Click "Install".
 
-1. Press `F5` to open a new Extension Development Host window
-2. Type `Cmd+L` or `Onboard AI: Chat` in the Command Palette to start a new session
+## Usage
+- Press CMD+L
+- Type your query in natural language and press "Enter"
 
-To sign out, do so via the VS Code `Accounts` icon in the Activity Bar (bottom left).
+## Support
+For more information and support, visit [Onboard AI](https://www.getonboardai.com/).
 
-Known issues:
-- If you hit 'Back' before a new repo is done processing, an unexpected error may occur. In this case, just enter the GitHub URL again to reprocess your repo.
-- Generated markdown doesn't always wrap correctly. 
-- After logging in, you may not be automatically redirected. In this case, just reopen/reload the chat window with `Cmd+L`.
-- Sometimes when reauthenticating with the `Onboard AI: Login` command, a timeout error pops up. You can (usually) ignore this.
-- Do not log out, you won't be able to log back in lol. Edit: Actually you can, but you'll have to do it via `Accounts`, similar to sign out.
-- Also, if you log out, you will not be prompted to log back in and will receive errors when trying to execute basic commands.
-- If you already have a command mapped to `Cmd+L`, the keybinding may not function properly.
+## Feedback
+We value your feedback. Please submit any issues or suggestions via our [Discord](https://discord.com/invite/xZhUcFKzu7) or via [email](founders@getonboardai.com).
+
+---
+*Onboard AI - Chat with your codebase, generate complex code changes, and onboard faster.*

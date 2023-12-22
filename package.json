@@ -1,9 +1,9 @@
 {
   "name": "onboard-vscode",
   "displayName": "Onboard AI",
-  "description": "Onboard AI",
-  "publisher": "Onboard AI",
-  "version": "0.0.3",
+  "description": "Search and understand any repo in English.",
+  "publisher": "OnboardAI",
+  "version": "0.0.4",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -73,5 +73,9 @@
     "mixpanel-browser": "^2.48.1",
     "posthog-js": "^1.96.1",
     "react": "^18.2.0"
-  }
+  },
+  "activationEvents": [
+    "onCommand:onboard.chat",
+    "onCommand:onboard.login"
+  ]
 }
