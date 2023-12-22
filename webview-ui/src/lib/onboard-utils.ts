@@ -225,7 +225,6 @@ export function cleanMessage(message: Message): Message {
   const contentChunks: string[] = [];
   const sources: Source[] = [];
   let agentStatus = "";
-
   const segments = message.content.split("\n");
   for (const segment of segments) {
 

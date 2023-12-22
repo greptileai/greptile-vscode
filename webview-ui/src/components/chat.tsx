@@ -200,10 +200,14 @@ export const Chat = React.memo(
                 messages: messages,
             }
         });
+        try {
+            const newDisplayMessages = messages.map((message) => cleanMessage(message));
+            setDisplayMessages(newDisplayMessages);
 
-        const newDisplayMessages = messages.map((message) => cleanMessage(message));
-        setDisplayMessages(newDisplayMessages);
-
+        } catch (e) {
+            console.log(e);
+        }
+        
         if (messages.length === 0) return;
         if(!session?.user && messages.length > 10) {
             console.log('Max messages reached')
