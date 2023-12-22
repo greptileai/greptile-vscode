@@ -73,9 +73,5 @@
     "mixpanel-browser": "^2.48.1",
     "posthog-js": "^1.96.1",
     "react": "^18.2.0"
-  },
-  "activationEvents": [
-    "onCommand:onboard.chat",
-    "onCommand:onboard.login"
-  ]
+  }
 }

@@ -46,8 +46,10 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
     }
   }, [session?.state?.repoUrl, navigate, setSession]);
 
-  const handleClone = async () => {
+  const [isCloning, setIsCloning] = React.useState(false);
 
+  const handleClone = async () => {
+    setIsCloning(true);
     posthog.capture("Repository cloned", { source: "onboard-vscode", repo: session?.state?.repo || "" });
     mixpanel.track("Repository cloned", { source: "onboard-vscode", repo: session?.state?.repo || "" });
     console.log("Checking membership");
@@ -211,7 +213,7 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
                   onClick={handleClone}
                   className="submit"
                 >
-                  Submit
+                  {isCloning ? 'Loading...' : 'Submit'}
                 </VSCodeButton>
               </div>
             {/* or

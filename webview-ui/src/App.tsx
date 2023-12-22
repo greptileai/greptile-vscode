@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { createMemoryRouter, RouterProvider } from "react-router-dom";
-
 import { NewChat } from "./components/chat-new-chat";
 import ChatPage from "./pages/chat-page";
 import { vscode } from "./lib/vscode-utils";
@@ -81,11 +80,9 @@ function App() {
   }, []);
 
   return (
-    <>
       <SessionContext.Provider value={{session, setSession}}>
         <RouterProvider router={router}/>
       </SessionContext.Provider>
-    </>
   );
 }
 
