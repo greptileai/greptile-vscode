@@ -42,8 +42,6 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
             repo: parsedRepo
           }
         });
-        // Automatically navigate to the chat page for the parsed repo
-        navigate(`/chat/${parsedRepo}`);
       }
     }
   }, [session?.state?.repoUrl, navigate, setSession]);
@@ -160,7 +158,9 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
       handleClone();
     }
   };
-
+  if (session?.state?.chat?.session_id) {
+    navigate(`/chat/${session?.state?.repo || ""}`);
+  }
   return (
     <div>
       {session ? (
@@ -191,7 +191,7 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
               <div className="flex-row">
                 <VSCodeTextField
                   placeholder=""
-                  value={session?.state?.repoUrl || ""}
+                  value="" //{session?.state?.repoUrl || ""}
                   onKeyDown={handleKeyDown}
                   onChange={(e) => {
                     setSession({

@@ -22,7 +22,6 @@ export interface ChatPanelProps
   isStreaming: boolean;
 }
 
-
 export function ChatPanel({
   id,
   isLoading,

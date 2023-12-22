@@ -26,7 +26,7 @@ export default function ChatPage({}: ChatPageProps) {
 
   // console.log(useParams());
 
-  const session_id = undefined;
+  const session_id = session?.state?.chat?.session_id;
   const user_id = undefined;
 
   const repo = [owner, repoName].join("/");
@@ -153,6 +153,17 @@ export default function ChatPage({}: ChatPageProps) {
 
   // console.log("repo states", repoStates);
 
+  const backHandler = () => {
+    setSession({
+      ...session,
+      state: {
+        ...session?.state,
+        chat: null
+      }
+    });
+    navigate(`/`);
+  }
+
   return (
     <>
     <ChatStateProvider initialState={{repoStates: repoStates, mainRepoInfo: session?.state?.repoInfo || null, disabled:{value:false, reason:''}}}>
@@ -160,7 +171,7 @@ export default function ChatPage({}: ChatPageProps) {
         <VSCodeButton
             aria-label="Back"
             appearance="icon"
-            onClick={() => navigate(-1)}
+            onClick={() => backHandler()}
         >
             ←
         </VSCodeButton>
