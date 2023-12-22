@@ -24,10 +24,6 @@ export async function activate(context: ExtensionContext) {
 
   context.subscriptions.push(disposable);
 
-  const openChat = commands.registerCommand("onboard.chat", () => {
-    ChatPanel.render(context.extensionUri);
-  });
-
   const githubAuth = vscode.commands.registerCommand('onboard.login', async () => {
     const octokit = await credentials.getOctokit();
     const userInfo = await octokit.users.getAuthenticated();
