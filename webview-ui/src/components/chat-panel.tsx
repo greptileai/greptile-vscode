@@ -22,6 +22,7 @@ export interface ChatPanelProps
   isStreaming: boolean;
 }
 
+
 export function ChatPanel({
   id,
   isLoading,
@@ -34,6 +35,8 @@ export function ChatPanel({
   isStreaming,
 }: ChatPanelProps) {
   const posthog = usePostHog();
+
+  
 
   return (
     <div>

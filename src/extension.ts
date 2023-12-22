@@ -11,6 +11,18 @@ export async function activate(context: ExtensionContext) {
   const credentials = new Credentials();
   await credentials.initialize(context);
   
+  let disposable = vscode.commands.registerCommand('onboard.chat', () => {
+    // Toggle the chat panel
+    if (ChatPanel.currentPanel) {
+      // If the panel is open, close it
+      ChatPanel.currentPanel.dispose();
+    } else {
+      // If the panel is not open, create and show it
+      ChatPanel.render(context.extensionUri);
+    }
+  });
+
+  context.subscriptions.push(disposable);
 
   const openChat = commands.registerCommand("onboard.chat", () => {
     ChatPanel.render(context.extensionUri);
@@ -26,6 +38,6 @@ export async function activate(context: ExtensionContext) {
   });
 
   // Add command to the extension context
-  context.subscriptions.push(openChat);
+  context.subscriptions.push(disposable);
   context.subscriptions.push(githubAuth);
 }
