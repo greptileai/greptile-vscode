@@ -2,6 +2,7 @@
   "name": "onboard-vscode",
   "displayName": "Onboard AI",
   "description": "Onboard AI",
+  "publisher": "Onboard AI",
   "version": "0.0.3",
   "license": "MIT",
   "repository": {
