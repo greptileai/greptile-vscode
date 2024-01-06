@@ -19,6 +19,27 @@
   },
   "main": "./out/extension.js",
   "contributes": {
+    "views": {
+      "onboardView": [
+        {
+          "id": "repository",
+          "name": "Repository"
+        },
+        {
+          "id": "chat",
+          "name": "Chat"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "icon": "images/logo.svg",
+          "id": "onboardView",
+          "title": "Onboard"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "onboard.chat",
