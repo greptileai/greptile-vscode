@@ -193,21 +193,25 @@ export const Chat = React.memo(
 
     useEffect(() => {
         console.log("messages", messages);
-        setSession({
+
+        if (JSON.stringify(session?.state?.messages) !== JSON.stringify(messages)) {
+          setSession({
             ...session,
             state: {
-                ...session?.state,
-                messages: messages,
+              ...session?.state,
+              messages: messages,
             }
-        });
+          });
+        }
+
         try {
-            const newDisplayMessages = messages.map((message) => cleanMessage(message));
+            const newDisplayMessages = messages.filter(Boolean).map((message) => cleanMessage(message));
             setDisplayMessages(newDisplayMessages);
 
         } catch (e) {
             console.log(e);
         }
-        
+
         if (messages.length === 0) return;
         if(!session?.user && messages.length > 10) {
             console.log('Max messages reached')
