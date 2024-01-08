@@ -143,32 +143,27 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
           console.log("Cloned repo and moving to:", session?.state?.repo || "");
           navigate(`/chat/${session?.state?.repo || ""}`);
         } else {
-          if (res.status === 402) {
+          if (res.status === 401) {
+            const message = await res.json().then((data) => data.response);
             vscode.postMessage({
-              command: "upgrade",
-              text: "Upgrade to Onboard Pro to process private repos! 🔐"
+              command: "error",
+              text: `Permission error. ${message}`
             });
-            setIsCloning(false);
-          } else if (res.status === 426) {
-            vscode.postMessage({
-              command: "upgrade",
-              text: "Upgrade to Onboard Pro to process large repos! 🐘"
-            });
-            setIsCloning(false);
+            console.log("Permission error", message);
           } else if (res.status === 404) {
             vscode.postMessage({
               command: "error",
               text: "This repository was not found, or you do not have access to it. If this is your repo, please try logging in again. Reach out to us on Discord for support."
             });
-            setIsCloning(false);
+            console.log("Repo not found");
           } else {
             vscode.postMessage({
               command: "error",
-              text: "Unknown Error"
+              text: `Unknown Error ${res.status} ${res.statusText}`
             });
-            console.log("Unknown Error");
-            setIsCloning(false);
+            console.log("Unknown Error", res.status, res.statusText);
           }
+          setIsCloning(false);
         }
       });
     } else {
