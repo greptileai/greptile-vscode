@@ -33,6 +33,7 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
     if (repoUrl) {
       // Parse the repo URL to get the repo identifier
       const parsedRepo = parseIdentifier(repoUrl);
+      console.log("parsed", parsedRepo)
       if (parsedRepo) {
         // If the repo is parsed successfully, update the session state
         setSession({
@@ -53,6 +54,15 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
     posthog.capture("Repository cloned", { source: "onboard-vscode", repo: session?.state?.repo || "" });
     mixpanel.track("Repository cloned", { source: "onboard-vscode", repo: session?.state?.repo || "" });
     console.log("Checking membership");
+
+    // clear repoInfo to avoid mixups
+    setSession({
+      ...session,
+      state: {
+        ...session?.state,
+        repoInfo: undefined
+      }
+    } as Session);
 
     // checking membership
     const checkMembership = async () => {
@@ -193,16 +203,16 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
               <div className="flex-row">
                 <VSCodeTextField
                   placeholder=""
-                  value="" //{session?.state?.repoUrl || ""}
+                  value={session?.state?.repoUrl || ""}
                   onKeyDown={handleKeyDown}
-                  onChange={(e) => {
+                  onInput={(event) => {
                     setSession({
                       ...session,
                       state: {
                         ...session?.state,
-                        repoUrl: e.target.value
+                        repoUrl: event.currentTarget.value
                       }
-                    } as Session)
+                    });
                   }}
                 >
                   Github URL

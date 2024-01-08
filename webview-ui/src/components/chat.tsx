@@ -26,8 +26,7 @@ export interface ChatProps extends React.ComponentProps<"div"> {
     // chatParentId?: string;
 }
 
-export const Chat = React.memo(
-    function ChatComponent({
+export const Chat = function ChatComponent({
     session_id,
     repoInfo,
     initialMessages,
@@ -316,4 +315,4 @@ export const Chat = React.memo(
     return (
         getComponent(chatLoadingState.loadingRepoStates[repoInfo.repository])
     )
-});
+};
