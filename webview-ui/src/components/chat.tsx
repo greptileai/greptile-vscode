@@ -32,7 +32,7 @@ export const Chat = function ChatComponent({
     initialMessages,
     className,
   }: ChatProps)  {
-    console.log("Starting Chat", session_id, repoInfo, initialMessages, className);
+    // console.log("Starting Chat", session_id, repoInfo, initialMessages, className);
     const { session, setSession } = useContext(SessionContext);
 
     const [displayMessages, setDisplayMessages] = React.useState<Message[]>([]);

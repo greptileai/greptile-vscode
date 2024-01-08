@@ -18,7 +18,7 @@ interface NewChatProps {
 
 export const NewChat = ({ setDialogOpen }: NewChatProps) => {
 
-  console.log("Starting NewChat")
+  // console.log("Starting NewChat")
 
   const { session, setSession } = useContext(SessionContext);
   const posthog = usePostHog();
@@ -33,14 +33,24 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
     if (repoUrl) {
       // Parse the repo URL to get the repo identifier
       const parsedRepo = parseIdentifier(repoUrl);
-      console.log("parsed", parsedRepo)
       if (parsedRepo) {
         // If the repo is parsed successfully, update the session state
         setSession({
           ...session,
           state: {
             ...session?.state,
-            repo: parsedRepo
+            repo: parsedRepo,
+            error: undefined
+          }
+        });
+      } else {
+        // If the repo is not parsed successfully, clear the session state
+        setSession({
+          ...session,
+          state: {
+            ...session?.state,
+            repo: undefined,
+            error: "Invalid repository identifier"
           }
         });
       }
@@ -117,6 +127,7 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
             command: "error",
             text: "This repository was not found, or you do not have access to it. If this is your repo, please try logging in again. Reach out to us on Discord for support."
           });
+          setIsCloning(false);
           // todo: get refresh token
         } else {
           return res;
@@ -137,22 +148,26 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
               command: "upgrade",
               text: "Upgrade to Onboard Pro to process private repos! 🔐"
             });
+            setIsCloning(false);
           } else if (res.status === 426) {
             vscode.postMessage({
               command: "upgrade",
               text: "Upgrade to Onboard Pro to process large repos! 🐘"
             });
+            setIsCloning(false);
           } else if (res.status === 404) {
             vscode.postMessage({
               command: "error",
               text: "This repository was not found, or you do not have access to it. If this is your repo, please try logging in again. Reach out to us on Discord for support."
             });
+            setIsCloning(false);
           } else {
             vscode.postMessage({
               command: "error",
               text: "Unknown Error"
             });
             console.log("Unknown Error");
+            setIsCloning(false);
           }
         }
       });
@@ -162,11 +177,12 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
         command: "error",
         text: "Please enter a valid GitHub repository URL, like https://github.com/onboardai/onboard."
       });
+      setIsCloning(false);
     }
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter") {
+    if (event.key === "Enter" && !session?.state?.error) {
       handleClone();
     }
   };
@@ -222,6 +238,7 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
                   aria-label="Submit repo"
                   onClick={handleClone}
                   className="submit"
+                  disabled={!!session?.state?.error}
                 >
                   {isCloning ? 'Loading...' : 'Submit'}
                 </VSCodeButton>

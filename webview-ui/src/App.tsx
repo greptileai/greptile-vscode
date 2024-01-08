@@ -22,7 +22,7 @@ const router = createMemoryRouter([ // cons to this?
 
 function App() {
 
-  console.log("Starting App")
+  // console.log("Starting App")
 
   const [session, setSession] = useState<Session | undefined>(undefined);
   const posthog = usePostHog();
