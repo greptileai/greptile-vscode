@@ -13,8 +13,9 @@ export default defineConfig({
         entryFileNames: `assets/[name].js`,
         chunkFileNames: `assets/[name].js`,
         assetFileNames: `assets/[name].[ext]`,
-      },
+      }
     },
+    chunkSizeWarningLimit: 1600
   },
   // server: {
   //   proxy: {
