@@ -27,6 +27,7 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
 
   const navigate = useNavigate();
 
+  // todo: fix (sometimes when a new repo fails, a previously chosen repo will be rendered)
   useEffect(() => {
     // This effect runs when the component mounts and whenever session.state.repoUrl changes
     const repoUrl = session?.state?.repoUrl;
@@ -43,6 +44,8 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
             error: undefined
           }
         });
+        // Automatically navigate to the chat page for the parsed repo
+        navigate(`/chat/${parsedRepo}`);
       } else {
         // If the repo is not parsed successfully, clear the session state
         setSession({
@@ -143,7 +146,7 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
           console.log("Cloned repo and moving to:", session?.state?.repo || "");
           navigate(`/chat/${session?.state?.repo || ""}`);
         } else {
-          if (res.status === 401) {
+          if (res.status === 401) { 
             const message = await res.json().then((data) => data.response);
             vscode.postMessage({
               command: "error",
@@ -181,9 +184,11 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
       handleClone();
     }
   };
-  if (session?.state?.chat?.session_id) {
-    navigate(`/chat/${session?.state?.repo || ""}`);
-  }
+  
+  // if (session?.state?.chat?.session_id) {
+  //   navigate(`/chat/${session?.state?.repo || ""}`);
+  // }
+  
   return (
     <div>
       {session ? (
