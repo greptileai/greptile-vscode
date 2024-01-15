@@ -22,11 +22,13 @@
     "views": {
       "onboardView": [
         {
-          "id": "repository",
+          "type": "webview",
+          "id": "repositoryView",
           "name": "Repository"
         },
         {
-          "id": "chat",
+          "type": "webview",
+          "id": "chatView",
           "name": "Chat"
         }
       ]

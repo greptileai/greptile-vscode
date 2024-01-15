@@ -1,6 +1,8 @@
 import * as vscode from 'vscode';
 import { commands, ExtensionContext } from "vscode";
 import { ChatPanel } from "./panels/ChatPanel";
+import { RepositoryViewProvider } from './views/repositoryViewProvider';
+import { ChatViewProvider } from './views/chatViewProvider';
 import { SessionManager } from './sessionManager';
 import { Credentials } from './credentials';
 
@@ -30,6 +32,16 @@ export async function activate(context: ExtensionContext) {
     // reload the window to update
     vscode.commands.executeCommand('workbench.action.reloadWindow');
   });
+
+  const repositoryViewProvider = new RepositoryViewProvider(context.extensionUri);
+  context.subscriptions.push(
+    vscode.window.registerWebviewViewProvider(RepositoryViewProvider.viewType, repositoryViewProvider)
+  );
+
+  const chatViewProvider = new ChatViewProvider(context.extensionUri);
+  context.subscriptions.push(
+    vscode.window.registerWebviewViewProvider(ChatViewProvider.viewType, chatViewProvider)
+  );
 
   // Add command to the extension context
   context.subscriptions.push(openChat);
