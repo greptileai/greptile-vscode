@@ -63,7 +63,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
             <title>Onboard AI Chat</title>
           </head>
           <body>
-            <div id="root"></div>
+            <div id="root" viewType="${ChatViewProvider.viewType}"></div>
             <script type="module" nonce="${nonce}" src="${scriptUri}"></script>
           </body>
         </html>
@@ -111,6 +111,11 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
                 const session = message.session;
                 SessionManager.setSession(session);
                 return;
+
+              case "reload":
+                vscode.commands.executeCommand("workbench.action.webview.reloadWebviewAction");
+                return;
+
             }
           });
       }

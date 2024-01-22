@@ -22,14 +22,14 @@ export default function ChatPage({}: ChatPageProps) {
 
   const { session, setSession } = useContext(SessionContext);
 
-  let { owner, repoName } = useParams();
-
-  // console.log(useParams());
-
+  // let { owner, repoName } = useParams();
   const session_id = session?.state?.chat?.session_id;
   const user_id = undefined;
 
-  const repo = [owner, repoName].join("/");
+  // const repo = [owner, repoName].join("/");
+  const repo = session?.state?.repo;
+  console.log("repo: ", repo);
+  if (!repo) return <div>No repo chosen</div>;
 
   const [repoInfo, setRepoInfo] = useState<RepositoryInfo | null>(null);
   const navigate = useNavigate();
@@ -138,7 +138,6 @@ export default function ChatPage({}: ChatPageProps) {
     fetchInfo();
   }, []);
 
-
   if (!session?.state?.repoInfo || !session?.state?.chat) {
     return <VSCodeProgressRing />
   }
@@ -153,28 +152,28 @@ export default function ChatPage({}: ChatPageProps) {
 
   // console.log("repo states", repoStates);
 
-  const backHandler = () => {
-    setSession({
-      ...session,
-      state: {
-        ...session?.state,
-        chat: null
-      }
-    });
-    navigate(`/`);
-  }
+  // const backHandler = () => {
+  //   setSession({
+  //     ...session,
+  //     state: {
+  //       ...session?.state,
+  //       chat: null
+  //     }
+  //   });
+  //   navigate(`/`);
+  // }
 
   return (
     <>
     <ChatStateProvider initialState={{repoStates: repoStates, mainRepoInfo: session?.state?.repoInfo || null, disabled:{value:false, reason:''}}}>
       <ChatLoadingStateProvider initialState={{loadingRepoStates: repoStates}}>
-        <VSCodeButton
+        {/* <VSCodeButton
             aria-label="Back"
             appearance="icon"
             onClick={() => backHandler()}
         >
             ←
-        </VSCodeButton>
+        </VSCodeButton> */}
         <ChatComponent
           repoInfo={session?.state?.repoInfo || null}
           // initialRepoStates={repoStates}

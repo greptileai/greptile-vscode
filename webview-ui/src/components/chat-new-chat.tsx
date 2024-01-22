@@ -27,7 +27,6 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
 
   const navigate = useNavigate();
 
-  // todo: fix (sometimes when a new repo fails, a previously chosen repo will be rendered)
   useEffect(() => {
     // This effect runs when the component mounts and whenever session.state.repoUrl changes
     const repoUrl = session?.state?.repoUrl;
@@ -44,8 +43,15 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
             error: undefined
           }
         });
+
         // Automatically navigate to the chat page for the parsed repo
-        navigate(`/chat/${parsedRepo}`);
+        // navigate(`/chat/${parsedRepo}`);
+
+        // todo: make sure chat view is updated
+        vscode.postMessage({
+          command: "reload",
+          text: ""
+        });
       } else {
         // If the repo is not parsed successfully, clear the session state
         setSession({
@@ -144,7 +150,14 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
       submitJob().then(async (res) => {
         if (res.ok) {
           console.log("Cloned repo and moving to:", session?.state?.repo || "");
-          navigate(`/chat/${session?.state?.repo || ""}`);
+          // navigate(`/chat/${session?.state?.repo || ""}`);
+
+          // todo: make sure chat view is updated
+          vscode.postMessage({
+            command: "reload",
+            text: ""
+          });
+
         } else {
           if (res.status === 401) { 
             const message = await res.json().then((data) => data.response);
@@ -202,10 +215,28 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
                   onClick={() => {
                     posthog.capture("Sample repo clicked", { source: "onboard-vscode", repo: repo.repo });
                     mixpanel.track("Sample repo clicked", { source: "onboard-vscode", repo: repo.repo });
-                    navigate(`/chat/${repo.repo}`);
                     if (setDialogOpen) {
                       setDialogOpen(false);
                     }
+                    // navigate(`/chat/${repo.repo}`);
+
+                    // update session info
+                    console.log('repo.repo: ', repo.repo);
+                    setSession({
+                      ...session,
+                      state: {
+                        ...session?.state,
+                        repo: repo.repo,
+                        chat: undefined, // 
+                        repoInfo: undefined //
+                      }
+                    });
+
+                    /// reload chat view
+                    vscode.postMessage({
+                      command: "reload",
+                      text: ""
+                    });
                   }}
                   >
                       {repo.displayName}

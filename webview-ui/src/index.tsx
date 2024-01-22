@@ -15,7 +15,7 @@ const root = createRoot(container!);
 root.render(
   <React.StrictMode>
     <PostHogProvider apiKey={"phc_qh8L3NKZ4JP6pOLRnuF3UkkUVjmktWW1mR8WfiIvWyi"} options={options}>
-      <App />
+      <App viewType={container.getAttribute('viewType')}/>
     </PostHogProvider>
   </React.StrictMode>
 );

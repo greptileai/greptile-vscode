@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { createMemoryRouter, RouterProvider } from "react-router-dom";
+import { createMemoryRouter, RouterProvider, Navigate } from "react-router-dom";
 import { NewChat } from "./components/chat-new-chat";
 import ChatPage from "./pages/chat-page";
 import { vscode } from "./lib/vscode-utils";
@@ -9,20 +9,30 @@ import type { Session } from "./types/session";
 import "./App.css";
 import { usePostHog } from "posthog-js/react";
 
-const router = createMemoryRouter([ // cons to this?
-  {
-    path: "/",
-    element: <NewChat />,
-  },
-  {
-    path: "/chat/:owner/:repoName",
-    element: <ChatPage />
-  }
-]);
+export interface AppProps {
+  viewType: string
+}
 
-function App() {
+function App({ viewType }: AppProps) {
 
   // console.log("Starting App")
+
+  if (!viewType) return;
+
+  const router = createMemoryRouter([
+    {
+      path: "repositoryView",
+      element: <NewChat />
+    },
+    {
+      path: "chatView",
+      element: <ChatPage />
+    },
+    {
+      path: "*",
+      element: <Navigate replace to={`/${viewType}`} />
+    }
+  ]);
 
   const [session, setSession] = useState<Session | undefined>(undefined);
   const posthog = usePostHog();

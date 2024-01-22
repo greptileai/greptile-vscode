@@ -14,14 +14,17 @@ export async function activate(context: ExtensionContext) {
   await credentials.initialize(context);
   
   let openChat = vscode.commands.registerCommand('onboard.chat', () => {
-    // Toggle the chat panel
-    if (ChatPanel.currentPanel) {
-      // If the panel is open, close it
-      ChatPanel.currentPanel.dispose();
-    } else {
-      // If the panel is not open, create and show it
-      ChatPanel.render(context.extensionUri);
-    }
+    // // Toggle the chat panel
+    // if (ChatPanel.currentPanel) {
+    //   // If the panel is open, close it
+    //   ChatPanel.currentPanel.dispose();
+    // } else {
+    //   // If the panel is not open, create and show it
+    //   ChatPanel.render(context.extensionUri);
+    // }
+
+    vscode.commands.executeCommand('repositoryView.focus');
+    vscode.commands.executeCommand('chatView.focus');
   });
 
   const githubAuth = vscode.commands.registerCommand('onboard.login', async () => {
