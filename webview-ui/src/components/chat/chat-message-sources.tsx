@@ -3,11 +3,11 @@ import { CaretSortIcon } from "@radix-ui/react-icons";
 import { ExternalLink } from "lucide-react";
 import { decode } from "js-base64";
 
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../components/ui/collapsible";
-import { MemoizedReactMarkdown } from "../components/markdown";
-import { Source, RepositoryInfo } from "../types/chat";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
+import { MemoizedReactMarkdown } from "./markdown";
+import { Source, RepositoryInfo } from "../../types/chat";
 
-import "../App.css"
+import "../../App.css"
 
 interface IChatMessageSources {
   sources: Source[] | undefined;

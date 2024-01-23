@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { createMemoryRouter, RouterProvider, Navigate } from "react-router-dom";
-import { NewChat } from "./components/chat-new-chat";
+import { NewChat } from "./components/repo/chat-new-chat";
 import ChatPage from "./pages/chat-page";
 import { vscode } from "./lib/vscode-utils";
 import { SessionContext } from "./providers/session-provider";

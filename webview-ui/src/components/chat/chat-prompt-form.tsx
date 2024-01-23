@@ -2,7 +2,7 @@ import { UseChatHelpers } from "ai/react";
 import { useRef, ReactElement, useEffect} from "react";
 import { VSCodeButton, VSCodeTextArea } from "@vscode/webview-ui-toolkit/react";
 
-import { useEnterSubmit } from "../lib/hooks/use-enter-submit";
+import { useEnterSubmit } from "../../lib/hooks/use-enter-submit";
 
 export interface PromptProps
   extends Pick<UseChatHelpers, "input" | "setInput"> {

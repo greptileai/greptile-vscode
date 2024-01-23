@@ -8,14 +8,14 @@ import {
   DialogContent,
   DialogHeader,
   DialogTrigger,
-} from "./ui/dialog";
+} from "../ui/dialog";
 import { MemoizedReactMarkdown } from "./markdown";
-import { CodeBlock } from "./ui/codeblock";
+import { CodeBlock } from "../ui/codeblock";
 
-import { ChatMessageSources } from "../components/chat-message-sources";
-import { Message, RepositoryInfo } from "../types/chat";
+import { ChatMessageSources } from "./chat-message-sources";
+import { Message, RepositoryInfo } from "../../types/chat";
 
-import "../App.css";
+import "../../App.css";
 
 export interface ChatMessageProps {
   userId: string;

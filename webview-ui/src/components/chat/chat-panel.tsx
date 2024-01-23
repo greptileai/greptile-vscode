@@ -5,7 +5,7 @@ import React, { useEffect, useRef } from 'react';
 
 import { PromptForm } from "./chat-prompt-form";
 
-import "../App.css";
+import "../../App.css";
 import mixpanel from "mixpanel-browser";
 import { usePostHog } from "posthog-js/react";
 

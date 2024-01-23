@@ -4,7 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { VSCodeProgressRing, VSCodeButton } from "@vscode/webview-ui-toolkit/react";
 
-import { Chat as ChatComponent } from "../components/chat";
+import { Chat as ChatComponent } from "../components/chat/chat";
 import { type Chat, RepositoryInfo, Message } from "../types/chat";
 import type { Session } from '../types/session';
 import { getChat, getNewChat, getRepo } from "../lib/actions";

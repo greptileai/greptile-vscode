@@ -10,13 +10,13 @@ import {
     getLatestCommit,
     cleanMessage,
     checkRepoAuthorization
-} from "../lib/onboard-utils";
-import { vscode } from "../lib/vscode-utils";
-import { Message, RepositoryInfo } from '../types/chat';
-import type { Session, Membership } from '../types/session.d.ts';
-import { useChatLoadingState } from '../providers/chat-state-loading-provider';
-import { useChatRepoState, useChatState, useUpdateChatRepoState } from '../providers/chat-state-provider';
-import { SessionContext } from '../providers/session-provider';
+} from "../../lib/onboard-utils";
+import { vscode } from "../../lib/vscode-utils";
+import { Message, RepositoryInfo } from '../../types/chat';
+import type { Session, Membership } from '../../types/session';
+import { useChatLoadingState } from '../../providers/chat-state-loading-provider';
+import { useChatRepoState, useChatState, useUpdateChatRepoState } from '../../providers/chat-state-provider';
+import { SessionContext } from '../../providers/session-provider';
 
 export interface ChatProps extends React.ComponentProps<"div"> {
     session_id?: string | undefined;

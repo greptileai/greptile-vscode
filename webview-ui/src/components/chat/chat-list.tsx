@@ -2,8 +2,8 @@ import { VSCodeDivider } from "@vscode/webview-ui-toolkit/react";
 
 import { ChatMessage } from "./chat-message";
 import { ChatLoadingSkeleton } from "./chat-loading-skeleton";
-import { useChatState } from "../providers/chat-state-provider";
-import { Message, RepositoryInfo } from "../types/chat";
+import { useChatState } from "../../providers/chat-state-provider";
+import { Message, RepositoryInfo } from "../../types/chat";
 
 export interface ChatListProps {
   messages: Message[];

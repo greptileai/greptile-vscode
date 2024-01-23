@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 
-import { RepositoryInfo } from "../types/chat";
+import { RepositoryInfo } from "../../types/chat";
 
 interface IChatProcessingProps {
   repoInfo: RepositoryInfo;

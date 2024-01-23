@@ -2,13 +2,13 @@ import React, { useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { VSCodeDropdown, VSCodeOption, VSCodeTextField, VSCodeButton } from "@vscode/webview-ui-toolkit/react";
 
-import { SAMPLE_REPOS } from "../data/constants";
-import { vscode } from "../lib/vscode-utils";
-import { parseIdentifier } from "../lib/onboard-utils";
-import type { Session, Membership } from "../types/session";
-import { SessionContext } from "../providers/session-provider";
+import { SAMPLE_REPOS } from "../../data/constants";
+import { vscode } from "../../lib/vscode-utils";
+import { parseIdentifier } from "../../lib/onboard-utils";
+import type { Session, Membership } from "../../types/session";
+import { SessionContext } from "../../providers/session-provider";
 
-import "../App.css";
+import "../../App.css";
 import mixpanel from "mixpanel-browser";
 import { usePostHog } from "posthog-js/react";
 
