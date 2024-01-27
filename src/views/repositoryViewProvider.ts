@@ -24,6 +24,7 @@ export class RepositoryViewProvider implements vscode.WebviewViewProvider {
             localResourceRoots: [
                 vscode.Uri.joinPath(this.eUri, "out"),
                 vscode.Uri.joinPath(this.eUri, "webview-ui/build"),
+                vscode.Uri.joinPath(this.eUri, "node_modules/@vscode/codicons")
             ],
         };
 
@@ -37,8 +38,8 @@ export class RepositoryViewProvider implements vscode.WebviewViewProvider {
         const stylesUri = getUri(webview, this.eUri, ["webview-ui", "build", "assets", "index.css"]);
         // The JS file from the React build output
         const scriptUri = getUri(webview, this.eUri, ["webview-ui", "build", "assets", "index.js"]);
-    
-        // const codiconsUri = getUri(webview, extensionUri, ['node_modules', '@vscode/codicons', 'dist', 'codicon.css']);
+        // VS Code codicons
+        const codiconsUri = getUri(webview, this.eUri, ['node_modules', '@vscode/codicons', 'dist', 'codicon.css']);
     
         const nonce = getNonce();
     
@@ -52,8 +53,10 @@ export class RepositoryViewProvider implements vscode.WebviewViewProvider {
                   content="default-src 'none';
                            connect-src 'self' http://localhost:3001 https://mcxeqf7hzekaahjdqpojzf4hya0aflwj.lambda-url.us-east-1.on.aws/ https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/ https://api.github.com/ https://us.posthog.com/ https://app.posthog.com/ https://api-js.mixpanel.com/;
                            style-src ${webview.cspSource} 'unsafe-inline';
+                           font-src ${webview.cspSource};
                            script-src 'nonce-${nonce}' https://us.posthog.com/ https://app.posthog.com/;">
             <link rel="stylesheet" type="text/css" href="${stylesUri}">
+            <link rel="stylesheet" href="${codiconsUri}">
             <title>Onboard AI Chat</title>
           </head>
           <body>

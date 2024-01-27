@@ -24,6 +24,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
             localResourceRoots: [
                 vscode.Uri.joinPath(this.eUri, "out"),
                 vscode.Uri.joinPath(this.eUri, "webview-ui/build"),
+                vscode.Uri.joinPath(this.eUri, "node_modules/@vscode/codicons")
             ],
         };
 
@@ -37,9 +38,9 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
         const stylesUri = getUri(webview, this.eUri, ["webview-ui", "build", "assets", "index.css"]);
         // The JS file from the React build output
         const scriptUri = getUri(webview, this.eUri, ["webview-ui", "build", "assets", "index.js"]);
-    
-        // const codiconsUri = getUri(webview, extensionUri, ['node_modules', '@vscode/codicons', 'dist', 'codicon.css']);
-    
+        // VS Code codicons
+        const codiconsUri = getUri(webview, this.eUri, ['node_modules', '@vscode/codicons', 'dist', 'codicon.css']);
+
         const nonce = getNonce();
     
         return /*html*/ `
@@ -58,8 +59,10 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
                                               https://app.posthog.com/
                                               https://api-js.mixpanel.com/;
                            style-src ${webview.cspSource} 'unsafe-inline';
+                           font-src ${webview.cspSource};
                            script-src 'nonce-${nonce}' https://us.posthog.com/ https://app.posthog.com/;">
             <link rel="stylesheet" type="text/css" href="${stylesUri}">
+            <link rel="stylesheet" href="${codiconsUri}">
             <title>Onboard AI Chat</title>
           </head>
           <body>

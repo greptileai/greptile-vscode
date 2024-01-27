@@ -185,3 +185,7 @@ a:active {
   align-items: center;
   height: 100%; /* or set a specific height */
 }
+
+.icon {
+  font-size: var(--vscode-font-size);
+}

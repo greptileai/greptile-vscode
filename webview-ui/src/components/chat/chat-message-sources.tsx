@@ -58,7 +58,7 @@ export const ChatMessageSources = ({
                   repoStates[repo]?.external === true ? "" : "/"
                 }${source?.metadata?.filepath}`}{" "}
                 {source.lines ? `[${source.lines[0]}:${source.lines[1]}]` : ""}
-                <ExternalLink />
+                <div className="icon codicon codicon-link-external"></div>
               </a>
               <MemoizedReactMarkdown>
                 {source.text}
