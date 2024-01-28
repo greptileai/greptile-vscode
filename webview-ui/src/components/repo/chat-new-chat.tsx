@@ -18,72 +18,43 @@ interface NewChatProps {
 
 export const NewChat = ({ setDialogOpen }: NewChatProps) => {
 
-  // console.log("Starting NewChat")
-
   const { session, setSession } = useContext(SessionContext);
   const posthog = usePostHog();
 
-  // console.log("session", session);
-
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // This effect runs when the component mounts and whenever session.state.repoUrl changes
+  const [isCloning, setIsCloning] = React.useState(false);
+
+  const handleClone = async () => {
+    setIsCloning(true);
+
     const repoUrl = session?.state?.repoUrl;
+    let parsedRepo = '';
     if (repoUrl) {
       // Parse the repo URL to get the repo identifier
-      const parsedRepo = parseIdentifier(repoUrl);
+      parsedRepo = parseIdentifier(repoUrl);
       if (parsedRepo) {
         // If the repo is parsed successfully, update the session state
         setSession({
           ...session,
           state: {
             ...session?.state,
+            chat: undefined,
+            messages: [],
             repo: parsedRepo,
-            error: undefined
+            repoInfo: undefined
           }
-        });
-
-        // Automatically navigate to the chat page for the parsed repo
-        // navigate(`/chat/${parsedRepo}`);
-
-        // todo: make sure chat view is updated
-        vscode.postMessage({
-          command: "reload",
-          text: ""
-        });
+        } as Session);
       } else {
-        // If the repo is not parsed successfully, clear the session state
-        setSession({
-          ...session,
-          state: {
-            ...session?.state,
-            repo: undefined,
-            error: "Invalid repository identifier"
-          }
-        });
+        console.log("Error: Invalid repository identifier");
+        return;
       }
     }
-  }, [session?.state?.repoUrl, navigate, setSession]);
 
-  const [isCloning, setIsCloning] = React.useState(false);
-
-  const handleClone = async () => {
-    setIsCloning(true);
     posthog.capture("Repository cloned", { source: "onboard-vscode", repo: session?.state?.repo || "" });
     mixpanel.track("Repository cloned", { source: "onboard-vscode", repo: session?.state?.repo || "" });
+
     console.log("Checking membership");
-
-    // clear repoInfo to avoid mixups
-    setSession({
-      ...session,
-      state: {
-        ...session?.state,
-        repoInfo: undefined
-      }
-    } as Session);
-
-    // checking membership
     const checkMembership = async () => {
       if (!session?.user) return;
 
@@ -113,13 +84,14 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
     };
 
     checkMembership();
+    
     console.log("Handling clone");
-
     const submitJob = async () => {
+      // console.log('Submitting ', parsedRepo);
       return fetch('https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/repositories', {
         method: "POST",
         body: JSON.stringify({
-          repository: session?.state?.repo || "",
+          repository: parsedRepo || ""
         }),
         headers: {
           "Content-Type": "application/json",
@@ -144,15 +116,14 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
       });
     };
 
-    if (session?.state?.repo) {
+    if (parsedRepo) {
       // if session user token exists, set repoUrl to include token before github.com and after https:// with user session token + '@'
 
       submitJob().then(async (res) => {
         if (res.ok) {
-          console.log("Cloned repo and moving to:", session?.state?.repo || "");
+          console.log("Cloned repo and moving to: ", parsedRepo);
           // navigate(`/chat/${session?.state?.repo || ""}`);
 
-          // todo: make sure chat view is updated
           vscode.postMessage({
             command: "reload",
             text: ""
@@ -193,15 +164,11 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter" && !session?.state?.error) {
+    if (event.key === "Enter") { // && !session?.state?.error) {
       handleClone();
     }
   };
-  
-  // if (session?.state?.chat?.session_id) {
-  //   navigate(`/chat/${session?.state?.repo || ""}`);
-  // }
-  
+
   return (
     <div>
       {session ? (
@@ -221,7 +188,6 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
                     // navigate(`/chat/${repo.repo}`);
 
                     // update session info
-                    console.log('repo.repo: ', repo.repo);
                     setSession({
                       ...session,
                       state: {
