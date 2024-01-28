@@ -91,7 +91,7 @@ export function ChatPanel({
                 Stop generating
               </VSCodeButton>
             ) : (
-              messages?.length > 1 && (
+              messages?.length > 2 && (
                 <VSCodeButton
                   appearance="secondary"
                   aria-label="Regenerate response"
