@@ -38,11 +38,11 @@ export class Credentials {
 				...existingSession,
 				user: {
 					...existingSession?.user,
-					token: session.accessToken,
+					tokens: {['github']: {accessToken: session.accessToken}},
 					userId: email
 				}
 			} as Session);
-			// console.log(session.accessToken);
+			// console.log(SessionManager.getSession());
 
 			return;
 		}
@@ -84,11 +84,11 @@ export class Credentials {
 			...existingSession,
 			user: {
 				...existingSession?.user,
-				token: session.accessToken,
+				tokens: {['github']: {accessToken: session.accessToken}},
 				userId: email
 			}
 		} as Session);
-		console.log(session);
+		// console.log(SessionManager.getSession);
 
 		return this.octokit;
 	}
