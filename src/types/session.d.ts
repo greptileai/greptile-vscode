@@ -3,7 +3,7 @@ import { Chat, Message, RepositoryInfo } from "./chat";
 export enum Membership {
     Free = "free",
     Pro = "pro",
-    Business = "business"
+    Student = "student"
 }
 
 export type Session = {
@@ -20,11 +20,21 @@ export type Session = {
     user: {
         userId?: string;
         membership?: Membership | undefined;
-        /** Oauth access token */
-        token?: string;
-        refreshToken?: string;
         checkoutSession?: string;
         business?: boolean;
         freeTrialDaysRemaining?: number;
+
+        /** Oauth access token */
+        tokens: ExternalTokens;
+        // the last OAuth provider used to sign in
+        authProvider: string 
     };
-};
+}
+
+interface ExternalTokens {
+    [key: string]: {
+        accessToken: string;
+        idToken?: string;
+        refreshToken?: string;
+    };
+}

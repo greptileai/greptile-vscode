@@ -1,4 +1,4 @@
-import { Message as AIMessage } from "ai";
+import { Message } from "ai";
 
 export type Source = {
   dist: number;
@@ -7,6 +7,8 @@ export type Source = {
   metadata: {
     filepath: string;
     repository: string;
+    remote?: string;
+    branch?: string;
   };
   text: string;
   lines: undefined | number[];
@@ -15,9 +17,15 @@ export type Source = {
 export type Message = {
   sources?: Source[];
   agentStatus?: string;
-} & AIMessage;
+} & Message;
 
-type ChatInfo = {
+export type RepoKey = {
+  repository: string;
+  remote: string;
+  branch: string;
+};
+
+type OldChatInfo = {
   user_id: string;
   repo: string;
   additional_repos?: string[];
@@ -25,18 +33,31 @@ type ChatInfo = {
   timestamp: string;
   title: string;
   newChat: boolean; // for new sessions
+  repos?: string[]; // encoded repokey list
+};
+
+export type ChatInfo = {
+  user_id: string;
+  repos: string[]; // encoded repokey list
+  session_id: string;
+  timestamp: string;
+  title: string;
+  newChat: boolean; // for new sessions
+};
+
+export type OldChat = OldChatInfo & {
+  chat_log: Message[];
+  parent_id?: string;
 };
 
 export type Chat = ChatInfo & {
   chat_log: Message[];
-  additional_repos?: string[];
   parent_id?: string;
 };
 
-export type RepositoryInfo = {
-  repository: string;
+export type RepositoryInfo = RepoKey & {
+  source_id: string;
   indexId: string;
-  branch: string;
   filesProcessed?: number;
   numFiles?: number;
   message?: string;
@@ -44,7 +65,13 @@ export type RepositoryInfo = {
   sample_questions?: string[];
   sha?: string;
   external?: boolean;
-  status?: "completed" | "failed" | "cloning" | "processing" | "submitted";
+  status?:
+    | "completed"
+    | "failed"
+    | "cloning"
+    | "processing"
+    | "submitted"
+    | "queued";
 };
 
 type ServerActionResult<Result> = Promise<
