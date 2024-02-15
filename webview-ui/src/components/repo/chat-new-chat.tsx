@@ -3,7 +3,7 @@ import { VSCodeDropdown, VSCodeOption, VSCodeTextField, VSCodeButton } from "@vs
 import { usePostHog } from "posthog-js/react";
 import mixpanel from "mixpanel-browser";
 
-import { SAMPLE_REPOS } from "../../data/constants";
+import { SAMPLE_REPOS, API_BASE } from "../../data/constants";
 import { vscode } from "../../lib/vscode-utils";
 import { parseIdentifier } from "../../lib/onboard-utils";
 import { SessionContext } from "../../providers/session-provider";
@@ -56,7 +56,7 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
     const checkMembership = async () => {
       if (!session?.user) return;
 
-      const response = await fetch(`https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/membership`, {
+      const response = await fetch(`${API_BASE}/membership`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -86,7 +86,7 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
     console.log("Handling clone");
     const submitJob = async () => {
       console.log('Submitting ', parsedRepo);
-      return fetch('https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/repositories', {
+      return fetch(`${API_BASE}/repositories`, {
         method: "POST",
         body: JSON.stringify({
           remote: "github",

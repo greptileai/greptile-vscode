@@ -1,6 +1,7 @@
 import { encode } from "js-base64";
 
 import { fetcher } from "./onboard-utils";
+import { API_BASE } from "../data/constants";
 import { Chat, RepositoryInfo } from "../types/chat";
 import type { Session } from "../types/session";
 
@@ -14,7 +15,7 @@ export async function getChat(
     // console.log("getting chat", session_id, user_id);
 
     try {
-      const chat: any = await fetcher(`https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/chats/${session_id}`, {
+      const chat: any = await fetcher(`${API_BASE}/chats/${session_id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -61,7 +62,7 @@ export async function getRepo(
   session: Session
 ): Promise<RepositoryInfo | null> {
   try {
-    const repoInfo: any = await fetcher(`https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/repositories/batch?repositories=${encode(repoKey, true)}`, {
+    const repoInfo: any = await fetcher(`${API_BASE}/repositories/batch?repositories=${encode(repoKey, true)}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

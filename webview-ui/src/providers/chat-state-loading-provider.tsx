@@ -9,6 +9,7 @@ import { encode } from "js-base64";
 
 import { useChatState } from "./chat-state-provider";
 import { SessionContext } from "./session-provider";
+import { API_BASE } from "../data/constants";
 import {
   fetcher,
   getLatestCommit,
@@ -86,7 +87,7 @@ export function ChatLoadingStateProvider({
             version !== newRepoStates[repoKey].sha &&
             newRepoStates[repoKey].status === "completed"
           ) {
-            fetch('https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/repositories', {
+            fetch(`${API_BASE}/prod/v1/repositories`, {
               method: "POST",
               body: JSON.stringify({
                 remote: "github", // todo: update
@@ -107,7 +108,7 @@ export function ChatLoadingStateProvider({
       let metalIndex: { [key: string]: { status: string } } = {};
       const submitMetalIndexProcessing = Object.keys(newRepoStates).map(
         async (repo) => {
-          let metalIndexInfo = await fetcher(`https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/repositories/${encode(repo, true)}/status`, {
+          let metalIndexInfo = await fetcher(`${API_BASE}/repositories/${encode(repo, true)}/status`, {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -144,7 +145,7 @@ export function ChatLoadingStateProvider({
         // potential problem: initialAdditionalRepos is deleted during chat
         // but once new repos are set it still polls for the repos as well.
         if (repos.length === 0) break;
-        const response: any = await fetcher(`https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/repositories/batch?repositories=${repos.map((repo) => encode(repo, true)).join(",")}`, {
+        const response: any = await fetcher(`${API_BASE}/repositories/batch?repositories=${repos.map((repo) => encode(repo, true)).join(",")}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -202,7 +203,7 @@ export function ChatLoadingStateProvider({
         Object.keys(metalIndex).map(async (repo) => {
           while (metalIndex[repo]?.status !== "LIVE") {
             if (metalIndex[repo]?.status === "ARCHIVED") {
-              fetcher(`https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/repositories/${encode(repo, true)}/unarchive`, {
+              fetcher(`${API_BASE}/repositories/${encode(repo, true)}/unarchive`, {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
@@ -212,7 +213,7 @@ export function ChatLoadingStateProvider({
             }
             await new Promise((resolve) => setTimeout(resolve, 1000));
             if (newRepoStates[repo].indexId) {
-              metalIndex = await fetcher(`https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/repositories/${encode(repo, true)}/status`, {
+              metalIndex = await fetcher(`${API_BASE}/repositories/${encode(repo, true)}/status`, {
                 method: "GET",
                 headers: {
                   "Content-Type": "application/json",
