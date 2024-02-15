@@ -11,9 +11,9 @@ export const SAMPLE_REPOS: ISampleRepo[] = [
     displayName: "🤖  autoGPT",
   },
   {
-    repo: "mit-pdos/xv6-riscv",
-    shortName: "xv6",
-    displayName: "💾  xv6 RISC-V",
+    repo: "posthog/posthog",
+    shortName: "posthog",
+    displayName: "🦔  Posthog",
   },
   {
     repo: "pallets/flask",
@@ -26,9 +26,9 @@ export const SAMPLE_REPOS: ISampleRepo[] = [
     displayName: "⚛️  React JS",
   },
   {
-    repo: "pandas-dev/pandas",
-    shortName: "pandas",
-    displayName: "🐼  Pandas",
+    repo: "microsoft/vscode",
+    shortName: "vs-code",
+    displayName: "👩‍💻 VS Code",
   },
   {
     repo: "hwchase17/langchain",
