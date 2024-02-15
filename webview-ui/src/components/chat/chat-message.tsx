@@ -1,7 +1,8 @@
 // Inspired by Chatbot-UI and modified to fit the needs of this project
 // @see https://github.com/mckaywrigley/chatbot-ui/blob/main/components/Chat/ChatMessage.tsx
 
-import { VSCodeButton, VSCodeDivider } from "@vscode/webview-ui-toolkit/react";
+import { useEffect, useState } from "react";
+import { VSCodeDivider } from "@vscode/webview-ui-toolkit/react";
 
 import {
   Dialog,
@@ -21,8 +22,6 @@ export interface ChatMessageProps {
   userId: string;
   message: Message;
   repoStates: { [repo: string]: RepositoryInfo };
-  displayContinueButton?: boolean;
-  continueMessage?: () => void;
   readonly?: boolean;
   displayDivider?: boolean;
 }
@@ -31,12 +30,19 @@ export function ChatMessage({
   userId,
   message,
   repoStates,
-  displayContinueButton = false,
-  continueMessage,
   readonly = false,
   displayDivider = false,
   ...props
 }: ChatMessageProps) {
+
+  const [sourcesLoading, setSourcesLoading] = useState(true);
+
+  useEffect(() => {
+    if (message?.agentStatus?.includes("response") || message.content) {
+      setSourcesLoading(false);
+    }
+  }, [message?.agentStatus]);
+  
   return (
     <div
       {...props}
@@ -51,12 +57,33 @@ export function ChatMessage({
             {message.agentStatus}
           </div>
         )}
-        <MemoizedReactMarkdown
-          components={{
-            p({ children }: any) {
-              return <p>{children}</p>;
-            },
-            code({ node, inline, className, children, ...props }: any) {
+
+        <div>
+          <ChatMessageSources
+            sources={message.sources || []}
+            repoStates={repoStates}
+            isLoading={sourcesLoading}
+          />
+          {message.content ? (
+            <MemoizedReactMarkdown
+              components={{
+                p({ children }) {
+                  return <p>{children}</p>;
+                },
+                h1({ children }) {
+                  return (
+                    <h1>{children}</h1>
+                  );
+                },
+                h2({ children }) {
+                  return (
+                    <h1>{children}</h1>
+                  );
+                },
+                h3({ children }) {
+                  return <h1>{children}</h1>;
+                },
+            code({ node, inline, className, children, ...props }) {
               if (children.length) {
                 if (children[0] == "▍") {
                   return (
@@ -97,8 +124,8 @@ export function ChatMessage({
                   <DialogTrigger asChild>
                     <div>
                       <img
-                        src={src}
-                        alt={alt}
+                        src={src!}
+                        alt={alt!}
                         loading="lazy"
                       />
                       <div>
@@ -138,8 +165,8 @@ export function ChatMessage({
                   <DialogContent>
                     <DialogHeader>
                       <img
-                        src={src}
-                        alt={alt}
+                        src={src!}
+                        alt={alt!}
                         loading="lazy"
                       />
                     </DialogHeader>
@@ -147,7 +174,7 @@ export function ChatMessage({
                 </Dialog>
               );
             },
-            a({ href, children }: any) {
+            a({ href, children }) {
               return (
                 <a
                   href={href}
@@ -159,22 +186,30 @@ export function ChatMessage({
             },
           }}
         >
-          {!message.sources && message.content[0] === "["
+          {message.role === "assistant" && !message.sources && message.content[0] === "["
             ? ""
             : message.content.replaceAll("\u200b", "")}
         </MemoizedReactMarkdown>
+          ) : (
+            <div>
+              {/* Loading Skeleton */}
+            </div>
+          )}
+        </div>
         <div>
-          <ChatMessageSources
-            sources={message.sources}
+          {/* <ChatMessageSources
+            sources={message.sources || []}
             repoStates={repoStates}
-          />
+            isLoading={sourcesLoading}
+          /> */}
           <div>
-            {displayContinueButton && (
-              <VSCodeButton onClick={continueMessage}>
-                <p>Continue</p>
-              </VSCodeButton>
-            )}
-          </div>
+            {/* <ChatMessageActions
+              message={message}
+              userId={userId}
+              readonly={readonly}
+              deleteMessage={deleteMessage}
+            /> */}
+            </div>
         </div>
         {displayDivider && (
           <VSCodeDivider role="separator" className="divider"/>

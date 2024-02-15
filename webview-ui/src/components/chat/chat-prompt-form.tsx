@@ -1,15 +1,18 @@
-import { UseChatHelpers } from "ai/react";
-import { useRef, ReactElement, useEffect} from "react";
+import { ReactElement, useRef, useEffect} from "react";
 import { VSCodeButton, VSCodeTextArea } from "@vscode/webview-ui-toolkit/react";
 
+import { useChatState } from "../../providers/chat-state-provider";
+import { useChatLoadingState } from "../../providers/chat-state-loading-provider";
 import { useEnterSubmit } from "../../lib/hooks/use-enter-submit";
 
-export interface PromptProps
-  extends Pick<UseChatHelpers, "input" | "setInput"> {
+export interface PromptProps {
+  input: string;
+  setInput: (input: string) => void;
   onSubmit: (value: string) => Promise<void>;
   isLoading: boolean;
   isStreaming: boolean;
   renderButton: () => ReactElement<{}>;
+  someValidRepos: boolean;
 }
 
 export function PromptForm({
@@ -18,10 +21,14 @@ export function PromptForm({
   setInput,
   isLoading,
   isStreaming,
-  renderButton
+  renderButton,
+  someValidRepos
 }: PromptProps) {
   const { formRef, onKeyDown } = useEnterSubmit();
   const textAreaRef = useRef(null);
+
+  const { chatState } = useChatState();
+
   useEffect(() => {
     if (textAreaRef.current) {
       textAreaRef.current.focus();
@@ -29,12 +36,14 @@ export function PromptForm({
   }, []);
   return (
     <form
+      // onKeyDown={handleKeyDown}
       onSubmit={async (e) => {
+        // if (submitDisabled) return;
         e.preventDefault();
+        setInput("");
         if (!input?.trim()) {
           return;
         }
-        setInput("");
         await onSubmit(input);
       }}
       ref={formRef}
@@ -49,10 +58,15 @@ export function PromptForm({
           rows={3}
           cols={60}
           value={input}
-          disabled={isLoading}
+          disabled={isLoading || chatState.disabled.value || !someValidRepos}
           resize={"both"}
           onInput={(e) => setInput(e.target.value)}
-          placeholder="Send a message"
+          // placeholder="Send a message"
+          placeholder={
+            someValidRepos
+              ? "Ask a question"
+              : "Please wait while we process your repositories"
+          }
           spellCheck={false}
           className="text-area"
         />

@@ -1,79 +1,67 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useChat } from "ai/react";
-import { encode, decode } from "js-base64";
 
-import { ChatList } from './chat-list';
-import { ChatPanel } from './chat-panel';
-import ChatProcessing from './chat-processing';
+import { ChatLoadingStateProvider, useChatLoadingState } from '../../providers/chat-state-loading-provider';
+import { useChatState } from '../../providers/chat-state-provider';
+import { SessionContext } from '../../providers/session-provider';
 import {
-    fetcher,
-    getLatestCommit,
-    cleanMessage,
-    checkRepoAuthorization
+    cleanMessage
 } from "../../lib/onboard-utils";
 import { vscode } from "../../lib/vscode-utils";
+import { ChatStatus } from './chat-status';
+import { ChatList } from './chat-list';
+import { ChatPanel } from './chat-panel';
 import { Message, RepositoryInfo } from '../../types/chat';
-import type { Session, Membership } from '../../types/session';
-import { useChatLoadingState } from '../../providers/chat-state-loading-provider';
-import { useChatRepoState, useChatState, useUpdateChatRepoState } from '../../providers/chat-state-provider';
-import { SessionContext } from '../../providers/session-provider';
 
 export interface ChatProps extends React.ComponentProps<"div"> {
-    session_id?: string | undefined;
-    repoInfo: RepositoryInfo;
-    // initialRepoStates: { [repo: string]: RepositoryInfo };
-    initialMessages?: Message[];
-    // chatParentId?: string;
+    initialMessages: Message[];
+    sessionId: string;
+    repoStates: { [repo: string]: RepositoryInfo };
 }
 
 export const Chat = function ChatComponent({
-    session_id,
-    repoInfo,
     initialMessages,
-    className,
+    sessionId,
+    repoStates
   }: ChatProps)  {
     // console.log("Starting Chat", session_id, repoInfo, initialMessages, className);
+
     const { session, setSession } = useContext(SessionContext);
 
     const [displayMessages, setDisplayMessages] = React.useState<Message[]>([]);
-    const repoStates = useChatRepoState();
-    const setRepoStates = useUpdateChatRepoState();
-    const { chatStateDispatch } = useChatState();
-    const { chatLoadingState } = useChatLoadingState();
+    const [isStreaming, setIsStreaming] = useState(false);
+    const { chatState, chatStateDispatch } = useChatState();
+
+    let repos = Object.values(chatState.repoStates).map(
+        (repoState) => ({
+            name: repoState.repository,
+            branch: repoState.branch
+        })
+    )
 
     // vercel's ai useChat
     const {
         messages,
+        input,
+        isLoading,
         append,
         reload,
         stop,
-        isLoading,
-        input,
         setInput,
-        data,
         setMessages
     } = useChat({
         api: "https://mcxeqf7hzekaahjdqpojzf4hya0aflwj.lambda-url.us-east-1.on.aws/",
         initialMessages,
-        id: session_id,
+        id: sessionId,
         headers: {
-            "Authorization": "Bearer " + session?.user?.token
+            "Authorization": "Bearer " + session?.user?.tokens?.github.accessToken
         },
         body: {
-            repositories: Object.values(repoStates).map((repo) => {
-                return {
-                    name: repo.repository,
-                    branch: repo.branch,
-                    external: repo.external
-                }
-            }),
-            sessionId: session_id,
+            repositories: repos,
+            initialMessages,
+            sessionId: sessionId,
         },
         async onResponse(response) {
-
-            // console.log("Response: ", response);
-            // console.log("Messages: ", messages);
-
             setSession({
                 ...session,
                 state: {
@@ -81,6 +69,7 @@ export const Chat = function ChatComponent({
                     isStreaming: true
                 }
             });
+            setIsStreaming(true);
             if (response.status === 401 || response.status === 500) {
                 console.log("Error");
                 vscode.postMessage({
@@ -100,219 +89,93 @@ export const Chat = function ChatComponent({
                     isStreaming: false
                 }
             });
+            setIsStreaming(false);
         }
     });
 
-    const continueLastMessage = () => {
-        append(
-          {
-            role: "user",
-            // this is just for the user to see
-            // the actual prompt is defined in /api/chat/route.ts
-            content: "Please continue.",
-          },
-          {
-            options: {
-              body: {
-                continueChat: true,
-              },
-            },
-          },
-        );
-    };
-
-    const getComponent = (repoInfoLoading: RepositoryInfo) => {
-        if (!repoInfoLoading) {
-            return (
-                <p>Unexpected Error</p>
-            );
-        }
-
-        switch(repoInfoLoading.status) {
-            case "submitted":
-                // console.log("submitted")
-            case "cloning":
-                // console.log("cloning")
-            case "processing":
-                if (!repoInfoLoading.sha) {
-                    return (
-                        <div>
-                            <ChatProcessing repoInfo={repoInfoLoading} />
-                            <p>Processing...</p>
-                        </div>
-                    );
-                }
-                // add cancellation logic here?
-            case "failed":
-                if (!repoInfoLoading.sha) {
-                    return <p>Failed</p>;
-                }
-            case "completed":
-                return (
-                    <>
-                        <div>
-                            <ChatList
-                                messages={displayMessages || []}
-                                userId={session?.user?.userId || ""}
-                                repoStates={repoStates}
-                                continueLastMessage={continueLastMessage}
-                                isLoading={isLoading}
-                                isStreaming={session?.state?.isStreaming || false}
-                            />
-                        </div>
-                        <ChatPanel
-                            id={session_id}
-                            isLoading={isLoading}
-                            stop={stop}
-                            append={append}
-                            reload={reload}
-                            messages={messages}
-                            input={input}
-                            setInput={setInput}
-                            isStreaming={session?.state?.isStreaming || false}
-                        />
-                    </>
-                );
-            default:
-        }
-    };
-
-    // TODO: Fix this so it actually loads full chat context
     useEffect(() => {
-        // if (messages !== session?.state?.messages && session?.state?.messages) {
-        //     console.log("updating messages from session");
-        //     setMessages(session?.state?.messages);
-        // }
-        // if (input !== session?.state?.input && session?.state?.input) {
-        //     console.log("updating input from session");
-        //     setInput(session?.state?.input);
-        // }
-        setMessages(initialMessages || []);
-    }, []);
-
-    useEffect(() => {
-        console.log("messages", messages);
-
-        if (JSON.stringify(session?.state?.messages) !== JSON.stringify(messages)) {
-          setSession({
-            ...session,
-            state: {
-              ...session?.state,
-              messages: messages,
-            }
-          });
-        }
-
-        try {
-            const newDisplayMessages = messages.filter(Boolean).map((message) => cleanMessage(message));
-            setDisplayMessages(newDisplayMessages);
-
-        } catch (e) {
-            console.log(e);
-        }
-
+        const newDisplayMessages = messages.map((message) => cleanMessage(message));
+        setDisplayMessages(newDisplayMessages);
         if (messages.length === 0) return;
-        if(!session?.user && messages.length > 10) {
-            console.log('Max messages reached')
-            chatStateDispatch({
-                action: "set_disabled",
-                payload: {
-                value: true,
-                reason: "Please sign in to continue.",
-                }
-            })
-            return;
+        if (!session?.user && messages.length > 2) {
+          console.log("max messages reached");
+          chatStateDispatch({
+            action: "set_disabled",
+            payload: {
+              value: true,
+              reason: "Please sign in to continue.",
+            },
+          });
+          return;
         } else {
             chatStateDispatch({
-                action: "set_disabled",
-                payload: {
+              action: "set_disabled",
+              payload: {
                 value: false,
-                reason: ""
-                }
-            })
-        }
-    }, [messages]);
-
-    /** TODO: Check auth and membership */
-    useEffect(() => {
-        console.log("Checking auth and membership")
-
-         // if (!session?.user) return;
-
-        const checkAuthandMembership = async () => {
-
-            const response = await fetch(`https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/membership`, {
-                method: "GET",
-                headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + session?.user?.token
-                },
-            }).then(async (res) => {
-                return res.json();
-            }).then(async (res) => {
-                // console.log('MEMBERSHIP', res);
-                return res;
-            });
-
-            if (response['membership'] !== session?.user?.membership) {
-                // update session
-                setSession({
-                    ...session,
-                    user: {
-                        ...session?.user,
-                        token: session?.user?.token,
-                        membership: response['membership']
-                    }
-                  } as Session);
-            }
-
-            const repoAuth = await checkRepoAuthorization(
-                repoInfo.repository,
-                session
-            );
-
-            switch (repoAuth) {
-                case 402:
-                    console.log('Error: Private repo')
-                    vscode.postMessage({
-                        command: "upgrade",
-                        text: "Upgrade to Onboard Pro to process private repos! 🔐"})
-                    break;
-                case 404:
-                    console.log('Error: Repo not found');
-                    vscode.postMessage({
-                        command: "error",
-                        text: "This repository was not found, or you do not have access to it. If this is your repo, please try logging in again. Reach out to us on Discord for support."
-                    });
-                    break;
-                case 426:
-                    vscode.postMessage({
-                        command: "upgrade",
-                        text: "Upgrade to Onboard Pro to process large repos! 🐘"
-                    });
-                    break;
-                default:
-            }
-        }
-
-        Object.values(repoStates).forEach((repo) => {
-            if (!repo.indexId) return;
-
-            // unarchive
-            fetcher(`https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/repositories/${encode(repo.repository, true)}/unarchive`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + session?.user?.token
+                reason: "",
               },
             });
+        }
+    }, [messages, session?.user]);
 
-        });
-
-        checkAuthandMembership();
-    }, []);
+    const someValidRepos = Object.values(chatState.repoStates).some(
+        (repoState) => {
+            // console.log('repo state: ', repoState)
+            return (
+            (repoState.status !== "completed" && repoState.sha) ||
+            repoState.status === "completed"
+            );
+        },
+    );
 
     return (
-        getComponent(chatLoadingState.loadingRepoStates[repoInfo.repository])
-    )
+        <div>
+            {someValidRepos ? (
+                <div>
+                    <ChatList
+                        session={session}
+                        messages={displayMessages}
+                        isLoading={isLoading}
+                        isStreaming={isStreaming}
+                        setMessages={setMessages}
+                        sessionId={sessionId}
+                    />
+                    {displayMessages.length <= 1 &&
+                        Object.keys(chatState.repoStates).length > 0 &&
+                        !isLoading && (
+                            <div>
+                                {/* Sample Questions */}
+                            </div>
+                        )}
+                </div>
+            ) : (
+                <div>
+                    <div>
+                        <ChatLoadingStateProvider>
+                            {Object.keys(chatState.repoStates).map((repoKey) => {
+                            return <ChatStatus key={repoKey} repoKey={repoKey} />;
+                            })}
+                        </ChatLoadingStateProvider>
+                        <p>
+                            We will email you at {session?.user?.email} once the
+                            repositories have finished processing
+                        </p>
+                    </div>
+                </div>
+            )}
+            <ChatPanel
+                messages={messages}
+                input={input}
+                isLoading={isLoading}
+                isStreaming={isStreaming}
+                someValidRepos={someValidRepos}
+                sessionId={sessionId}
+                append={append}
+                reload={reload}
+                stop={stop}
+                setInput={setInput}
+                setIsStreaming={setIsStreaming}
+            />
+        </div>
+    );
 };

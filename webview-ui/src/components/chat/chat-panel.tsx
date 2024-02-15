@@ -1,40 +1,42 @@
-import { type UseChatHelpers } from "ai/react";
+import { useEffect, useRef } from 'react';
 import { VSCodeButton } from "@vscode/webview-ui-toolkit/react";
-import React, { useEffect, useRef } from 'react';
-
+import { usePostHog } from "posthog-js/react";
+import mixpanel from "mixpanel-browser";
 
 import { PromptForm } from "./chat-prompt-form";
+import { useChatState } from "../../providers/chat-state-provider";
+import { Message } from "../../types/chat";
 
 import "../../App.css";
-import mixpanel from "mixpanel-browser";
-import { usePostHog } from "posthog-js/react";
 
-export interface ChatPanelProps
-  extends Pick<
-    UseChatHelpers,
-    | "append"
-    | "isLoading"
-    | "reload"
-    | "messages"
-    | "stop"
-    | "input"
-    | "setInput"
-  > {
-  id?: string;
+export interface ChatPanelProps {
+  messages: Message[];
+  isLoading: boolean;
   isStreaming: boolean;
+  someValidRepos: boolean;
+  input: string;
+  sessionId: string;
+  setInput: (input: string) => void;
+  setIsStreaming: (isStreaming: boolean) => void;
+  stop: () => void;
+  append: (message: Message) => void;
+  reload: () => void;
 }
 
 export function ChatPanel({
-  id,
+  messages,
   isLoading,
+  isStreaming,
+  someValidRepos,
+  input,
+  sessionId,
+  setInput,
+  setIsStreaming,
   stop,
   append,
-  reload,
-  input,
-  setInput,
-  messages,
-  isStreaming,
+  reload
 }: ChatPanelProps) {
+  const { chatState } = useChatState();
   const posthog = usePostHog();
 
   const messagesEndRef = useRef(null);
@@ -64,7 +66,7 @@ export function ChatPanel({
               });
 
               await append({
-                id,
+                id: chatState.session_id,
                 content: value,
                 role: "user",
               });
@@ -73,6 +75,7 @@ export function ChatPanel({
             setInput={setInput}
             isLoading={isLoading}
             isStreaming={isStreaming}
+            someValidRepos={someValidRepos}
             renderButton={() => isLoading ? (
               <VSCodeButton
                 appearance="secondary"

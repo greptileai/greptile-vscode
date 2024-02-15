@@ -1,3 +1,5 @@
+import { encode } from "js-base64";
+
 import { fetcher } from "./onboard-utils";
 import { Chat, RepositoryInfo } from "../types/chat";
 import type { Session } from "../types/session";
@@ -16,7 +18,7 @@ export async function getChat(
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer " + session?.user?.token
+          "Authorization": "Bearer " + session?.user?.tokens?.github.accessToken
         },
       })
       // console.log(chat);
@@ -34,7 +36,7 @@ export async function getChat(
 
 export async function getNewChat(
     userId: string,
-    repo: string,
+    repos: string[],
   ): Promise<Chat | null> {
     // need to wait until chat history has been fetched and set
     console.log("Getting new chat");
@@ -42,33 +44,30 @@ export async function getNewChat(
     const session_id =
       Math.random().toString(36).substring(2, 15) +
       Math.random().toString(36).substring(2, 15);
-    // will need to poll
+
     return {
       user_id: userId,
-      repo,
+      repos: repos,
       session_id,
       chat_log: [],
       timestamp: Math.floor(Date.now() / 1000).toString(),
-      title: repo,
+      title: repos[0].split(":").slice(-1)[0],
       newChat: true,
     };
 }
 
 export async function getRepo(
-  repo: string,
+  repoKey: string, // remote:repository:branch
   session: Session
 ): Promise<RepositoryInfo | null> {
   try {
-    // query parameter = comma separated list of repos
-    const repoInfo: any = await fetcher(`https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/repositories/batch?repositories=${repo}`, {
+    const repoInfo: any = await fetcher(`https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/repositories/batch?repositories=${encode(repoKey, true)}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer " + session?.user?.token // todo: fix for when no token exists?
+        "Authorization": "Bearer " + session?.user?.tokens?.github.accessToken
       },
     })
-
-    // console.log(repoInfo);
     return repoInfo;
   } catch (error) {
     console.log(error);

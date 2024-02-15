@@ -2,28 +2,22 @@ import React, {
   createContext,
   useContext,
   useReducer,
-  useMemo,
 } from "react";
 
-import { type RepositoryInfo } from "../types/chat";
+import { type RepositoryInfo, ChatInfo } from "../types/chat";
 
 export type ChatState = {
-  disabled: { value: boolean, reason: string };
-  mainRepoInfo: RepositoryInfo;
+  session_id: string;
   repoStates: { [repo: string]: RepositoryInfo };
-   // maybe also add showPoll, showContactForm, etc
+  disabled: { value: boolean, reason: string };
+  chats: ChatInfo[];
 }
 
 const initialChatState = {
   disabled: { value: false, reason: ""},
-  mainRepoInfo: {
-    status: undefined,
-    repository: "",
-    private: false,
-    indexId: "",
-    branch: "",
-  },
   repoStates: {},
+  session_id: "",
+  chats: []
 }
 
 export interface ChatStateAction {
@@ -33,6 +27,16 @@ export interface ChatStateAction {
 
 const chatStateReducer = (state: any, action: ChatStateAction) => {
   switch (action.action) {
+    case "set_chats":
+      return {
+        ...state,
+        chats: action.payload,
+      };
+    case "set_session_id":
+      return {
+        ...state,
+        session_id: action.payload,
+      };
     case "set_disabled":
       return {
         ...state,
@@ -42,6 +46,11 @@ const chatStateReducer = (state: any, action: ChatStateAction) => {
       return {
         ...state,
         repoStates: action.payload,
+      };
+    case "set_streaming":
+      return {
+        ...state,
+        streaming: action.payload,
       };
     default:
       return state;
@@ -64,33 +73,25 @@ export const useChatState = () => {
   return context;
 }
 
-export function useChatRepoState() {
-  const { chatState } = useChatState();
-  // console.log('useChatRepoState', chatState);
-  const repoStates = useMemo(() => chatState.repoStates, [chatState.repoStates]);
-  return repoStates;
+interface ChatStateProviderProps {
+  sessionId: string;
+  repoStates: { [repo: string]: RepositoryInfo };
 }
 
-export function useUpdateChatRepoState() {
-  const { chatStateDispatch } = useChatState();
-
-  const setRepoStates = (newState:  { [repo: string]: RepositoryInfo }) => {
-    chatStateDispatch({
-      action: 'set_repo_states',
-      payload: newState,
-    });
-  };
-  return setRepoStates;
-}
-
-export function ChatStateProvider({ children, initialState }: { children: React.ReactNode, initialState: ChatState }) {
+export function ChatStateProvider({
+  children,
+  initialProvidedState,
+}: {
+  children: React.ReactNode;
+  initialProvidedState: ChatStateProviderProps;
+}) {
   const [chatState, chatStateDispatch] = useReducer(chatStateReducer, {
     ...initialChatState,
-    ...initialState,
-  }); 
+    ...initialProvidedState,
+  });
 
   return (
-    <ChatStateContext.Provider value={{chatState, chatStateDispatch}}>
+    <ChatStateContext.Provider value={{ chatState, chatStateDispatch }}>
       {children}
     </ChatStateContext.Provider>
   );

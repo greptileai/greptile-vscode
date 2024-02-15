@@ -1,72 +1,128 @@
-import { VSCodeButton } from "@vscode/webview-ui-toolkit/react";
-import { CaretSortIcon } from "@radix-ui/react-icons";
-import { ExternalLink } from "lucide-react";
+import * as React from "react";
+import { Globe, Minus, Plus } from "lucide-react";
 import { decode } from "js-base64";
 
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
-import { MemoizedReactMarkdown } from "./markdown";
+import { ChatLoadingSkeleton } from "./chat-loading-skeleton";
+import { getRepoUrlForAction } from "../../lib/onboard-utils";
 import { Source, RepositoryInfo } from "../../types/chat";
-
-import "../../App.css"
 
 interface IChatMessageSources {
   sources: Source[] | undefined;
-  repoStates: { [repo: string]: RepositoryInfo };
+  repoStates: { [repoKey: string]: RepositoryInfo };
+  isLoading: boolean;
 }
+
 export const ChatMessageSources = ({
   sources,
   repoStates,
+  isLoading,
 }: IChatMessageSources) => {
-  const getURL = (repo: string, repoState: RepositoryInfo, source: Source) => {
-    if (repoState?.external)
-      return `https://${repo}${source?.metadata?.filepath}`;
-    return `https://github.com/${repo}/blob/${repoStates[repo]?.branch}/${source
-      ?.metadata?.filepath}${
-      source.lines ? `#L${source.lines[0]}-L${source.lines[1]}` : ""
-    }`;
-  };
+  const [expandedSources, setExpandedSources] = React.useState<boolean>(false);
+  const numberOfSourcesToDisplayWhenCollapsed = 3;
+  const skeletonArray = Array.from(
+    Array(numberOfSourcesToDisplayWhenCollapsed + 1).keys(),
+  );
 
-  if (!sources || sources.length === 0) return <div></div>;
+  const getURL = (
+    repoKey: string,
+    repoState: RepositoryInfo,
+    source: Source,
+  ) => {
+    if (repoState?.external)
+      return `https://${repoKey}${source?.metadata?.filepath}`;
+    return getRepoUrlForAction(
+      {
+        repository: repoState?.repository,
+        branch: repoState?.branch,
+        remote: repoState?.remote,
+      },
+      "source",
+      { filepath: source?.metadata?.filepath, lines: source?.lines },
+    );
+  };
+  const sourcesCount = sources?.length || 0;
+  if (!sources || sourcesCount === 0) return <div></div>;
 
   return (
-    <Collapsible>
-      <div>
-        <CollapsibleTrigger asChild>
-          <VSCodeButton appearance="secondary">
-            Sources
-            <CaretSortIcon/>
-            <span className="sr-only">Toggle</span>
-          </VSCodeButton>
-        </CollapsibleTrigger>
-      </div>
-      <CollapsibleContent>
-        {sources.slice(0, 10).map((source: Source, index: number) => {
-          // I am so sorry for this, decode only when doesn't exist in repoStates :(
-          const repo = repoStates[source?.metadata?.repository]
-            ? source?.metadata?.repository
-            : decode(source?.metadata?.repository);
+    <div>
+      <p>{sourcesCount} result(s)</p>
+      {(expandedSources
+        ? sources
+        : sources.slice(0, numberOfSourcesToDisplayWhenCollapsed)
+      ).map((source: Source, index: number) => {
+        const remote = source?.metadata?.remote || "github";
+        const branch = source?.metadata?.branch || "main";
+        const regex = /([a-zA-Z0-9\.-_])\/([a-zA-Z0-9\.-_])/;
+        const match = source?.metadata?.repository?.match(regex);
+        let repo = source?.metadata?.repository;
+        if (!match) repo = decode(source?.metadata?.repository);
+        const repoKey = `${remote}:${branch}:${repo}`;
 
-          return (
-            <div
-              key={index}
-            >
-              <a
-                href={getURL(repo, repoStates[repo.toLowerCase()], source)}
-                target="_blank"
-              >
-                {`${repo}${
-                  repoStates[repo]?.external === true ? "" : "/"
-                }${source?.metadata?.filepath}`}{" "}
-                {source.lines ? `[${source.lines[0]}:${source.lines[1]}]` : ""}
-                <div className="icon codicon codicon-link-external"></div>
-              </a>
-              <MemoizedReactMarkdown>
-                {source.text}
-              </MemoizedReactMarkdown>
+        const getIcon = (remote: string) => {
+          switch (remote) {
+            case "github":
+            case "gitlab":
+            default:
+              return <Globe />;
+          }
+        };
+
+        return (
+          <a
+            key={index}
+            href={getURL(repoKey, repoStates[repoKey], source)}
+            target="_blank"
+          >
+            <div>
+              <div>
+                {getIcon(remote)}
+              </div>
+              <span>
+                /{source?.metadata?.filepath}
+              </span>{" "}
+              {source.lines ? `[${source.lines[0]}:${source.lines[1]}]` : ""}
             </div>
-          );
-        })}
-      </CollapsibleContent>
-    </Collapsible>
+
+            <div>
+              <div>
+                {repo}
+              </div>
+              <div>
+                {branch}
+              </div>
+            </div>
+          </a>
+        );
+      })}
+
+      {(expandedSources ||
+        (!expandedSources &&
+          sources.length > numberOfSourcesToDisplayWhenCollapsed)) && (
+        <div
+          onClick={() => setExpandedSources(!expandedSources)}
+        >
+          <div>
+            {expandedSources ? (
+              <Minus />
+            ) : (
+              <Plus />
+            )}
+          </div>
+          <div>
+            {expandedSources
+              ? `Collapse`
+              : `View ${
+                  sources.length - numberOfSourcesToDisplayWhenCollapsed
+                } More...`}
+          </div>
+        </div>
+      )}
+
+      {skeletonArray.map((i) => {
+        if (isLoading && sources.length < i + 1) {
+          return <ChatLoadingSkeleton /> // <Skeleton key={i} className="w-full h-8" />;
+        }
+      })}
+    </div>
   );
 };

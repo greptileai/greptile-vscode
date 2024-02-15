@@ -3,26 +3,27 @@ import { VSCodeDivider } from "@vscode/webview-ui-toolkit/react";
 import { ChatMessage } from "./chat-message";
 import { ChatLoadingSkeleton } from "./chat-loading-skeleton";
 import { useChatState } from "../../providers/chat-state-provider";
-import { Message, RepositoryInfo } from "../../types/chat";
+import { Message } from "../../types/chat";
+import { Session } from "../../types/session";
 
 export interface ChatListProps {
+  session: Session | null;
   messages: Message[];
-  userId: string;
-  repoStates: { [repo: string]: RepositoryInfo };
-  continueLastMessage?: () => void;
   isLoading: boolean;
   isStreaming: boolean;
   readonly?: boolean;
+  setMessages: (messages: Message[]) => void;
+  sessionId: string;
 }
 
 export function ChatList({
+  session,
   messages,
-  userId,
-  repoStates,
-  continueLastMessage,
   isLoading,
   isStreaming,
   readonly = false,
+  setMessages,
+  sessionId
 }: ChatListProps) {
   
   const { chatState } = useChatState();
@@ -36,17 +37,9 @@ export function ChatList({
         return (
           <div key={index}>
             <ChatMessage
-              userId={userId}
+              userId={session?.user?.userId}
               message={message}
-              repoStates={repoStates}
-              displayContinueButton={
-                index === messages.length - 1 &&
-                index !== 0 &&
-                !(isLoading || isStreaming) &&
-                message.role === "assistant" &&
-                false
-              }
-              continueMessage={continueLastMessage}
+              repoStates={chatState.repoStates}
               readonly={readonly}
               displayDivider={
                 index < messages.length - 1

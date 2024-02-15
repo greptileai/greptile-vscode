@@ -12,10 +12,9 @@ import { SessionContext } from "./session-provider";
 import {
   fetcher,
   getLatestCommit,
+  serializeRepoKey
 } from "../lib/onboard-utils";
-import { vscode } from "../lib/vscode-utils";
 import { type RepositoryInfo } from "../types/chat";
-import type { Session } from '../types/session';
 
 export type ChatLoadingState = {
   loadingRepoStates: { [repo: string]: RepositoryInfo };
@@ -31,7 +30,6 @@ export interface ChatStateAction {
 }
 
 const chatLoadingStateReducer = (state: any, action: ChatStateAction) => {
-  // console.log("chatLoadingStateReducer", action)
   switch (action.action) {
     case "set_loading_repo_states":
       return {
@@ -59,59 +57,72 @@ export const useChatLoadingState = () => {
   return context;
 }
 
-export function ChatLoadingStateProvider({ children, initialState }: { children: React.ReactNode, initialState: ChatLoadingState }) {
-  const [chatLoadingState, chatLoadingStateDispatch] = useReducer(chatLoadingStateReducer, {
-    ...initialChatState,
-    ...initialState,
-  });
+export function ChatLoadingStateProvider({
+  children
+}: {
+  children: React.ReactNode
+}) {
   const { chatState, chatStateDispatch } = useChatState();
+  const [chatLoadingState, chatLoadingStateDispatch] = useReducer(
+    chatLoadingStateReducer, {
+    ...initialChatState,
+    loadingRepoStates: chatState.repoStates
+  });
 
   const { session } = useContext(SessionContext);
-
   const isCancelled = useRef(false);
   useEffect(() => {
-    console.log('useEffect for polling', chatState.repoStates);
+    // console.log('useEffect for polling', chatState.repoStates);
     isCancelled.current = false;
     const poll = async () => {
       // console.log('polling repo states')
       let newRepoStates = chatState.repoStates;
-      const latestVersion = await getLatestCommit(
-        chatState.mainRepoInfo.repository,
-        chatState.mainRepoInfo.branch,
-        session?.user?.token,
-      );
-      if (
-        chatState.mainRepoInfo.sha &&
-        latestVersion !== chatState.mainRepoInfo.sha &&
-        chatState.mainRepoInfo.status === "completed"
-      ) {
-        fetch('https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/repositories', {
-          method: "POST",
-          body: JSON.stringify({
-            repository: chatState.mainRepoInfo.repository,
-            notify: false,
-          }),
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + session?.user?.token
-          },
-        });
-        // sleep 2 seconds to let the clone start
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-      }
 
-      let metalIndexStatus = await fetcher(`https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/repositories/${encode(chatState.mainRepoInfo.repository, true)}/status`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " +  session?.user?.token
-        },
-      }).then((res) => res.status);
+      const submitReposProcessing = Object.keys(newRepoStates).map(
+        async (repoKey) => {
+          const version = await getLatestCommit(repoKey, session);
+          if (
+            newRepoStates[repoKey].sha &&
+            version !== newRepoStates[repoKey].sha &&
+            newRepoStates[repoKey].status === "completed"
+          ) {
+            fetch('https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/repositories', {
+              method: "POST",
+              body: JSON.stringify({
+                remote: "github", // todo: update
+                repository: newRepoStates[repoKey].repository,
+                notify: false,
+              }),
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + session?.user?.tokens?.github.accessToken
+              },
+            });
+          }
+        }
+      );
+      await Promise.allSettled(submitReposProcessing);
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      let metalIndex: { [key: string]: { status: string } } = {};
+      const submitMetalIndexProcessing = Object.keys(newRepoStates).map(
+        async (repo) => {
+          let metalIndexInfo = await fetcher(`https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/repositories/${encode(repo, true)}/status`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer " +  session?.user?.tokens?.github.accessToken
+            },
+          }); // .then((res) => res.status);
+          metalIndex[repo] = metalIndexInfo;
+        }
+      );
+      await Promise.allSettled(submitMetalIndexProcessing);
 
       // set status to processing for all, to at least check once
-      Object.keys(newRepoStates).forEach((repo) => {
-        newRepoStates[repo] = {
-          ...newRepoStates[repo],
+      Object.keys(newRepoStates).forEach((repoKey) => {
+        newRepoStates[repoKey] = {
+          ...newRepoStates[repoKey],
           status: "processing",
         };
       });
@@ -123,49 +134,54 @@ export function ChatLoadingStateProvider({ children, initialState }: { children:
         // console.log('polling', newRepoStates, isCancelled.current);
         let repos = Object.keys(newRepoStates).filter(
           (repo) =>
+            !newRepoStates[repo].indexId || 
             !newRepoStates[repo].repository ||
             (newRepoStates[repo].status !== "completed" &&
               (repoFailureCount[repo] || 0) < 3 &&
               !clonedReposWaitingForUnarchive.includes(repo)),
         );
+
         // potential problem: initialAdditionalRepos is deleted during chat
         // but once new repos are set it still polls for the repos as well.
         if (repos.length === 0) break;
-
-        // const response: RepositoryInfo[] = await fetcher(
-        //   `http://localhost:3001/api/poll/batch?repos=${repos.join(",")}`,
-        // );
-        const repoInfo: any = await fetcher(`https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/repositories/batch?repositories=${repos.join(",")}`, {
+        const response: any = await fetcher(`https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/repositories/batch?repositories=${repos.map((repo) => encode(repo, true)).join(",")}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": "Bearer " + session?.user?.token
+            "Authorization": "Bearer " + session?.user?.tokens?.github.accessToken
           },
         })
-        const response = [repoInfo.responses[0]]; // todo: catch failed repo
+        // const response = [repoInfo.responses[0]]; // todo: catch and handle failed repos
 
         for (const repoStatus of response) {
           // TODO: handle error in some
-          newRepoStates[repoStatus.repository] = {
-            ...newRepoStates[repoStatus.repository],
+          // console.log("repo status: ", repoStatus);
+
+          const repoKey = serializeRepoKey({
+            repository: repoStatus.repository,
+            branch: repoStatus.branch,
+            remote: repoStatus.remote,
+          });
+          newRepoStates[repoKey] = {
+            ...newRepoStates[repoKey],
             ...repoStatus,
             numFiles: repoStatus.numFiles,
             filesProcessed: repoStatus.filesProcessed,
             status:
-              repoStatus.status === "completed" && metalIndexStatus === "LIVE"
+              repoStatus.status === "completed" &&
+              metalIndex[repoKey]?.status === "LIVE"
                 ? "completed"
                 : repoStatus.status,
           };
-          // TODO: temporary solution, make this work with all repos
           if (
             repoStatus.status === "completed" &&
-            !clonedReposWaitingForUnarchive.includes(repoStatus.repository)
+            !clonedReposWaitingForUnarchive.includes(repoKey)
           ) {
-            clonedReposWaitingForUnarchive.push(repoStatus.repository);
+            clonedReposWaitingForUnarchive.push(repoKey);
           }
           if (repoStatus.status === "failed") {
-            repoFailureCount[repoStatus.repository] =
-              (repoFailureCount[repoStatus.repository] || 0) + 1;
+            repoFailureCount[repoKey] =
+              (repoFailureCount[repoKey] || 0) + 1;
           }
         }
 
@@ -182,44 +198,38 @@ export function ChatLoadingStateProvider({ children, initialState }: { children:
         payload: { ...chatLoadingState.loadingRepoStates, ...newRepoStates},
       });
 
-      // check if metal index is live
-      while (metalIndexStatus !== "LIVE") {
-        // set repository status to processing
-        // console.log('polling set loading repos 3')
-        chatLoadingStateDispatch({
-          action: "set_loading_repo_states",
-          payload: { ...chatLoadingState.loadingRepoStates, ...newRepoStates},
-        });
-
-        if (metalIndexStatus === "ARCHIVED") {
-          // if archived, then we need to reindex
-          fetcher(`https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/repositories/${encode(chatState.mainRepoInfo.repository, true)}/unarchive`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": "Bearer " + session?.user?.token
-            },
-          });
-          if (isCancelled.current) {
-            // console.log('Polling stopped');
-            break; // Exit the loop if polling is cancelled
+      await Promise.all(
+        Object.keys(metalIndex).map(async (repo) => {
+          while (metalIndex[repo]?.status !== "LIVE") {
+            if (metalIndex[repo]?.status === "ARCHIVED") {
+              fetcher(`https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/repositories/${encode(repo, true)}/unarchive`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": "Bearer " + session?.user?.tokens?.github.accessToken
+                },
+              });
+            }
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            if (newRepoStates[repo].indexId) {
+              metalIndex = await fetcher(`https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/repositories/${encode(repo, true)}/status`, {
+                method: "GET",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": "Bearer " +  session?.user?.tokens?.github.accessToken,
+                },
+              }).then((res) => res.status);
+            }
+            newRepoStates[repo] = {
+              ...newRepoStates[repo],
+              status:
+                metalIndex[repo]?.status === "LIVE"
+                  ? "completed"
+                  : "processing"
+            };
           }
-        }
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        metalIndexStatus = await fetcher(`https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/repositories/${encode(chatState.mainRepoInfo.repository, true)}/status`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " +  session?.user?.token,
-          },
-        }).then((res) => res.status);
-        // console.log("metalIndex", metalIndex);
-        newRepoStates[chatState.mainRepoInfo.repository] = {
-          ...newRepoStates[chatState.mainRepoInfo.repository],
-          status: metalIndexStatus === "LIVE" ? "completed" : "processing",
-        };
-        // console.log("metal index status:", metalIndexStatus);
-      }
+        })
+      );
       // console.log('polling set loading repos 4')
       chatLoadingStateDispatch({
         action: "set_loading_repo_states",
@@ -237,10 +247,12 @@ export function ChatLoadingStateProvider({ children, initialState }: { children:
       // TODO: this is not exiting properly
       isCancelled.current = true;
     };
-  }, [chatState.repoStates])
+  }, [chatState.repoStates, chatStateDispatch]);
 
   return (
-    <ChatLoadingStateContext.Provider value={{chatLoadingState, chatLoadingStateDispatch}}>
+    <ChatLoadingStateContext.Provider
+      value={{chatLoadingState, chatLoadingStateDispatch}}
+    >
       {children}
     </ChatLoadingStateContext.Provider>
   );

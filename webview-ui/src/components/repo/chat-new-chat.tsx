@@ -1,16 +1,15 @@
-import React, { useEffect, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useContext } from "react";
 import { VSCodeDropdown, VSCodeOption, VSCodeTextField, VSCodeButton } from "@vscode/webview-ui-toolkit/react";
+import { usePostHog } from "posthog-js/react";
+import mixpanel from "mixpanel-browser";
 
 import { SAMPLE_REPOS } from "../../data/constants";
 import { vscode } from "../../lib/vscode-utils";
 import { parseIdentifier } from "../../lib/onboard-utils";
-import type { Session, Membership } from "../../types/session";
 import { SessionContext } from "../../providers/session-provider";
+import type { Session} from "../../types/session";
 
 import "../../App.css";
-import mixpanel from "mixpanel-browser";
-import { usePostHog } from "posthog-js/react";
 
 interface NewChatProps {
   setDialogOpen?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -18,11 +17,9 @@ interface NewChatProps {
 
 export const NewChat = ({ setDialogOpen }: NewChatProps) => {
 
-  const { session, setSession } = useContext(SessionContext);
   const posthog = usePostHog();
 
-  const navigate = useNavigate();
-
+  const { session, setSession } = useContext(SessionContext);
   const [isCloning, setIsCloning] = React.useState(false);
 
   const handleClone = async () => {
@@ -41,7 +38,8 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
             ...session?.state,
             chat: undefined,
             messages: [],
-            repo: parsedRepo,
+            // repo: parsedRepo,
+            repo: parsedRepo.split("::")[1], // todo: add ability to choose branch
             repoInfo: undefined
           }
         } as Session);
@@ -62,7 +60,7 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer " + session?.user?.token
+          "Authorization": "Bearer " + session?.user?.tokens?.github.accessToken
         },
       })
       .then(async (res) => {
@@ -76,7 +74,7 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
           ...session,
           user: {
             ...session?.user,
-            token: session?.user?.token,
+            token: session?.user?.tokens?.github.accessToken,
             membership: response['membership']
           }
         } as Session);
@@ -87,15 +85,16 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
     
     console.log("Handling clone");
     const submitJob = async () => {
-      // console.log('Submitting ', parsedRepo);
+      console.log('Submitting ', parsedRepo);
       return fetch('https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/repositories', {
         method: "POST",
         body: JSON.stringify({
-          repository: parsedRepo || ""
+          remote: "github",
+          repository: parsedRepo.split("::")[1] || "" // todo: update
         }),
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer " + session?.user?.token
+          "Authorization": "Bearer " + session?.user?.tokens?.github.accessToken
         },
       })
       .then(async (res) => {
@@ -122,7 +121,6 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
       submitJob().then(async (res) => {
         if (res.ok) {
           console.log("Cloned repo and moving to: ", parsedRepo);
-          // navigate(`/chat/${session?.state?.repo || ""}`);
 
           vscode.postMessage({
             command: "reload",
@@ -185,7 +183,6 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
                     if (setDialogOpen) {
                       setDialogOpen(false);
                     }
-                    // navigate(`/chat/${repo.repo}`);
 
                     // update session info
                     setSession({
