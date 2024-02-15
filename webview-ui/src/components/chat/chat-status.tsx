@@ -1,18 +1,23 @@
-import React from "react";
+import React, { useContext } from "react";
 import { AlertTriangle, CheckCircle2, Terminal } from "lucide-react";
 import { VSCodeButton } from "@vscode/webview-ui-toolkit/react"
 
+import { SessionContext } from "../../providers/session-provider";
 import { useChatLoadingState } from "../../providers/chat-state-loading-provider";
 import { useChatState } from "../../providers/chat-state-provider";
+import { API_BASE } from "../../data/constants";
 
 interface ChatStatusProps {
   repoKey: string;
 }
 
 export const ChatStatus = ({ repoKey }: ChatStatusProps) => {
+  const { session, setSession } = useContext(SessionContext);
+
   const [progress, setProgress] = React.useState(0);
   const { chatLoadingState, chatLoadingStateDispatch } = useChatLoadingState();
   const { chatState, chatStateDispatch } = useChatState();
+
   const repoInfo = chatLoadingState.loadingRepoStates[repoKey] || {
     status: "submitted",
     repository: repoKey,
@@ -161,7 +166,17 @@ export const ChatStatus = ({ repoKey }: ChatStatusProps) => {
                     },
                   },
                 });
-                // todo: retry
+                fetch(`${API_BASE}/prod/v1/repositories`, { // todo: test
+                  method: "POST",
+                  body: JSON.stringify({
+                    remote: "github", // todo: update
+                    repository: repoInfo.repository
+                  }),
+                  headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + session?.user?.tokens?.github.accessToken
+                  },
+                });
               }}
             >
               Retry
