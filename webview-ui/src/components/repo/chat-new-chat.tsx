@@ -90,7 +90,7 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
         method: "POST",
         body: JSON.stringify({
           remote: "github", // todo: update
-          repository: parsedRepo.split(":")[1] || ""
+          repository: parsedRepo.split(":")[1].toLowerCase() || ""
         }),
         headers: {
           "Content-Type": "application/json",

@@ -127,7 +127,7 @@ export default function ChatPage({}: ChatPageProps) {
             throw new Error("Unauthorized or Does not exist");
           console.log("verified permission");
 
-          let temp = dRepoKey.remote + ":" + dRepoKey.repository + ":" + dRepoKey.branch;
+          let temp = dRepoKey.remote + ":" + dRepoKey.repository.toLowerCase() + ":" + dRepoKey.branch;
 
           let repoInfo = await getRepo(temp, session) // returns [failed, responses]
           .catch((e) => {
