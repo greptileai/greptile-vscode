@@ -157,8 +157,8 @@ export const Chat = function ChatComponent({
                             })}
                         </ChatLoadingStateProvider>
                         <p>
-                            We will email you at {session?.user?.email} once the
-                            repositories have finished processing
+                            We will email you at {session?.user?.userId} once your
+                            repository has finished processing.
                         </p>
                     </div>
                 </div>

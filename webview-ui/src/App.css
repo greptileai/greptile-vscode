@@ -189,3 +189,48 @@ a:active {
 .icon {
   font-size: var(--vscode-font-size);
 }
+
+.progress-icon {
+  color: green;
+}
+
+.circular-progress-bar {
+  vertical-align: top;
+}
+
+.progress-outline {
+  fill: transparent;
+  stroke: gray;
+}
+
+.progress-fill {
+  fill: transparent;
+  stroke: #1177bb;
+  transition: 'stroke-dashoffset 0.35s';
+}
+
+.processing-body {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 0.5rem 1rem;
+}
+
+.processing-title {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 0.5rem 0.5rem 0;
+}
+
+.processing-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  padding-bottom: 2px;
+}
+
+.processing-status {
+  grid-column: span 5 / span 5;
+}

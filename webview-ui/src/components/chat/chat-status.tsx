@@ -54,94 +54,76 @@ export const ChatStatus = ({ repoKey }: ChatStatusProps) => {
   const currentStep = repoInfo?.status ? steps.indexOf(repoInfo.status) : 0;
   return (
     <div>
-      <span>
-        <p>
-          {repoInfo.repository} ({repoInfo.branch})
-        </p>
+      <span className="processing-title">
+        Processing <code>{repoInfo.repository} ({repoInfo.branch})</code>
       </span>
-      <div>
-        <div>
-          <CircularProgressBar
-            progress={repoInfo.status === "submitted" ? 50 : 0}
-            size={24}
-            completed={
-              repoInfo.status === "cloning" || repoInfo.status === "processing"
-            }
-          />
-        </div>
-        <div>Submitted</div>
-        <div>
-          {currentStep <= 0
-            ? "Submitting repository..."
-            : "Repository submitted"}
-        </div>
-      </div>
-      <div>
-        <div>
-          <CircularProgressBar
-            progress={repoInfo.status === "cloning" ? 50 : 0}
-            size={24}
-            completed={repoInfo.status === "processing"}
-          />
-        </div>
-        <div>Cloning</div>
-        <div>
-          {currentStep <= 1
-            ? currentStep < 1
-              ? "Clone repository for processing"
-              : "Cloning repository..."
-            : "Repository cloned"}
-        </div>
-      </div>
-      <div>
-        <div>
-          <CircularProgressBar
-            progress={
-              repoInfo.status === "processing"
-                ? ((repoInfo?.filesProcessed || 0) /
-                    (repoInfo?.numFiles || 1)) *
-                  100
-                : 0
-            }
-            size={24}
-          />
-        </div>
-        <div>Processing</div>
-        <div>
-          {currentStep <= 2
-            ? currentStep < 2
-              ? "Process repository"
-              : "Processing repository..."
-            : "Repository processed"}
-        </div>
-        <div>
-          <strong>
-            {(
-              ((repoInfo?.filesProcessed || 0) / (repoInfo?.numFiles || 1)) *
-              100
-            ).toFixed(0)}
-            %
-          </strong>
-        </div>
-      </div>
-      {repoInfo.status !== "failed" ? (
-        <div>
-          <div>
+      <div className="processing-body">
+        <div id="submitted" className="processing-grid">
             <CircularProgressBar
-              progress={repoInfo.status === "completed" ? 100 : 0}
-              size={24}
+              progress={repoInfo.status === "submitted" ? 50 : 0}
+              size={16}
+              completed={
+                repoInfo.status === "cloning" || repoInfo.status === "processing"
+              }
             />
+          <div className="processing-status">
+            {currentStep <= 0
+              ? "Submitting repository..."
+              : "Repository submitted"}
           </div>
-          <div>Completed</div>
-          <div></div>
         </div>
-      ) : (
-        <div>
-          <div>
-            <CircularProgressBar progress={100} size={24} />
+        <div id="cloning" className="processing-grid">
+            <CircularProgressBar
+              progress={repoInfo.status === "cloning" ? 50 : 0}
+              size={16}
+              completed={repoInfo.status === "processing"}
+            />
+          <div className="processing-status">
+            {currentStep <= 1
+              ? currentStep < 1
+                ? "Clone repository for processing"
+                : "Cloning repository..."
+              : "Repository cloned"}
           </div>
-          <div>Failed</div>
-          <div>This repo failed to process</div>
+        </div>
+        <div id="processing" className="processing-grid">
+            <CircularProgressBar
+              progress={
+                repoInfo.status === "processing"
+                  ? ((repoInfo?.filesProcessed || 0) /
+                      (repoInfo?.numFiles || 1)) *
+                    100
+                  : 0
+              }
+              size={16}
+            />
+          <div className="processing-status">
+            {currentStep <= 2
+              ? currentStep < 2
+                ? "Process repository"
+                : "Processing repository..."
+              : "Repository processed"}
+          </div>
+          <div>
+              {(
+                ((repoInfo?.filesProcessed || 0) / (repoInfo?.numFiles || 1)) *
+                100
+              ).toFixed(0)}
+              %
+          </div>
+        </div>
+        {repoInfo.status !== "failed" ? (
+          <div id="completed" className="processing-grid">
+              <CircularProgressBar
+                progress={repoInfo.status === "completed" ? 100 : 0}
+                size={16}
+              />
+            <div className="processing-status">Complete</div>
+          </div>
+        ) : ( // todo: test
+          <div id="failed" className="processing-grid">
+              <CircularProgressBar progress={100} size={16} />
+            <div className="processing-status">Failed to process</div>
           <div>
             <VSCodeButton
               onClick={(target) => {
@@ -166,7 +148,7 @@ export const ChatStatus = ({ repoKey }: ChatStatusProps) => {
                     },
                   },
                 });
-                fetch(`${API_BASE}/prod/v1/repositories`, { // todo: test
+                fetch(`${API_BASE}/prod/v1/repositories`, {
                   method: "POST",
                   body: JSON.stringify({
                     remote: "github", // todo: update
@@ -183,7 +165,8 @@ export const ChatStatus = ({ repoKey }: ChatStatusProps) => {
             </VSCodeButton>
           </div>
         </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
@@ -223,27 +206,28 @@ const CircularProgressBar = ({
   if (completed) {
     return (
       <div>
-        <CheckCircle2 size={size} color="green" />
+        <div className="progress-icon codicon codicon-pass"></div>
       </div>
     );
   }
 
   return (
-    <div>
+    <div className="circular-progress-bar">
       <svg width={size} height={size}>
         <circle
+          className="progress-outline"
           strokeWidth={strokeWidth}
           r={radius}
           cx={size / 2}
           cy={size / 2}
         />
         <circle
+          className="progress-fill"
           strokeWidth={strokeWidth}
           r={radius}
           cx={size / 2}
           cy={size / 2}
           strokeDasharray={strokeDasharray}
-          // style={{ transition: 'stroke-dashoffset 0.35s' }}
           transform={`rotate(-90 ${size / 2} ${size / 2})`}
         />
       </svg>
