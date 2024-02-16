@@ -15,7 +15,7 @@ import {
   getLatestCommit,
   serializeRepoKey
 } from "../lib/onboard-utils";
-import { type RepositoryInfo } from "../types/chat";
+import { RepositoryInfo, RepoKey } from "../types/chat";
 
 export type ChatLoadingState = {
   loadingRepoStates: { [repo: string]: RepositoryInfo };
@@ -159,10 +159,10 @@ export function ChatLoadingStateProvider({
           // console.log("repo status: ", repoStatus);
 
           const repoKey = serializeRepoKey({
+            remote: repoStatus.remote,
             repository: repoStatus.repository,
             branch: repoStatus.branch,
-            remote: repoStatus.remote,
-          });
+          } as RepoKey);
           newRepoStates[repoKey] = {
             ...newRepoStates[repoKey],
             ...repoStatus,

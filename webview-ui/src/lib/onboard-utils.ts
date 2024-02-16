@@ -91,8 +91,8 @@ export const parseIdentifier = (input: string): string | null => {
     if (keys.length === 1)
       return serializeRepoKey({
         remote: "github",
-        branch: "",
         repository: keys[0],
+        branch: ""
       });
     if (keys.length === 3) {
       let remote = keys[0],
@@ -105,8 +105,8 @@ export const parseIdentifier = (input: string): string | null => {
       }
       return serializeRepoKey({
         remote: remote,
-        branch: branch,
         repository: repository,
+        branch: branch
       });
     }
     return null; // only 2 entries may be ambiguous (1 might be as well...)
@@ -157,8 +157,8 @@ export const parseIdentifier = (input: string): string | null => {
       if (!repository) return null;
       return serializeRepoKey({
         remote: remote,
-        branch: branch || "",
         repository: repository,
+        branch: branch || ""
       });
     } catch (e) {
       return null;
@@ -289,7 +289,7 @@ export const getNewSessionId = () => {
 };
 
 export function deserializeRepoKey(repoKey: string): RepoKey {
-  let [remote, branch, repository] = repoKey.split(":");
+  let [remote, repository, branch] = repoKey.split(":");
   if (remote !== "github" && remote !== "gitlab" && remote !== "azure") {
     remote = "github";
   }
@@ -303,8 +303,8 @@ export function deserializeRepoKey(repoKey: string): RepoKey {
 }
 
 export function serializeRepoKey(repoKey: RepoKey): string {
-  const { remote, branch, repository } = repoKey;
-  return `${remote}:${branch}:${repository}`;
+  const { remote, repository, branch } = repoKey;
+  return `${remote}:${repository}:${branch}`;
 }
 
 export function getRepoKeysFromParams(params: {

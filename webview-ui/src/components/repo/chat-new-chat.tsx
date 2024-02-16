@@ -39,7 +39,7 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
             chat: undefined,
             messages: [],
             // repo: parsedRepo,
-            repo: parsedRepo.split("::")[1], // todo: add ability to choose branch
+            repo: parsedRepo.split(":")[1], // todo: add ability to choose branch
             repoInfo: undefined
           }
         } as Session);
@@ -89,8 +89,8 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
       return fetch(`${API_BASE}/repositories`, {
         method: "POST",
         body: JSON.stringify({
-          remote: "github",
-          repository: parsedRepo.split("::")[1] || "" // todo: update
+          remote: "github", // todo: update
+          repository: parsedRepo.split(":")[1] || ""
         }),
         headers: {
           "Content-Type": "application/json",
