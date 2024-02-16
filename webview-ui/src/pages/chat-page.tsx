@@ -32,7 +32,9 @@ export default function ChatPage({}: ChatPageProps) {
 
   const [repoInfo, setRepoInfo] = useState<RepositoryInfo | null>(null);
   const [repos, setRepos] = useState<string[]>([]);
-  const [repoStates, setRepoStates] = useState<{ [repoKey: string]: RepositoryInfo }>({});
+  const [repoStates, setRepoStates] = useState<{ [repoKey: string]: RepositoryInfo }>({
+    [`${session?.state?.repoInfo?.remote}:${session?.state?.repoInfo?.repository}:${session?.state?.repoInfo?.branch}`]: session?.state?.repoInfo
+  });
 
   useEffect(() => {
     if (!repoInfo) return;
@@ -66,11 +68,11 @@ export default function ChatPage({}: ChatPageProps) {
 
          // **************** get chat info *******************
 
-         let chat: Chat | null = session_id
-          ? await getChat(session_id, user_id, session)
-          : await getNewChat(user_id, repo);
-
-          // console.log("chat: ", chat);
+        //  let chat: Chat | null = session_id
+        //   ? await getChat(session_id, user_id, session)
+        //   : await getNewChat(user_id, repo);
+        // console.log("chat: ", chat);
+          let chat: Chat | null = await getNewChat(user_id, repo);
 
           if (!chat && !session_id) {
             // console.log("no chat and no session_id");
@@ -129,16 +131,16 @@ export default function ChatPage({}: ChatPageProps) {
 
           let temp = dRepoKey.remote + ":" + dRepoKey.repository.toLowerCase() + ":" + dRepoKey.branch;
 
-          let repoInfo = await getRepo(temp, session) // returns [failed, responses]
+          let repoInfos = await getRepo(temp, session) // returns [failed, responses]
           .catch((e) => {
             console.error(e);
           });
           // console.log("repoInfo: ", repoInfo);
-          if (!repoInfo) {
+          if (!repoInfos) {
             console.log("no repo info");
             return;
           }
-          return [temp, repoInfo] as [ // changed, might need to revert
+          return [temp, repoInfos] as [
             string,
             any // RepositoryInfo,
           ];
@@ -157,7 +159,6 @@ export default function ChatPage({}: ChatPageProps) {
             setRepoInfo(repoInformation.responses[0]); // todo: support multiple repos and handle failed repos
             
             setRepoStates({
-              // ...repoStates,
               [repoKey]: {
                   ...repoInformation.responses[0],
                   status: repoInformation.status || "submitted",
