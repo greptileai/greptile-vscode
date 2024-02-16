@@ -1,5 +1,4 @@
 import * as React from "react";
-import { Globe, Minus, Plus } from "lucide-react";
 import { decode } from "js-base64";
 
 import { ChatLoadingSkeleton } from "./chat-loading-skeleton";
@@ -30,6 +29,7 @@ export const ChatMessageSources = ({
   ) => {
     if (repoState?.external)
       return `https://${repoKey}${source?.metadata?.filepath}`;
+
     return getRepoUrlForAction(
       {
         repository: repoState?.repository,
@@ -56,40 +56,23 @@ export const ChatMessageSources = ({
         const match = source?.metadata?.repository?.match(regex);
         let repo = source?.metadata?.repository;
         if (!match) repo = decode(source?.metadata?.repository);
-        const repoKey = `${remote}:${branch}:${repo}`;
 
-        const getIcon = (remote: string) => {
-          switch (remote) {
-            case "github":
-            case "gitlab":
-            default:
-              return <Globe />;
-          }
-        };
+        const urlRepoKey = `${remote}:${branch}:${repo}`;
+        const repoKey = `${remote}:${repo}:${branch}`;
 
         return (
           <a
             key={index}
-            href={getURL(repoKey, repoStates[repoKey], source)}
+            href={getURL(urlRepoKey, repoStates[repoKey], source)}
             target="_blank"
           >
             <div>
-              <div>
-                {getIcon(remote)}
-              </div>
+              {repo}:{branch}
               <span>
                 /{source?.metadata?.filepath}
               </span>{" "}
               {source.lines ? `[${source.lines[0]}:${source.lines[1]}]` : ""}
-            </div>
-
-            <div>
-              <div>
-                {repo}
-              </div>
-              <div>
-                {branch}
-              </div>
+              <div className="icon codicon codicon-link-external"></div>
             </div>
           </a>
         );
@@ -103,12 +86,10 @@ export const ChatMessageSources = ({
         >
           <div>
             {expandedSources ? (
-              <Minus />
+              <div className="icon codicon codicon-chevron-up"></div>
             ) : (
-              <Plus />
+              <div className="icon codicon codicon-chevron-down"></div>
             )}
-          </div>
-          <div>
             {expandedSources
               ? `Collapse`
               : `View ${
