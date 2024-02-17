@@ -38,8 +38,7 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
             ...session?.state,
             chat: undefined,
             messages: [],
-            // repo: parsedRepo,
-            repo: parsedRepo.split(":")[1], // todo: add ability to choose branch
+            repo: parsedRepo.split(":")[1], // todo: make repos
             repoInfo: undefined
           }
         } as Session);
@@ -148,6 +147,7 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
             });
             console.log("Unknown Error", res.status, res.statusText);
           }
+          // todo: catch bad branches
           setIsCloning(false);
         }
       });

@@ -90,7 +90,7 @@ export function ChatLoadingStateProvider({
             fetch(`${API_BASE}/prod/v1/repositories`, {
               method: "POST",
               body: JSON.stringify({
-                remote: "github", // todo: update
+                remote: "github", // todo: support others
                 repository: newRepoStates[repoKey].repository,
                 notify: false,
               }),
@@ -152,7 +152,6 @@ export function ChatLoadingStateProvider({
             "Authorization": "Bearer " + session?.user?.tokens?.github.accessToken
           },
         })
-        // const response = [repoInfo.responses[0]]; // todo: catch and handle failed repos
 
         for (const repoStatus of response) {
           // TODO: handle error in some

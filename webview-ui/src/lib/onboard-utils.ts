@@ -61,7 +61,7 @@ export const getDefaultBranch = async (
   return result;
 };
 
-export const getLatestCommit = async ( // todo: check
+export const getLatestCommit = async (
   repoKey: string,
   session: Session | null
 ) => {
@@ -69,7 +69,6 @@ export const getLatestCommit = async ( // todo: check
 
   console.log("getting latest commit");
   const result = await getRemote(repoKey, "commit", session?.user?.tokens?.[repoKeyObj.remote]?.accessToken)
-  // .then((res) => res.json())
   .then((res) => res.data.sha) // TODO make sure that this is the correct field for gitlab
   .catch(() => undefined);
 
@@ -462,7 +461,7 @@ async function getRemote(repoKey: string, action: string, token: string) {
       "Authorization": `Bearer ${token}` 
     };
 
-    const externalResponse = await axios.get(url, { headers }); // todo: check encoding
+    const externalResponse = await axios.get(url, { headers });
     const data = await externalResponse.data;
     console.log("data retrieved");
     return { data: data, status: 200 };

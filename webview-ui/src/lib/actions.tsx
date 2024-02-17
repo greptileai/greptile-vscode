@@ -22,7 +22,6 @@ export async function getChat(
           "Authorization": "Bearer " + session?.user?.tokens?.github.accessToken
         },
       })
-      // console.log(chat);
 
       if (!chat || (user_id && chat.user_id !== user_id)) {
         throw new Error("Chat did not return anything or user_id does not match");

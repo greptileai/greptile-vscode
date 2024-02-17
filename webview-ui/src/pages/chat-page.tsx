@@ -56,7 +56,6 @@ export default function ChatPage({}: ChatPageProps) {
 
   // TODO concurrentize these api calls.
   // repoInfo might not exist if it is not processed yet
-  // console.log("fetching repo info, repo:", repo);
 
   useEffect(() => {
     async function fetchInfo() {
@@ -71,11 +70,9 @@ export default function ChatPage({}: ChatPageProps) {
         //  let chat: Chat | null = session_id
         //   ? await getChat(session_id, user_id, session)
         //   : await getNewChat(user_id, repo);
-        // console.log("chat: ", chat);
-          let chat: Chat | null = await getNewChat(user_id, repo);
+        let chat: Chat | null = await getNewChat(user_id, repo);
 
           if (!chat && !session_id) {
-            // console.log("no chat and no session_id");
             chat = await getNewChat(user_id, repo);
           }
   
@@ -99,7 +96,7 @@ export default function ChatPage({}: ChatPageProps) {
         const repos: string[] = [parseIdentifier(repo)];
 
         if (repos.length === 0) console.log("not found");
-        // console.log("repos: ", repos);
+
         setRepos(repos);
 
         // get empty branches and set them in new db
@@ -110,7 +107,6 @@ export default function ChatPage({}: ChatPageProps) {
           if (!dRepoKey.branch)
             defaultBranch = await getDefaultBranch(repoKey, session);
             dRepoKey.branch = defaultBranch;
-          // console.log("default branch: ", defaultBranch);
 
           // replace significant-gravitas/auto-gpt with significant-gravitas/autogpt
           // hacky solution, works for now. Ideally get the canonical name from the remote
@@ -124,7 +120,6 @@ export default function ChatPage({}: ChatPageProps) {
           )
             ? 200
             : await checkRepoAuthorization(completeRepoKey, session);
-          // console.log("status: ", status);
           if (status !== 200 && status !== 426)
             throw new Error("Unauthorized or Does not exist");
           console.log("verified permission");
@@ -135,7 +130,6 @@ export default function ChatPage({}: ChatPageProps) {
           .catch((e) => {
             console.error(e);
           });
-          // console.log("repoInfo: ", repoInfo);
           if (!repoInfos) {
             console.log("no repo info");
             return;
@@ -163,7 +157,7 @@ export default function ChatPage({}: ChatPageProps) {
                   ...repoInformation.responses[0],
                   status: repoInformation.status || "submitted",
                 }
-            }); // todo: check this
+            });
 
             successes++;
           } else {
@@ -203,7 +197,7 @@ export default function ChatPage({}: ChatPageProps) {
     click [here](https://calendly.com/dakshgupta/free-coffee).`,
   } as Message;
 
-  const formatted_chat_log = session?.state?.chat_log || [];
+  const formatted_chat_log = session?.state?.messages || [];
   // console.log('repostates: ', repoStates);
 
   return (
