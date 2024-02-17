@@ -10,6 +10,7 @@ export type Session = {
     state?: {
         url: string;
         repo: string;
+        branch?: string;
         repoUrl: string;
         repoInfo?: RepositoryInfo;
         chat?: Chat;

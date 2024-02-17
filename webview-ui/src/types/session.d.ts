@@ -9,7 +9,8 @@ export enum Membership {
 export type Session = {
     state?: {
         url: string;
-        repo: string; // encoded repoKey?
+        repo: string;
+        branch?: string;
         repoUrl: string;
         repoInfo?: RepositoryInfo;
         chat?: Chat;
