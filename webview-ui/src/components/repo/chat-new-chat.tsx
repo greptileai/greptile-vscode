@@ -26,10 +26,11 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
     setIsCloning(true);
 
     const repoUrl = session?.state?.repoUrl;
+    const branch = session?.state?.branch;
     let parsedRepo = '';
     if (repoUrl) {
       // Parse the repo URL to get the repo identifier
-      parsedRepo = parseIdentifier(repoUrl);
+      parsedRepo = parseIdentifier(repoUrl) + `${branch}`;
       if (parsedRepo) {
         // If the repo is parsed successfully, update the session state
         setSession({
@@ -235,6 +236,23 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
                   }}
                 >
                   Github URL
+                </VSCodeTextField>
+                <VSCodeTextField
+                  placeholder="default"
+                  value={session?.state?.branch || ""}
+                  onKeyDown={handleKeyDown}
+                  onInput={(event) => {
+                    setSession({
+                      ...session,
+                      state: {
+                        ...session?.state,
+                        branch: event.currentTarget.value
+                      }
+                    });
+                  }}
+                  className="branch"
+                >
+                  Branch
                 </VSCodeTextField>
                 <VSCodeButton
                   appearance="primary"

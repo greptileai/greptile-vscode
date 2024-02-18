@@ -97,11 +97,9 @@ export default function ChatPage({}: ChatPageProps) {
         // get empty branches and set them in new db
         const getRepoInfoAndPermission = repoKeys.map(async (repoKey: string) => {
           const dRepoKey = deserializeRepoKey(repoKey);
-          let defaultBranch = "";
           if (!dRepoKey.remote) dRepoKey.remote = "github";
           if (!dRepoKey.branch)
-            defaultBranch = await getDefaultBranch(repoKey, session);
-            dRepoKey.branch = defaultBranch;
+            dRepoKey.branch = await getDefaultBranch(repoKey, session);
 
           // replace significant-gravitas/auto-gpt with significant-gravitas/autogpt
           // hacky solution, works for now. Ideally get the canonical name from the remote

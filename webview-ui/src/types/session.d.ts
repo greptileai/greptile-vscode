@@ -11,6 +11,7 @@ export type Session = {
         url: string;
         repos: string[];
         repoUrl: string;
+        branch?: string;
         repoInfo?: RepositoryInfo;
         chat?: Chat;
         messages: Message[];

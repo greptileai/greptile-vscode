@@ -179,6 +179,10 @@ a:active {
   margin-left: 0.5rem;
 }
 
+.branch {
+  margin-left: 0.5rem;
+}
+
 .centered-container {
   display: flex;
   justify-content: center;
