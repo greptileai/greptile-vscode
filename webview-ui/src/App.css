@@ -195,12 +195,12 @@ a:active {
 
 .circular-progress-bar .outline {
   fill: transparent;
-  stroke: var(--vscode-welcomePage-progress-background);
+  stroke: var(--vscode-list-hoverBackground);
 }
 
 .circular-progress-bar .fill {
   fill: transparent;
-  stroke: var(--vscode-welcomePage-progress-foreground);
+  stroke: var(--vscode-progressBar-background);
   transition: 'stroke-dashoffset 0.35s';
 }
 
