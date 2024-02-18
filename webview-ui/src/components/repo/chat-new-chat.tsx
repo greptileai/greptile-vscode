@@ -5,7 +5,7 @@ import mixpanel from "mixpanel-browser";
 
 import { SAMPLE_REPOS, API_BASE } from "../../data/constants";
 import { vscode } from "../../lib/vscode-utils";
-import { parseIdentifier } from "../../lib/onboard-utils";
+import { deserializeRepoKey, parseIdentifier, serializeRepoKey } from "../../lib/onboard-utils";
 import { SessionContext } from "../../providers/session-provider";
 import type { Session} from "../../types/session";
 
@@ -38,7 +38,7 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
             ...session?.state,
             chat: undefined,
             messages: [],
-            repo: parsedRepo.split(":")[1], // todo: make repos
+            repos: [parsedRepo],
             repoInfo: undefined
           }
         } as Session);
@@ -85,11 +85,14 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
     console.log("Handling clone");
     const submitJob = async () => {
       console.log('Submitting ', parsedRepo);
+
+      const dRepoKey = deserializeRepoKey(parsedRepo);
+
       return fetch(`${API_BASE}/repositories`, {
         method: "POST",
         body: JSON.stringify({
-          remote: "github", // todo: update
-          repository: parsedRepo.split(":")[1].toLowerCase() || ""
+          remote: dRepoKey.remote,
+          repository: dRepoKey.repository.toLowerCase() || ""
         }),
         headers: {
           "Content-Type": "application/json",
@@ -184,12 +187,18 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
                       setDialogOpen(false);
                     }
 
+                    const repoKey = serializeRepoKey({
+                      remote: "github",
+                      repository: repo.repo,
+                      branch: ""
+                    });
+
                     // update session info
                     setSession({
                       ...session,
                       state: {
                         ...session?.state,
-                        repo: repo.repo,
+                        repos: [repoKey],
                         chat: undefined, // 
                         repoInfo: undefined //
                       }
@@ -237,8 +246,6 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
                   {isCloning ? 'Loading...' : 'Submit'}
                 </VSCodeButton>
               </div>
-            {/* or
-            <p>Recent Repos:</p> */}
           </div>
         </div>
       ) : (

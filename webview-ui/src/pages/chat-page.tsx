@@ -27,13 +27,12 @@ export default function ChatPage({}: ChatPageProps) {
 
   const session_id = session?.state?.chat?.session_id;
   const user_id = session?.user?.userId;
-  const repo = session?.state?.repo;
-  if (!repo) return <div>No repo chosen</div>;
+  if (!session?.state?.repos) return <div>No repo chosen</div>;
 
   const [repoInfo, setRepoInfo] = useState<RepositoryInfo | null>(null);
   const [repos, setRepos] = useState<string[]>([]);
   const [repoStates, setRepoStates] = useState<{ [repoKey: string]: RepositoryInfo }>({
-    [`${session?.state?.repoInfo?.remote}:${session?.state?.repoInfo?.repository}:${session?.state?.repoInfo?.branch}`]: session?.state?.repoInfo
+    [session?.state?.repos[0]]: session?.state?.repoInfo
   });
 
   useEffect(() => {
@@ -59,7 +58,7 @@ export default function ChatPage({}: ChatPageProps) {
 
   useEffect(() => {
     async function fetchInfo() {
-      console.log("Running fetchInfo for", repo, session)
+      console.log("Running fetchInfo for", session?.state?.repos, session)
 
         // check with GitHub if user has access to repo
         // const status = await checkRepoAuthorization(repo, session);
@@ -70,37 +69,33 @@ export default function ChatPage({}: ChatPageProps) {
         //  let chat: Chat | null = session_id
         //   ? await getChat(session_id, user_id, session)
         //   : await getNewChat(user_id, repo);
-        let chat: Chat | null = await getNewChat(user_id, repo);
+        let chat: Chat | null = await getNewChat(user_id, session?.state?.repos);
 
-          if (!chat && !session_id) {
-            chat = await getNewChat(user_id, repo);
+        if (!chat && !session_id) {
+          chat = await getNewChat(user_id, session?.state?.repos);
+        }
+
+        setSession({
+          ...session,
+          state: {
+            ...session?.state,
+            chat: chat
           }
-  
-          setSession({
-            ...session,
-            state: {
-              ...session?.state,
-              chat: chat
-            }
-          })
+        })
+
+        if (!chat) console.log("no chat found");
 
         // **************** get repo info *******************
-
-        const repoKeys = session?.state?.repo; // todo: update to support multiple repos
-
-        if (!chat && !repoKeys.length) console.log("not found");
 
         // const repos: string[] = (
         //   chat?.repos.map((repo) => parseIdentifier(repo) || "") || []
         // ).concat(repoKeys || []);
-        const repos: string[] = [parseIdentifier(repo)];
+        const repoKeys: string[] = session?.state?.repos;
+        setRepos(repoKeys);
 
-        if (repos.length === 0) console.log("not found");
-
-        setRepos(repos);
 
         // get empty branches and set them in new db
-        const getRepoInfoAndPermission = repos.map(async (repoKey: string) => {
+        const getRepoInfoAndPermission = repoKeys.map(async (repoKey: string) => {
           const dRepoKey = deserializeRepoKey(repoKey);
           let defaultBranch = "";
           if (!dRepoKey.remote) dRepoKey.remote = "github";
@@ -115,6 +110,7 @@ export default function ChatPage({}: ChatPageProps) {
           }
 
           const completeRepoKey = serializeRepoKey(dRepoKey);
+          console.log('complete repo key: ', completeRepoKey)
           const status = SAMPLE_REPOS.map((repo) => repo.repo).includes(
             dRepoKey.repository,
           )
@@ -124,9 +120,8 @@ export default function ChatPage({}: ChatPageProps) {
             throw new Error("Unauthorized or Does not exist");
           console.log("verified permission");
 
-          let temp = dRepoKey.remote + ":" + dRepoKey.repository.toLowerCase() + ":" + dRepoKey.branch;
-
-          let repoInfos = await getRepo(temp, session) // returns [failed, responses]
+          // todo: update session repoKeys
+          let repoInfos = await getRepo(completeRepoKey, session) // returns [failed, responses]
           .catch((e) => {
             console.error(e);
           });
@@ -134,7 +129,7 @@ export default function ChatPage({}: ChatPageProps) {
             console.log("no repo info");
             return;
           }
-          return [temp, repoInfos] as [
+          return [completeRepoKey, repoInfos] as [
             string,
             any // RepositoryInfo,
           ];
@@ -183,7 +178,7 @@ export default function ChatPage({}: ChatPageProps) {
       .join(", ");
     return (
       repoNames.slice(0, repoNames.lastIndexOf(", ")) +
-      " and " +
+      " and " + 
       repoNames.slice(repoNames.lastIndexOf(", ") + 2)
     );
   };
