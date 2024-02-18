@@ -1,5 +1,4 @@
-import React, { useContext } from "react";
-import { AlertTriangle, CheckCircle2, Terminal } from "lucide-react";
+import { useState, useEffect, useContext } from "react";
 import { VSCodeButton } from "@vscode/webview-ui-toolkit/react"
 
 import { SessionContext } from "../../providers/session-provider";
@@ -14,7 +13,7 @@ interface ChatStatusProps {
 export const ChatStatus = ({ repoKey }: ChatStatusProps) => {
   const { session, setSession } = useContext(SessionContext);
 
-  const [progress, setProgress] = React.useState(0);
+  const [progress, setProgress] = useState(0);
   const { chatLoadingState, chatLoadingStateDispatch } = useChatLoadingState();
   const { chatState, chatStateDispatch } = useChatState();
 
@@ -27,7 +26,7 @@ export const ChatStatus = ({ repoKey }: ChatStatusProps) => {
     filesProcessed: 0,
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     setProgress(
       (100 * (repoInfo?.filesProcessed || 1)) / (repoInfo?.numFiles || 1),
     );
@@ -42,7 +41,7 @@ export const ChatStatus = ({ repoKey }: ChatStatusProps) => {
     undefined,
   ];
 
-  React.useEffect(() => {
+  useEffect(() => {
     // increment by 1 every second
     const interval = setInterval(() => {
       setProgress((progress) =>
@@ -206,23 +205,22 @@ const CircularProgressBar = ({
   if (completed) {
     return (
       <div>
-        <div className="progress-icon codicon codicon-pass"></div>
+        <div className="text-green icon codicon codicon-pass"></div>
       </div>
     );
   }
 
   return (
-    <div className="circular-progress-bar">
-      <svg width={size} height={size}>
+      <svg width={size} height={size} className="circular-progress-bar">
         <circle
-          className="progress-outline"
+          className="outline"
           strokeWidth={strokeWidth}
           r={radius}
           cx={size / 2}
           cy={size / 2}
         />
         <circle
-          className="progress-fill"
+          className="fill"
           strokeWidth={strokeWidth}
           r={radius}
           cx={size / 2}
@@ -231,6 +229,5 @@ const CircularProgressBar = ({
           transform={`rotate(-90 ${size / 2} ${size / 2})`}
         />
       </svg>
-    </div>
   );
 };

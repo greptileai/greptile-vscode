@@ -175,9 +175,9 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
     <div>
       {session ? (
         <div>
-          <div className="dropdown-container">
-            <label htmlFor="my-dropdown">Try a Popular Repo: </label>
-            <VSCodeDropdown id="my-dropdown">
+          <div id="sample-repos">
+            <label htmlFor="sample-repos-dropdown">Try a Popular Repo: </label>
+            <VSCodeDropdown id="sample-repos-dropdown">
             {SAMPLE_REPOS.map((repo, index) => (
                   <VSCodeOption
                   key={index}
@@ -220,7 +220,7 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
           or
           <div>
             <p>Enter a Repo:</p>
-              <div className="flex-row">
+              <div id="new-repo-container">
                 <VSCodeTextField
                   placeholder=""
                   value={session?.state?.repoUrl || ""}
@@ -238,6 +238,7 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
                   Github URL
                 </VSCodeTextField>
                 <VSCodeTextField
+                  id="new-repo-branch"
                   placeholder="default"
                   value={session?.state?.branch || ""}
                   onKeyDown={handleKeyDown}
@@ -250,15 +251,14 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
                       }
                     });
                   }}
-                  className="branch"
                 >
                   Branch
                 </VSCodeTextField>
                 <VSCodeButton
+                  id="new-repo-submit"
                   appearance="primary"
                   aria-label="Submit repo"
                   onClick={handleClone}
-                  className="submit"
                   disabled={!!session?.state?.error}
                 >
                   {isCloning ? 'Loading...' : 'Submit'}
@@ -267,7 +267,7 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
           </div>
         </div>
       ) : (
-        <div className="centered-container">
+        <div id="login-container">
           <VSCodeButton
             onClick={() => {
               posthog.capture("Github Login Clicked", { source: "onboard-vscode" });

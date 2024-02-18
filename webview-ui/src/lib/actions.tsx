@@ -60,6 +60,7 @@ export async function getRepo(
   repoKey: string, // remote:repository:branch
   session: Session
 ): Promise<RepositoryInfo | null> {
+  // console.log(repoKey)
   try {
     const repoInfo: any = await fetcher(`${API_BASE}/repositories/batch?repositories=${encode(repoKey, true)}`, {
       method: "GET",
@@ -68,6 +69,7 @@ export async function getRepo(
         "Authorization": "Bearer " + session?.user?.tokens?.github.accessToken
       },
     })
+    // console.log('REPOINFO: ', repoInfo)
     return repoInfo;
   } catch (error) {
     console.log(error);

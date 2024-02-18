@@ -61,7 +61,6 @@ export function PromptForm({
           disabled={isLoading || chatState.disabled.value || !someValidRepos}
           resize={"both"}
           onInput={(e) => setInput(e.target.value)}
-          // placeholder="Send a message"
           placeholder={
             someValidRepos
               ? "Ask a question"
@@ -78,7 +77,6 @@ export function PromptForm({
             disabled={isLoading || input === ""} // isStreaming?
             className="button"
           >
-
             Send message
           </VSCodeButton>
           {renderButton()}

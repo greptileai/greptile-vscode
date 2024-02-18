@@ -46,14 +46,14 @@ export function ChatMessage({
   return (
     <div
       {...props}
-      className="outer-div"
+      className="message-container"
     >
-      <div className="inner-icon">
+      <div className="role-icon">
         {message.role === "user" ? "🫵" : "🤖"}
       </div>
-      <div className="inner-message">
+      <div className="message-content">
         {message.agentStatus && (
-          <div className="agent-status">
+          <div className="bold">
             {message.agentStatus}
           </div>
         )}
@@ -197,19 +197,6 @@ export function ChatMessage({
           )}
         </div>
         <div>
-          {/* <ChatMessageSources
-            sources={message.sources || []}
-            repoStates={repoStates}
-            isLoading={sourcesLoading}
-          /> */}
-          <div>
-            {/* <ChatMessageActions
-              message={message}
-              userId={userId}
-              readonly={readonly}
-              deleteMessage={deleteMessage}
-            /> */}
-            </div>
         </div>
         {displayDivider && (
           <VSCodeDivider role="separator" className="divider"/>

@@ -50,7 +50,7 @@ export function ChatList({
       })}
       {isLoading && !isStreaming && (
         <>
-          <VSCodeDivider />
+          <VSCodeDivider className="divider"/>
           <ChatLoadingSkeleton />
         </>
       )}
