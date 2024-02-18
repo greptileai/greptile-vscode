@@ -1,18 +1,17 @@
-import * as vscode from 'vscode';
-import { commands, ExtensionContext } from "vscode";
-import { ChatPanel } from "./panels/ChatPanel";
-import { RepositoryViewProvider } from './views/repositoryViewProvider';
-import { ChatViewProvider } from './views/chatViewProvider';
-import { SessionManager } from './sessionManager';
-import { Credentials } from './credentials';
+import * as vscode from 'vscode'
+import { commands, ExtensionContext } from 'vscode'
+import { ChatPanel } from './panels/ChatPanel'
+import { RepositoryViewProvider } from './views/repositoryViewProvider'
+import { ChatViewProvider } from './views/chatViewProvider'
+import { SessionManager } from './sessionManager'
+import { Credentials } from './credentials'
 
 export async function activate(context: ExtensionContext) {
+  SessionManager.globalState = context.globalState
 
-  SessionManager.globalState = context.globalState;
+  const credentials = new Credentials()
+  await credentials.initialize(context)
 
-  const credentials = new Credentials();
-  await credentials.initialize(context);
-  
   let openChat = vscode.commands.registerCommand('onboard.chat', () => {
     // // Toggle the chat panel
     // if (ChatPanel.currentPanel) {
@@ -23,30 +22,33 @@ export async function activate(context: ExtensionContext) {
     //   ChatPanel.render(context.extensionUri);
     // }
 
-    vscode.commands.executeCommand('repositoryView.focus');
-    vscode.commands.executeCommand('chatView.focus');
-  });
+    vscode.commands.executeCommand('repositoryView.focus')
+    vscode.commands.executeCommand('chatView.focus')
+  })
 
   const githubAuth = vscode.commands.registerCommand('onboard.login', async () => {
-    const octokit = await credentials.getOctokit();
-    const userInfo = await octokit.users.getAuthenticated();
+    const octokit = await credentials.getOctokit()
+    const userInfo = await octokit.users.getAuthenticated()
 
-    vscode.window.showInformationMessage(`Logged into GitHub as ${userInfo.data.login}`);
+    vscode.window.showInformationMessage(`Logged into GitHub as ${userInfo.data.login}`)
     // reload the window to update
-    vscode.commands.executeCommand('workbench.action.reloadWindow');
-  });
+    vscode.commands.executeCommand('workbench.action.reloadWindow')
+  })
 
-  const repositoryViewProvider = new RepositoryViewProvider(context.extensionUri);
+  const repositoryViewProvider = new RepositoryViewProvider(context.extensionUri)
   context.subscriptions.push(
-    vscode.window.registerWebviewViewProvider(RepositoryViewProvider.viewType, repositoryViewProvider)
-  );
+    vscode.window.registerWebviewViewProvider(
+      RepositoryViewProvider.viewType,
+      repositoryViewProvider
+    )
+  )
 
-  const chatViewProvider = new ChatViewProvider(context.extensionUri);
+  const chatViewProvider = new ChatViewProvider(context.extensionUri)
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(ChatViewProvider.viewType, chatViewProvider)
-  );
+  )
 
   // Add command to the extension context
-  context.subscriptions.push(openChat);
-  context.subscriptions.push(githubAuth);
+  context.subscriptions.push(openChat)
+  context.subscriptions.push(githubAuth)
 }

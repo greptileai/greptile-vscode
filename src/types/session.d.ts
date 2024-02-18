@@ -1,41 +1,41 @@
-import { Chat, Message, RepositoryInfo } from "./chat";
+import { Chat, Message, RepositoryInfo } from './chat'
 
 export enum Membership {
-    Free = "free",
-    Pro = "pro",
-    Student = "student"
+  Free = 'free',
+  Pro = 'pro',
+  Student = 'student',
 }
 
 export type Session = {
-    state?: {
-        url: string;
-        repos: string[];
-        repoUrl: string;
-        branch?: string;
-        repoInfo?: RepositoryInfo;
-        chat?: Chat;
-        messages: Message[];
-        isStreaming: boolean;
-        input: string;
-    },
-    user: {
-        userId?: string;
-        membership?: Membership | undefined;
-        checkoutSession?: string;
-        business?: boolean;
-        freeTrialDaysRemaining?: number;
+  state?: {
+    url: string
+    repos: string[]
+    repoUrl: string
+    branch?: string
+    repoInfo?: RepositoryInfo
+    chat?: Chat
+    messages: Message[]
+    isStreaming: boolean
+    input: string
+  }
+  user: {
+    userId?: string
+    membership?: Membership | undefined
+    checkoutSession?: string
+    business?: boolean
+    freeTrialDaysRemaining?: number
 
-        /** Oauth access token */
-        tokens: ExternalTokens;
-        // the last OAuth provider used to sign in
-        authProvider: string 
-    };
+    /** Oauth access token */
+    tokens: ExternalTokens
+    // the last OAuth provider used to sign in
+    authProvider: string
+  }
 }
 
 interface ExternalTokens {
-    [key: string]: {
-        accessToken: string;
-        idToken?: string;
-        refreshToken?: string;
-    };
+  [key: string]: {
+    accessToken: string
+    idToken?: string
+    refreshToken?: string
+  }
 }

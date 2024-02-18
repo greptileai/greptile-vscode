@@ -1,26 +1,26 @@
-import { useEffect, useRef } from 'react';
-import { VSCodeButton } from "@vscode/webview-ui-toolkit/react";
-import { usePostHog } from "posthog-js/react";
-import mixpanel from "mixpanel-browser";
+import { useEffect, useRef } from 'react'
+import { VSCodeButton } from '@vscode/webview-ui-toolkit/react'
+import { usePostHog } from 'posthog-js/react'
+import mixpanel from 'mixpanel-browser'
 
-import { PromptForm } from "./chat-prompt-form";
-import { useChatState } from "../../providers/chat-state-provider";
-import { Message } from "../../types/chat";
+import { PromptForm } from './chat-prompt-form'
+import { useChatState } from '../../providers/chat-state-provider'
+import { Message } from '../../types/chat'
 
-import "../../App.css";
+import '../../App.css'
 
 export interface ChatPanelProps {
-  messages: Message[];
-  isLoading: boolean;
-  isStreaming: boolean;
-  someValidRepos: boolean;
-  input: string;
-  sessionId: string;
-  setInput: (input: string) => void;
-  setIsStreaming: (isStreaming: boolean) => void;
-  stop: () => void;
-  append: (message: Message) => void;
-  reload: () => void;
+  messages: Message[]
+  isLoading: boolean
+  isStreaming: boolean
+  someValidRepos: boolean
+  input: string
+  sessionId: string
+  setInput: (input: string) => void
+  setIsStreaming: (isStreaming: boolean) => void
+  stop: () => void
+  append: (message: Message) => void
+  reload: () => void
 }
 
 export function ChatPanel({
@@ -34,22 +34,22 @@ export function ChatPanel({
   setIsStreaming,
   stop,
   append,
-  reload
+  reload,
 }: ChatPanelProps) {
-  const { chatState } = useChatState();
-  const posthog = usePostHog();
+  const { chatState } = useChatState()
+  const posthog = usePostHog()
 
-  const messagesEndRef = useRef(null);
+  const messagesEndRef = useRef(null)
 
   // Scroll to bottom function
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
 
   // Effect to scroll to bottom on mount
   useEffect(() => {
-    scrollToBottom();
-  }, []); 
+    scrollToBottom()
+  }, [])
 
   return (
     <div>
@@ -57,66 +57,68 @@ export function ChatPanel({
         <div>
           <PromptForm
             onSubmit={async (value) => {
-              console.log("Chat message sent", value);
-              posthog.capture("Chat message sent", {
-                source: "onboard-vscode"
-              });
-              mixpanel.track("Chat message sent", {
-                source: "onboard-vscode"
-              });
+              console.log('Chat message sent', value)
+              posthog.capture('Chat message sent', {
+                source: 'onboard-vscode',
+              })
+              mixpanel.track('Chat message sent', {
+                source: 'onboard-vscode',
+              })
 
               await append({
                 id: chatState.session_id,
                 content: value,
-                role: "user",
-              });
+                role: 'user',
+              })
             }}
             input={input}
             setInput={setInput}
             isLoading={isLoading}
             isStreaming={isStreaming}
             someValidRepos={someValidRepos}
-            renderButton={() => isLoading ? (
-              <VSCodeButton
-                appearance="secondary"
-                aria-label="Stop generating"
-                onClick={() => {
-                  posthog.capture("Response stopped", {
-                    source: "onboard-vscode"
-                  });
-                  mixpanel.track("Response stopped", {
-                    source: "onboard-vscode"
-                  });
-                  stop()
-                }}
-                className="button"
-              >
-                Stop generating
-              </VSCodeButton>
-            ) : (
-              messages?.length > 2 && (
+            renderButton={() =>
+              isLoading ? (
                 <VSCodeButton
-                  appearance="secondary"
-                  aria-label="Regenerate response"
+                  appearance='secondary'
+                  aria-label='Stop generating'
                   onClick={() => {
-                    posthog.capture("Response regenerated", {
-                      source: "onboard-vscode"
-                    });
-                    mixpanel.track("Response regenerated", {
-                      source: "onboard-vscode"
-                    });
-                    reload()
+                    posthog.capture('Response stopped', {
+                      source: 'onboard-vscode',
+                    })
+                    mixpanel.track('Response stopped', {
+                      source: 'onboard-vscode',
+                    })
+                    stop()
                   }}
-                  className="button"
+                  className='button'
                 >
-                  Regenerate response
+                  Stop generating
                 </VSCodeButton>
+              ) : (
+                messages?.length > 2 && (
+                  <VSCodeButton
+                    appearance='secondary'
+                    aria-label='Regenerate response'
+                    onClick={() => {
+                      posthog.capture('Response regenerated', {
+                        source: 'onboard-vscode',
+                      })
+                      mixpanel.track('Response regenerated', {
+                        source: 'onboard-vscode',
+                      })
+                      reload()
+                    }}
+                    className='button'
+                  >
+                    Regenerate response
+                  </VSCodeButton>
+                )
               )
-            )}
+            }
           />
         </div>
       </div>
       {/* <div ref={messagesEndRef} /> */}
     </div>
-  );
+  )
 }

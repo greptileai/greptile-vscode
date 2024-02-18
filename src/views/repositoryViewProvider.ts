@@ -1,49 +1,54 @@
-import * as vscode from 'vscode';
-import { getNonce } from '../utilities/getNonce';
-import { getUri } from '../utilities/getUri';
-import { SessionManager } from "../sessionManager";
+import * as vscode from 'vscode'
+import { getNonce } from '../utilities/getNonce'
+import { getUri } from '../utilities/getUri'
+import { SessionManager } from '../sessionManager'
 
 export class RepositoryViewProvider implements vscode.WebviewViewProvider {
-    public static readonly viewType = 'repositoryView';
-    private _view?: vscode.WebviewView;
-    private eUri: vscode.Uri;
+  public static readonly viewType = 'repositoryView'
+  private _view?: vscode.WebviewView
+  private eUri: vscode.Uri
 
-    constructor(extensionUri: vscode.Uri) {
-        this.eUri = extensionUri;
+  constructor(extensionUri: vscode.Uri) {
+    this.eUri = extensionUri
+  }
+
+  public resolveWebviewView(
+    webviewView: vscode.WebviewView,
+    context: vscode.WebviewViewResolveContext,
+    _token: vscode.CancellationToken
+  ) {
+    this._view = webviewView
+
+    webviewView.webview.options = {
+      enableScripts: true,
+      localResourceRoots: [
+        vscode.Uri.joinPath(this.eUri, 'out'),
+        vscode.Uri.joinPath(this.eUri, 'webview-ui/build'),
+        vscode.Uri.joinPath(this.eUri, 'node_modules/@vscode/codicons'),
+      ],
     }
 
-    public resolveWebviewView(
-      webviewView: vscode.WebviewView,
-      context: vscode.WebviewViewResolveContext,
-      _token: vscode.CancellationToken,
-    ) {
-        this._view = webviewView;
+    webviewView.webview.html = this._getHtmlForWebview(webviewView.webview)
 
-        webviewView.webview.options = {
-            enableScripts: true,
-            localResourceRoots: [
-                vscode.Uri.joinPath(this.eUri, "out"),
-                vscode.Uri.joinPath(this.eUri, "webview-ui/build"),
-                vscode.Uri.joinPath(this.eUri, "node_modules/@vscode/codicons")
-            ],
-        };
+    this._setWebviewMessageListener(this._view.webview)
+  }
 
-        webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
+  private _getHtmlForWebview(webview: vscode.Webview) {
+    // The CSS file from the React build output
+    const stylesUri = getUri(webview, this.eUri, ['webview-ui', 'build', 'assets', 'index.css'])
+    // The JS file from the React build output
+    const scriptUri = getUri(webview, this.eUri, ['webview-ui', 'build', 'assets', 'index.js'])
+    // VS Code codicons
+    const codiconsUri = getUri(webview, this.eUri, [
+      'node_modules',
+      '@vscode/codicons',
+      'dist',
+      'codicon.css',
+    ])
 
-        this._setWebviewMessageListener(this._view.webview);
-    }
+    const nonce = getNonce()
 
-    private _getHtmlForWebview(webview: vscode.Webview) {
-        // The CSS file from the React build output
-        const stylesUri = getUri(webview, this.eUri, ["webview-ui", "build", "assets", "index.css"]);
-        // The JS file from the React build output
-        const scriptUri = getUri(webview, this.eUri, ["webview-ui", "build", "assets", "index.js"]);
-        // VS Code codicons
-        const codiconsUri = getUri(webview, this.eUri, ['node_modules', '@vscode/codicons', 'dist', 'codicon.css']);
-    
-        const nonce = getNonce();
-    
-        return /*html*/ `
+    return /*html*/ `
         <!DOCTYPE html>
         <html lang="en">
           <head>
@@ -64,55 +69,54 @@ export class RepositoryViewProvider implements vscode.WebviewViewProvider {
             <script type="module" nonce="${nonce}" src="${scriptUri}"></script>
           </body>
         </html>
-      `;
-      }
+      `
+  }
 
-    private _setWebviewMessageListener(webview: vscode.Webview) {
-        webview.onDidReceiveMessage(
-          (message: any) => {
-            const command = message.command;
-            const text = message.text;
-    
-            switch (command) {
-              case "hello":
-                // Code that should run in response to the hello message command
-                vscode.window.showInformationMessage(text);
-                return;
-              // Add more switch case statements here as more webview message commands
-              // are created within the webview context (i.e. inside media/main.js)
-              case "login":
-                vscode.commands.executeCommand('onboard.login');
-                // commands.executeCommand("workbench.action.webview.reloadWebviewAction"); // reloads all webviews
-                return;
-    
-              case "chat":
-                vscode.window.showInformationMessage(text);
-                return;
-    
-              case "upgrade":
-                vscode.window.showInformationMessage(text);
-                return;
-    
-              case "error":
-                vscode.window.showErrorMessage(text);
-                return;
-    
-              case "getSession":
-                webview.postMessage({
-                  command: "session",
-                  value: SessionManager.getSession()
-                });
-                return;
-    
-              case "setSession":
-                const session = message.session;
-                SessionManager.setSession(session);
-                return;
+  private _setWebviewMessageListener(webview: vscode.Webview) {
+    webview.onDidReceiveMessage((message: any) => {
+      const command = message.command
+      const text = message.text
 
-              case "reload":
-                vscode.commands.executeCommand("workbench.action.webview.reloadWebviewAction");
-                return;
-            }
-          });
+      switch (command) {
+        case 'hello':
+          // Code that should run in response to the hello message command
+          vscode.window.showInformationMessage(text)
+          return
+        // Add more switch case statements here as more webview message commands
+        // are created within the webview context (i.e. inside media/main.js)
+        case 'login':
+          vscode.commands.executeCommand('onboard.login')
+          // commands.executeCommand("workbench.action.webview.reloadWebviewAction"); // reloads all webviews
+          return
+
+        case 'chat':
+          vscode.window.showInformationMessage(text)
+          return
+
+        case 'upgrade':
+          vscode.window.showInformationMessage(text)
+          return
+
+        case 'error':
+          vscode.window.showErrorMessage(text)
+          return
+
+        case 'getSession':
+          webview.postMessage({
+            command: 'session',
+            value: SessionManager.getSession(),
+          })
+          return
+
+        case 'setSession':
+          const session = message.session
+          SessionManager.setSession(session)
+          return
+
+        case 'reload':
+          vscode.commands.executeCommand('workbench.action.webview.reloadWebviewAction')
+          return
       }
+    })
+  }
 }

@@ -1,168 +1,160 @@
-import { useEffect, useContext, useState } from 'react';
-import { VSCodeProgressRing } from "@vscode/webview-ui-toolkit/react";
+import { useEffect, useContext, useState } from 'react'
+import { VSCodeProgressRing } from '@vscode/webview-ui-toolkit/react'
 
-import { Chat as ChatComponent } from "../components/chat/chat";
-import { getChat, getNewChat, getRepo } from "../lib/actions";
-import { SAMPLE_REPOS } from '../data/constants';
+import { Chat as ChatComponent } from '../components/chat/chat'
+import { getChat, getNewChat, getRepo } from '../lib/actions'
+import { SAMPLE_REPOS } from '../data/constants'
 import {
   checkRepoAuthorization,
   deserializeRepoKey,
   getDefaultBranch,
   parseIdentifier,
-  serializeRepoKey
-} from "../lib/onboard-utils";
-import { vscode } from "../lib/vscode-utils";
-import { ChatStateProvider } from '../providers/chat-state-provider';
-import { SessionContext } from '../providers/session-provider';
-import { Chat, RepositoryInfo, Message } from "../types/chat";
-import { Session } from '../types/session';
+  serializeRepoKey,
+} from '../lib/onboard-utils'
+import { vscode } from '../lib/vscode-utils'
+import { ChatStateProvider } from '../providers/chat-state-provider'
+import { SessionContext } from '../providers/session-provider'
+import { Chat, RepositoryInfo, Message } from '../types/chat'
+import { Session } from '../types/session'
 
-import "../App.css"
+import '../App.css'
 
 export interface ChatPageProps {}
 
 export default function ChatPage({}: ChatPageProps) {
+  const { session, setSession } = useContext(SessionContext)
 
-  const { session, setSession } = useContext(SessionContext);
+  const session_id = session?.state?.chat?.session_id
+  const user_id = session?.user?.userId
+  if (!session?.state?.repos) return <div>No repo chosen</div>
 
-  const session_id = session?.state?.chat?.session_id;
-  const user_id = session?.user?.userId;
-  if (!session?.state?.repos) return <div>No repo chosen</div>;
-
-  const [repoInfo, setRepoInfo] = useState<RepositoryInfo | null>(null);
-  const [repos, setRepos] = useState<string[]>([]);
+  const [repoInfo, setRepoInfo] = useState<RepositoryInfo | null>(null)
+  const [repos, setRepos] = useState<string[]>([])
   const [repoStates, setRepoStates] = useState<{ [repoKey: string]: RepositoryInfo }>({
-    [session?.state?.repos[0]]: session?.state?.repoInfo
-  });
+    [session?.state?.repos[0]]: session?.state?.repoInfo,
+  })
 
   useEffect(() => {
-    if (!repoInfo) return;
-    console.log("Trying to set session to", {
+    if (!repoInfo) return
+    console.log('Trying to set session to', {
       ...session,
       state: {
         ...session?.state,
-        repoInfo: {...repoInfo}
-      }
-    } as Session);
+        repoInfo: { ...repoInfo },
+      },
+    } as Session)
     setSession({
       ...session,
       state: {
         ...session?.state,
-        repoInfo: {...repoInfo}
-      }
-    } as Session);
-  }, [repoInfo]);
+        repoInfo: { ...repoInfo },
+      },
+    } as Session)
+  }, [repoInfo])
 
   // TODO concurrentize these api calls.
   // repoInfo might not exist if it is not processed yet
 
   useEffect(() => {
     async function fetchInfo() {
-      console.log("Running fetchInfo for", session?.state?.repos, session)
+      console.log('Running fetchInfo for', session?.state?.repos, session)
 
-        // check with GitHub if user has access to repo
-        // const status = await checkRepoAuthorization(repo, session);
-        // if (status !== 200) return;
+      // check with GitHub if user has access to repo
+      // const status = await checkRepoAuthorization(repo, session);
+      // if (status !== 200) return;
 
-         // **************** get chat info *******************
+      // **************** get chat info *******************
 
-        //  let chat: Chat | null = session_id
-        //   ? await getChat(session_id, user_id, session)
-        //   : await getNewChat(user_id, repo);
-        let chat: Chat | null = await getNewChat(user_id, session?.state?.repos);
+      //  let chat: Chat | null = session_id
+      //   ? await getChat(session_id, user_id, session)
+      //   : await getNewChat(user_id, repo);
+      let chat: Chat | null = await getNewChat(user_id, session?.state?.repos)
 
-        if (!chat && !session_id) {
-          chat = await getNewChat(user_id, session?.state?.repos);
+      if (!chat && !session_id) {
+        chat = await getNewChat(user_id, session?.state?.repos)
+      }
+
+      setSession({
+        ...session,
+        state: {
+          ...session?.state,
+          chat: chat,
+        },
+      })
+
+      if (!chat) console.log('no chat found')
+
+      // **************** get repo info *******************
+
+      // const repos: string[] = (
+      //   chat?.repos.map((repo) => parseIdentifier(repo) || "") || []
+      // ).concat(repoKeys || []);
+      const repoKeys: string[] = session?.state?.repos
+      setRepos(repoKeys)
+
+      // get empty branches and set them in new db
+      const getRepoInfoAndPermission = repoKeys.map(async (repoKey: string) => {
+        const dRepoKey = deserializeRepoKey(repoKey)
+        if (!dRepoKey.remote) dRepoKey.remote = 'github'
+        if (!dRepoKey.branch) dRepoKey.branch = await getDefaultBranch(repoKey, session)
+
+        // replace significant-gravitas/auto-gpt with significant-gravitas/autogpt
+        // hacky solution, works for now. Ideally get the canonical name from the remote
+        if (dRepoKey.repository.toLowerCase() === 'significant-gravitas/auto-gpt') {
+          dRepoKey.repository = 'significant-gravitas/autogpt'
         }
 
-        setSession({
-          ...session,
-          state: {
-            ...session?.state,
-            chat: chat
-          }
-        })
+        const completeRepoKey = serializeRepoKey(dRepoKey)
+        console.log('complete repo key: ', completeRepoKey)
+        const status = SAMPLE_REPOS.map((repo) => repo.repo).includes(dRepoKey.repository)
+          ? 200
+          : await checkRepoAuthorization(completeRepoKey, session)
+        if (status !== 200 && status !== 426) throw new Error('Unauthorized or Does not exist')
+        console.log('verified permission')
 
-        if (!chat) console.log("no chat found");
-
-        // **************** get repo info *******************
-
-        // const repos: string[] = (
-        //   chat?.repos.map((repo) => parseIdentifier(repo) || "") || []
-        // ).concat(repoKeys || []);
-        const repoKeys: string[] = session?.state?.repos;
-        setRepos(repoKeys);
-
-
-        // get empty branches and set them in new db
-        const getRepoInfoAndPermission = repoKeys.map(async (repoKey: string) => {
-          const dRepoKey = deserializeRepoKey(repoKey);
-          if (!dRepoKey.remote) dRepoKey.remote = "github";
-          if (!dRepoKey.branch)
-            dRepoKey.branch = await getDefaultBranch(repoKey, session);
-
-          // replace significant-gravitas/auto-gpt with significant-gravitas/autogpt
-          // hacky solution, works for now. Ideally get the canonical name from the remote
-          if (dRepoKey.repository.toLowerCase() === "significant-gravitas/auto-gpt") {
-            dRepoKey.repository = "significant-gravitas/autogpt";
-          }
-
-          const completeRepoKey = serializeRepoKey(dRepoKey);
-          console.log('complete repo key: ', completeRepoKey)
-          const status = SAMPLE_REPOS.map((repo) => repo.repo).includes(
-            dRepoKey.repository,
-          )
-            ? 200
-            : await checkRepoAuthorization(completeRepoKey, session);
-          if (status !== 200 && status !== 426)
-            throw new Error("Unauthorized or Does not exist");
-          console.log("verified permission");
-
-          // todo: update session repoKeys
-          let repoInfos = await getRepo(completeRepoKey, session) // returns [failed, responses]
+        // todo: update session repoKeys
+        let repoInfos = await getRepo(completeRepoKey, session) // returns [failed, responses]
           .catch((e) => {
-            console.error(e);
-          });
-          if (!repoInfos) {
-            console.log("no repo info");
-            return;
-          }
-          return [completeRepoKey, repoInfos] as [
-            string,
-            any // RepositoryInfo,
-          ];
-        });
+            console.error(e)
+          })
+        if (!repoInfos) {
+          console.log('no repo info')
+          return
+        }
+        return [completeRepoKey, repoInfos] as [
+          string,
+          any // RepositoryInfo,
+        ]
+      })
 
-        const repoInfoAndPermission = await Promise.allSettled(
-          getRepoInfoAndPermission
-        );
+      const repoInfoAndPermission = await Promise.allSettled(getRepoInfoAndPermission)
 
-        let successes = 0;
-        repoInfoAndPermission.forEach((promise) => {
-          if (promise.status === "fulfilled") {
-            const [repoKey, repoInformation] = promise.value;
-            if (!repoKey) return;
+      let successes = 0
+      repoInfoAndPermission.forEach((promise) => {
+        if (promise.status === 'fulfilled') {
+          const [repoKey, repoInformation] = promise.value
+          if (!repoKey) return
 
-            setRepoInfo(repoInformation.responses[0]); // todo: support multiple repos and handle failed repos
-            
-            setRepoStates({
-              [repoKey]: {
-                  ...repoInformation.responses[0],
-                  status: repoInformation.status || "submitted",
-                }
-            });
+          setRepoInfo(repoInformation.responses[0]) // todo: support multiple repos and handle failed repos
 
-            successes++;
-          } else {
-            console.error(promise.reason);
-          }
-        });
+          setRepoStates({
+            [repoKey]: {
+              ...repoInformation.responses[0],
+              status: repoInformation.status || 'submitted',
+            },
+          })
 
-        if (successes === 0) console.log("not found");
+          successes++
+        } else {
+          console.error(promise.reason)
+        }
+      })
+
+      if (successes === 0) console.log('not found')
     }
 
-    fetchInfo();
-  }, []);
+    fetchInfo()
+  }, [])
 
   if (!session?.state?.repoInfo || !session?.state?.chat) {
     // console.log('session.state.repoInfo: ', session?.state?.repoInfo, 'session.state.chat: ', session?.state?.chat)
@@ -170,33 +162,31 @@ export default function ChatPage({}: ChatPageProps) {
   }
 
   const getRepositories = () => {
-    if (repos.length === 1) return deserializeRepoKey(repos[0]).repository;
-    const repoNames = repos
-      .map((repo) => deserializeRepoKey(repo).repository)
-      .join(", ");
+    if (repos.length === 1) return deserializeRepoKey(repos[0]).repository
+    const repoNames = repos.map((repo) => deserializeRepoKey(repo).repository).join(', ')
     return (
-      repoNames.slice(0, repoNames.lastIndexOf(", ")) +
-      " and " + 
-      repoNames.slice(repoNames.lastIndexOf(", ") + 2)
-    );
-  };
+      repoNames.slice(0, repoNames.lastIndexOf(', ')) +
+      ' and ' +
+      repoNames.slice(repoNames.lastIndexOf(', ') + 2)
+    )
+  }
 
   const firstMessage = {
-    role: "assistant",
+    role: 'assistant',
     content: `Hi! I am an expert on the ${getRepositories()} repositor${
-      repos.length > 1 ? "ies" : "y"
+      repos.length > 1 ? 'ies' : 'y'
     }.\
     Ask me anything! To share your feedback with our team,\
     click [here](https://calendly.com/dakshgupta/free-coffee).`,
-  } as Message;
+  } as Message
 
-  const formatted_chat_log = session?.state?.messages || [];
+  const formatted_chat_log = session?.state?.messages || []
   // console.log('repostates: ', repoStates);
 
   return (
     <>
-    <ChatStateProvider
-      initialProvidedState={{
+      <ChatStateProvider
+        initialProvidedState={{
           sessionId: session?.state?.chat?.session_id,
           repoStates: repoStates,
         }}
@@ -206,7 +196,7 @@ export default function ChatPage({}: ChatPageProps) {
           sessionId={session?.state?.chat?.session_id}
           repoStates={repoStates}
         />
-    </ChatStateProvider>
+      </ChatStateProvider>
     </>
-  );
+  )
 }
