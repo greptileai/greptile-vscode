@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import {
   VSCodeDropdown,
   VSCodeOption,
@@ -13,6 +13,7 @@ import { vscode } from '../../lib/vscode-utils'
 import { deserializeRepoKey, parseIdentifier, serializeRepoKey } from '../../lib/onboard-utils'
 import { SessionContext } from '../../providers/session-provider'
 import type { Session } from '../../types/session'
+import { ChatStatus } from './chat-status'
 
 import '../../App.css'
 
@@ -179,6 +180,11 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
     }
   }
 
+  const someValidRepos = () => {
+    const repoInfo = session?.state?.repoInfo
+    return (repoInfo.status !== 'completed' && repoInfo.sha) || repoInfo.status === 'completed'
+  }
+
   return (
     <div>
       {session ? (
@@ -278,6 +284,15 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
                 {isCloning ? 'Loading...' : 'Submit'}
               </VSCodeButton>
             </div>
+          </div>
+          <div>
+            {someValidRepos ? (
+              <div>
+                <ChatStatus key={session?.state?.repos[0]} repoKey={session?.state?.repos[0]} />
+              </div>
+            ) : (
+              <></>
+            )}
           </div>
         </div>
       ) : (

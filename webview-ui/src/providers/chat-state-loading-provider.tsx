@@ -65,7 +65,7 @@ export function ChatLoadingStateProvider({ children }: { children: React.ReactNo
       let newRepoStates = chatState.repoStates
 
       const submitReposProcessing = Object.keys(newRepoStates).map(async (repoKey) => {
-        const version = await getLatestCommit(repoKey, session)
+        const version = await getLatestCommit(repoKey, session) // todo: ensure branch exists
         if (
           newRepoStates[repoKey].sha &&
           version !== newRepoStates[repoKey].sha &&
