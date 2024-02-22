@@ -14,6 +14,7 @@ import { deserializeRepoKey, parseIdentifier, serializeRepoKey } from '../../lib
 import { SessionContext } from '../../providers/session-provider'
 import type { Session } from '../../types/session'
 import { ChatStatus } from './chat-status'
+import { RepoChip } from './chat-repo-chip'
 
 import '../../App.css'
 
@@ -288,7 +289,8 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
           <div>
             {someValidRepos ? (
               <div>
-                <ChatStatus key={session?.state?.repos[0]} repoKey={session?.state?.repos[0]} />
+                {/* <ChatStatus key={session?.state?.repos[0]} repoKey={session?.state?.repos[0]} /> */}
+                <RepoChip key={session?.state?.repos[0]} repoKey={session?.state?.repos[0]} />
               </div>
             ) : (
               <></>

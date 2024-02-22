@@ -187,6 +187,14 @@ a:active {
   color: gray;
 }
 
+.repo-chip {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+}
+
 /* Progress Bar */
 
 .circular-progress-bar {
