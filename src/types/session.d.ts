@@ -11,8 +11,8 @@ export type Session = {
     url: string
     repos: string[]
     repoUrl: string
-    branch?: string
-    repoInfo?: RepositoryInfo
+    branch: string
+    repoStates?: { [repo: string]: RepositoryInfo }
     chat?: Chat
     messages: Message[]
     isStreaming: boolean

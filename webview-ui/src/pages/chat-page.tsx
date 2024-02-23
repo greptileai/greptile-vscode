@@ -30,27 +30,27 @@ export default function ChatPage({}: ChatPageProps) {
 
   const [repoInfo, setRepoInfo] = useState<RepositoryInfo | null>(null)
   const [repos, setRepos] = useState<string[]>([])
-  const [repoStates, setRepoStates] = useState<{ [repoKey: string]: RepositoryInfo }>({
-    [session?.state?.repos[0]]: session?.state?.repoInfo,
-  })
+  const [repoStates, setRepoStates] = useState<{ [repoKey: string]: RepositoryInfo }>(
+    session?.state?.repoStates
+  )
 
   useEffect(() => {
-    if (!repoInfo) return
+    if (!repoStates) return
     console.log('Trying to set session to', {
       ...session,
       state: {
         ...session?.state,
-        repoInfo: { ...repoInfo },
+        repoStates: { ...repoStates },
       },
     } as Session)
     setSession({
       ...session,
       state: {
         ...session?.state,
-        repoInfo: { ...repoInfo },
+        repoStates: { ...repoStates },
       },
     } as Session)
-  }, [repoInfo])
+  }, [repoStates])
 
   // TODO concurrentize these api calls.
   // repoInfo might not exist if it is not processed yet
@@ -135,7 +135,7 @@ export default function ChatPage({}: ChatPageProps) {
           const [repoKey, repoInformation] = promise.value
           if (!repoKey) return
 
-          setRepoInfo(repoInformation.responses[0]) // todo: support multiple repos and handle failed repos
+          // setRepoInfo(repoInformation.responses[0]) // todo: support multiple repos and handle failed repos
 
           setRepoStates({
             [repoKey]: {
@@ -156,8 +156,8 @@ export default function ChatPage({}: ChatPageProps) {
     fetchInfo()
   }, [])
 
-  if (!session?.state?.repoInfo || !session?.state?.chat) {
-    // console.log('session.state.repoInfo: ', session?.state?.repoInfo, 'session.state.chat: ', session?.state?.chat)
+  if (!session?.state?.repoStates || !session?.state?.chat) {
+    // console.log('session.state.repoStates: ', session?.state?.repoStates, 'session.state.chat: ', session?.state?.chat)
     return <VSCodeProgressRing />
   }
 

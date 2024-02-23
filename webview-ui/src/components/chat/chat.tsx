@@ -18,7 +18,7 @@ export interface ChatProps extends React.ComponentProps<'div'> {
 }
 
 export const Chat = function ChatComponent({ initialMessages, sessionId, repoStates }: ChatProps) {
-  // console.log("Starting Chat", session_id, repoInfo, initialMessages, className);
+  // console.log("Starting Chat", session_id, repoStates, initialMessages);
 
   const { session, setSession } = useContext(SessionContext)
 

@@ -13,6 +13,7 @@ import { vscode } from '../../lib/vscode-utils'
 import { deserializeRepoKey, parseIdentifier, serializeRepoKey } from '../../lib/onboard-utils'
 import { SessionContext } from '../../providers/session-provider'
 import type { Session } from '../../types/session'
+import { RepositoryInfo } from '../../types/chat'
 import { ChatStatus } from './chat-status'
 import { RepoChip } from './chat-repo-chip'
 
@@ -46,7 +47,10 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
             chat: undefined,
             messages: [],
             repos: [parsedRepo],
-            repoInfo: undefined,
+            repoStates: {
+              ...session?.state?.repoStates,
+              [parsedRepo]: undefined,
+            },
           },
         } as Session)
       } else {
@@ -182,8 +186,15 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
   }
 
   const someValidRepos = () => {
-    const repoInfo = session?.state?.repoInfo
-    return (repoInfo.status !== 'completed' && repoInfo.sha) || repoInfo.status === 'completed'
+    if (session?.state?.repoStates)
+      Object.values(session.state.repoStates).some((repoState: RepositoryInfo) => {
+        // console.log('repo state: ', repoState)
+        return (
+          (repoState.status !== 'completed' && repoState.sha) || repoState.status === 'completed'
+        )
+      })
+
+    return false
   }
 
   return (
@@ -222,7 +233,10 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
                         ...session?.state,
                         repos: [repoKey],
                         chat: undefined, //
-                        repoInfo: undefined, //
+                        repoStates: {
+                          ...session?.state?.repoStates,
+                          [repoKey]: undefined,
+                        },
                       },
                     })
 
@@ -288,10 +302,10 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
           </div>
           <div>
             {someValidRepos ? (
-              <div>
-                {/* <ChatStatus key={session?.state?.repos[0]} repoKey={session?.state?.repos[0]} /> */}
-                <RepoChip key={session?.state?.repos[0]} repoKey={session?.state?.repos[0]} />
-              </div>
+              Object.keys(session?.state?.repoStates).map((repoKey) => (
+                // <ChatStatus key={} repoKey={} />
+                <RepoChip key={repoKey} repoKey={repoKey} />
+              ))
             ) : (
               <></>
             )}

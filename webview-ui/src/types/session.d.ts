@@ -10,9 +10,9 @@ export type Session = {
   state?: {
     url: string
     repos: string[]
-    repoUrl: string
-    branch?: string
-    repoInfo?: RepositoryInfo
+    repoUrl: string // current value of url input
+    branch: string // current value of branch input
+    repoStates?: { [repo: string]: RepositoryInfo }
     chat?: Chat
     messages: Message[]
     isStreaming: boolean
