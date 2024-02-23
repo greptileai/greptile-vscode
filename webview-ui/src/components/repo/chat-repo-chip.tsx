@@ -12,7 +12,7 @@ export const RepoChip = ({ repoKey: sRepoKey }: RepoChipProps) => {
   const { session, setSession } = useContext(SessionContext)
   const repoStates = session?.state?.repoStates
 
-  if (!repoStates) return
+  if (!repoStates || !repoStates[sRepoKey]) return
   const repoKey = deserializeRepoKey(sRepoKey)
 
   const getStatusColor = (status: RepositoryInfo['status'] | 'readonly') => {
