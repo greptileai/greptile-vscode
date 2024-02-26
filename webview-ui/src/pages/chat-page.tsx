@@ -8,7 +8,6 @@ import {
   checkRepoAuthorization,
   deserializeRepoKey,
   getDefaultBranch,
-  parseIdentifier,
   serializeRepoKey,
 } from '../lib/onboard-utils'
 import { vscode } from '../lib/vscode-utils'
@@ -25,10 +24,9 @@ export default function ChatPage({}: ChatPageProps) {
   const { session, setSession } = useContext(SessionContext)
 
   const session_id = session?.state?.chat?.session_id
-  const user_id = session?.user?.userId
+  const user_id = session?.user?.userId // session?.state?.chat?.user_id
   if (!session?.state?.repos) return <div>No repo chosen</div>
 
-  const [repoInfo, setRepoInfo] = useState<RepositoryInfo | null>(null)
   const [repos, setRepos] = useState<string[]>([])
   const [repoStates, setRepoStates] = useState<{ [repoKey: string]: RepositoryInfo }>(
     session?.state?.repoStates
@@ -50,10 +48,7 @@ export default function ChatPage({}: ChatPageProps) {
         repoStates: { ...repoStates },
       },
     } as Session)
-  }, [repoStates])
-
-  // TODO concurrentize these api calls.
-  // repoInfo might not exist if it is not processed yet
+  }, [repoStates]) // chatState.repoStates
 
   useEffect(() => {
     async function fetchInfo() {
@@ -65,22 +60,30 @@ export default function ChatPage({}: ChatPageProps) {
 
       // **************** get chat info *******************
 
-      //  let chat: Chat | null = session_id
-      //   ? await getChat(session_id, user_id, session)
-      //   : await getNewChat(user_id, repo);
-      let chat: Chat | null = await getNewChat(user_id, session?.state?.repos)
+      // console.log('session id: ', session_id)
+      // console.log('user id: ', user_id)
 
-      if (!chat && !session_id) {
-        chat = await getNewChat(user_id, session?.state?.repos)
+      let chat: Chat | undefined = undefined
+
+      if (!session?.state?.chat) {
+        chat = session_id
+          ? await getChat(session_id, user_id, session)
+          : await getNewChat(user_id, session?.state?.repos)
+
+        if (!chat && !session_id) {
+          chat = await getNewChat(user_id, session?.state?.repos)
+        }
+
+        setSession({
+          ...session,
+          state: {
+            ...session?.state,
+            chat: chat,
+          },
+        })
+      } else {
+        chat = session.state.chat
       }
-
-      setSession({
-        ...session,
-        state: {
-          ...session?.state,
-          chat: chat,
-        },
-      })
 
       if (!chat) console.log('no chat found')
 
@@ -105,14 +108,13 @@ export default function ChatPage({}: ChatPageProps) {
         }
 
         const completeRepoKey = serializeRepoKey(dRepoKey)
-        console.log('complete repo key: ', completeRepoKey)
+        // console.log('complete repo key: ', completeRepoKey)
         const status = SAMPLE_REPOS.map((repo) => repo.repo).includes(dRepoKey.repository)
           ? 200
           : await checkRepoAuthorization(completeRepoKey, session)
         if (status !== 200 && status !== 426) throw new Error('Unauthorized or Does not exist')
         console.log('verified permission')
 
-        // todo: update session repoKeys
         let repoInfos = await getRepo(completeRepoKey, session) // returns [failed, responses]
           .catch((e) => {
             console.error(e)
@@ -123,7 +125,7 @@ export default function ChatPage({}: ChatPageProps) {
         }
         return [completeRepoKey, repoInfos] as [
           string,
-          any // RepositoryInfo,
+          any // RepositoryInfo
         ]
       })
 
@@ -136,11 +138,13 @@ export default function ChatPage({}: ChatPageProps) {
           if (!repoKey) return
 
           // setRepoInfo(repoInformation.responses[0]) // todo: support multiple repos and handle failed repos
+          // console.log('repoInformation: ', repoInformation)
 
           setRepoStates({
+            ...repoStates,
             [repoKey]: {
               ...repoInformation.responses[0],
-              status: repoInformation.status || 'submitted',
+              status: repoInformation.responses[0].status || 'submitted',
             },
           })
 
@@ -181,7 +185,6 @@ export default function ChatPage({}: ChatPageProps) {
   } as Message
 
   const formatted_chat_log = session?.state?.messages || []
-  // console.log('repostates: ', repoStates);
 
   return (
     <>
