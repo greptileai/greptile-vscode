@@ -55,7 +55,7 @@ export function ChatLoadingStateProvider({ children }: { children: React.ReactNo
     loadingRepoStates: chatState.repoStates,
   })
 
-  const { session } = useContext(SessionContext)
+  const { session, setSession } = useContext(SessionContext)
   const isCancelled = useRef(false)
   useEffect(() => {
     // console.log('useEffect for polling', chatState.repoStates);
@@ -88,22 +88,6 @@ export function ChatLoadingStateProvider({ children }: { children: React.ReactNo
       await Promise.allSettled(submitReposProcessing)
       await new Promise((resolve) => setTimeout(resolve, 2000))
 
-      let metalIndex: { [key: string]: { status: string } } = {}
-      const submitMetalIndexProcessing = Object.keys(newRepoStates).map(async (repo) => {
-        let metalIndexInfo = await fetcher(
-          `${API_BASE}/repositories/${encode(repo, true)}/status`,
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ' + session?.user?.tokens?.github.accessToken,
-            },
-          }
-        ) // .then((res) => res.status);
-        metalIndex[repo] = metalIndexInfo
-      })
-      await Promise.allSettled(submitMetalIndexProcessing)
-
       // set status to processing for all, to at least check once
       Object.keys(newRepoStates).forEach((repoKey) => {
         newRepoStates[repoKey] = {
@@ -111,6 +95,7 @@ export function ChatLoadingStateProvider({ children }: { children: React.ReactNo
           status: 'processing',
         }
       })
+      // console.log('newRepoStates1: ', newRepoStates)
 
       let maxTries = 1000000000 // lol
       const repoFailureCount: { [key: string]: number } = {}
@@ -156,11 +141,9 @@ export function ChatLoadingStateProvider({ children }: { children: React.ReactNo
             ...repoStatus,
             numFiles: repoStatus.numFiles,
             filesProcessed: repoStatus.filesProcessed,
-            status:
-              repoStatus.status === 'completed' && metalIndex[repoKey]?.status === 'LIVE'
-                ? 'completed'
-                : repoStatus.status,
+            status: repoStatus.status,
           }
+          // console.log('newRepoStates2: ', newRepoStates)
           if (
             repoStatus.status === 'completed' &&
             !clonedReposWaitingForUnarchive.includes(repoKey)
@@ -185,35 +168,6 @@ export function ChatLoadingStateProvider({ children }: { children: React.ReactNo
         payload: { ...chatLoadingState.loadingRepoStates, ...newRepoStates },
       })
 
-      await Promise.all(
-        Object.keys(metalIndex).map(async (repo) => {
-          while (metalIndex[repo]?.status !== 'LIVE') {
-            if (metalIndex[repo]?.status === 'ARCHIVED') {
-              fetcher(`${API_BASE}/repositories/${encode(repo, true)}/unarchive`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': 'Bearer ' + session?.user?.tokens?.github.accessToken,
-                },
-              })
-            }
-            await new Promise((resolve) => setTimeout(resolve, 1000))
-            if (newRepoStates[repo].indexId) {
-              metalIndex = await fetcher(`${API_BASE}/repositories/${encode(repo, true)}/status`, {
-                method: 'GET',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': 'Bearer ' + session?.user?.tokens?.github.accessToken,
-                },
-              }).then((res) => res.status)
-            }
-            newRepoStates[repo] = {
-              ...newRepoStates[repo],
-              status: metalIndex[repo]?.status === 'LIVE' ? 'completed' : 'processing',
-            }
-          }
-        })
-      )
       // console.log('polling set loading repos 4')
       chatLoadingStateDispatch({
         action: 'set_loading_repo_states',
