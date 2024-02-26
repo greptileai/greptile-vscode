@@ -201,58 +201,6 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
     <div>
       {session ? (
         <div>
-          <div id='sample-repos'>
-            <label htmlFor='sample-repos-dropdown'>Try a Popular Repo: </label>
-            <VSCodeDropdown id='sample-repos-dropdown'>
-              {SAMPLE_REPOS.map((repo, index) => (
-                <VSCodeOption
-                  key={index}
-                  onClick={() => {
-                    posthog.capture('Sample repo clicked', {
-                      source: 'onboard-vscode',
-                      repo: repo.repo,
-                    })
-                    mixpanel.track('Sample repo clicked', {
-                      source: 'onboard-vscode',
-                      repo: repo.repo,
-                    })
-                    if (setDialogOpen) {
-                      setDialogOpen(false)
-                    }
-
-                    const repoKey = serializeRepoKey({
-                      remote: 'github',
-                      repository: repo.repo,
-                      branch: '',
-                    })
-
-                    // update session info
-                    setSession({
-                      ...session,
-                      state: {
-                        ...session?.state,
-                        repos: [repoKey],
-                        chat: undefined, //
-                        repoStates: {
-                          ...session?.state?.repoStates,
-                          [repoKey]: undefined,
-                        },
-                      },
-                    })
-
-                    /// reload chat view
-                    vscode.postMessage({
-                      command: 'reload',
-                      text: '',
-                    })
-                  }}
-                >
-                  {repo.displayName}
-                </VSCodeOption>
-              ))}
-            </VSCodeDropdown>
-          </div>
-          or
           <div>
             <p>Enter a Repo:</p>
             <div id='new-repo-container'>
