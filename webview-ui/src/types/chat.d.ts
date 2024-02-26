@@ -28,7 +28,7 @@ export type RepoKey = {
 type OldChatInfo = {
   user_id: string
   repo: string
-  additional_repos?: string[]
+  additional_repos: string[]
   session_id: string
   timestamp: string
   title: string
