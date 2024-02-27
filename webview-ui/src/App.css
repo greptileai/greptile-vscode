@@ -195,6 +195,10 @@ a:active {
   position: relative;
 }
 
+#repo-chips {
+  margin-top: 0.5rem;
+}
+
 /* Progress Bar */
 
 .circular-progress-bar {

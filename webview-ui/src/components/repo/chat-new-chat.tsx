@@ -1,8 +1,5 @@
 import React, { useState, useContext } from 'react'
-import {
-  VSCodeTextField,
-  VSCodeButton,
-} from '@vscode/webview-ui-toolkit/react'
+import { VSCodeTextField, VSCodeButton } from '@vscode/webview-ui-toolkit/react'
 import { usePostHog } from 'posthog-js/react'
 import mixpanel from 'mixpanel-browser'
 
@@ -17,6 +14,7 @@ import type { Session } from '../../types/session'
 import { RepositoryInfo } from '../../types/chat'
 import { ChatStatus } from './chat-status'
 import { RepoChip } from './chat-repo-chip'
+import { RepoChipActions } from './chat-repo-chip-actions'
 
 import '../../App.css'
 
@@ -30,11 +28,13 @@ export const NewChat = () => {
   const { chatState, chatStateDispatch } = useChatState()
   const { chatLoadingStateDispatch } = useChatLoadingState()
   const [repoKeys, setRepoKeys] = useState<string[]>(
-    // Object.keys(session?.state?.repoStates.map((repo) => repo.toLowerCase())) || // chatState.repoStates
-    []
-  )
+  // Object.keys(session?.state?.repoStates.map((repo) => repo.toLowerCase())) || // chatState.repoStates
+  []
+)
 
   const processRepo = async () => {
+    // await new Promise((resolve) => setTimeout(resolve, 2000))
+    // console.log('repos at processRepo: ', session?.state?.repos)
     if (!session?.state?.repos) {
       // todo: add error handling
       handleClone()
@@ -122,7 +122,7 @@ export const NewChat = () => {
             ...session?.state,
             chat: undefined,
             messages: [],
-            repos: [parsedRepo],
+            repos: [...session?.state?.repos, parsedRepo],
             repoStates: {
               ...session?.state?.repoStates,
               [parsedRepo]: undefined,
@@ -325,11 +325,21 @@ export const NewChat = () => {
               </VSCodeButton>
             </div>
           </div>
-          <div>
-            {someValidRepos ? (
+          <div id='repo-chips'>
+            {someValidRepos && session?.state?.repoStates ? (
               Object.keys(session?.state?.repoStates).map((repoKey) => (
                 // <ChatStatus key={} repoKey={} />
-                <RepoChip key={repoKey} repoKey={repoKey} />
+                <RepoChip key={repoKey} repoKey={repoKey}>
+                  <RepoChipActions
+                    deleteRepo={() => {
+                      if (repoKeys.length === 1) {
+                        console.log('')
+                      } else {
+                        setRepoKeys(repoKeys.filter((r) => r !== repoKey))
+                      }
+                    }}
+                  />
+                </RepoChip>
               ))
             ) : (
               <></>

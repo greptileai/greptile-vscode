@@ -6,9 +6,10 @@ import { RepositoryInfo } from '../../types/chat'
 
 interface RepoChipProps {
   repoKey: string
+  children?: React.ReactNode
 }
 
-export const RepoChip = ({ repoKey: sRepoKey }: RepoChipProps) => {
+export const RepoChip = ({ repoKey: sRepoKey, children }: RepoChipProps) => {
   const { session, setSession } = useContext(SessionContext)
   const repoStates = session?.state?.repoStates
 
@@ -36,6 +37,7 @@ export const RepoChip = ({ repoKey: sRepoKey }: RepoChipProps) => {
   return (
     <div className='repo-chip'>
       <span className={`${getStatusColor(chipState)}`}>●</span> <p>{repoKey.repository}</p>
+      {children}
     </div>
   )
 }
