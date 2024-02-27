@@ -2,7 +2,6 @@ import { ReactElement, useRef, useEffect } from 'react'
 import { VSCodeButton, VSCodeTextArea } from '@vscode/webview-ui-toolkit/react'
 
 import { useChatState } from '../../providers/chat-state-provider'
-import { useChatLoadingState } from '../../providers/chat-state-loading-provider'
 import { useEnterSubmit } from '../../lib/hooks/use-enter-submit'
 
 export interface PromptProps {

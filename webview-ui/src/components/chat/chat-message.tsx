@@ -56,13 +56,13 @@ export function ChatMessage({
                   return <p>{children}</p>
                 },
                 h1({ children }) {
-                  return <h1>{children}</h1>
+                  return <p>{children}</p>
                 },
                 h2({ children }) {
-                  return <h1>{children}</h1>
+                  return <p>{children}</p>
                 },
                 h3({ children }) {
-                  return <h1>{children}</h1>
+                  return <p>{children}</p>
                 },
                 code({ node, inline, className, children, ...props }) {
                   if (children.length) {

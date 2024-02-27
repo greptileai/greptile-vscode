@@ -1,19 +1,15 @@
 import { encode } from 'js-base64'
 
 import {
-  checkRepoAuthorization,
   deserializeRepoKey,
   fetcher,
   getDefaultBranch,
-  isDomain,
-  parseIdentifier,
+  isDomain
 } from './onboard-utils'
 import { API_BASE } from '../data/constants'
 import { Chat, RepositoryInfo } from '../types/chat'
 import type { Session } from '../types/session'
 import { ChatState, ChatStateAction } from '../providers/chat-state-provider'
-import axios from 'axios'
-import mixpanel from 'mixpanel-browser'
 import { vscode } from './vscode-utils'
 
 export async function getChat(
@@ -104,8 +100,6 @@ export const addRepos = async ({
   repoKeys,
 }: AddReposProps) => {
   const newAdditionalRepos: string[] = []
-
-  // console.log('REPO KEYS: ', repoKeys)
 
   const newPossibleRepoStates = repoKeys.reduce((acc, repo) => {
     if (chatState.repoStates[repo]) {

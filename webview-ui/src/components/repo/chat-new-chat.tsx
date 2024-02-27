@@ -1,32 +1,26 @@
-import React, { useState, useContext, useEffect } from 'react'
+import React, { useState, useContext } from 'react'
 import {
-  VSCodeDropdown,
-  VSCodeOption,
   VSCodeTextField,
   VSCodeButton,
 } from '@vscode/webview-ui-toolkit/react'
 import { usePostHog } from 'posthog-js/react'
 import mixpanel from 'mixpanel-browser'
 
-import { SAMPLE_REPOS, API_BASE } from '../../data/constants'
+import { API_BASE } from '../../data/constants'
 import { vscode } from '../../lib/vscode-utils'
 import { deserializeRepoKey, getDefaultBranch, parseIdentifier } from '../../lib/onboard-utils'
+import { addRepos } from '../../lib/actions'
 import { SessionContext } from '../../providers/session-provider'
+import { useChatState } from '../../providers/chat-state-provider'
+import { useChatLoadingState } from '../../providers/chat-state-loading-provider'
 import type { Session } from '../../types/session'
 import { RepositoryInfo } from '../../types/chat'
 import { ChatStatus } from './chat-status'
 import { RepoChip } from './chat-repo-chip'
 
 import '../../App.css'
-import { useChatState } from '../../providers/chat-state-provider'
-import { useChatLoadingState } from '../../providers/chat-state-loading-provider'
-import { addRepos } from '../../lib/actions'
 
-interface NewChatProps {
-  setDialogOpen?: React.Dispatch<React.SetStateAction<boolean>>
-}
-
-export const NewChat = ({ setDialogOpen }: NewChatProps) => {
+export const NewChat = () => {
   const posthog = usePostHog()
 
   const { session, setSession } = useContext(SessionContext)
