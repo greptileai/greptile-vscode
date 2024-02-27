@@ -92,7 +92,7 @@ export const parseIdentifier = (input: string): string | null => {
       let remote = keys[0],
         branch = keys[1],
         repository = keys[2]
-      if (remote === 'azure' && repository.split('/').length == 2) {
+      if (remote === 'azure' && repository.split('/').length === 2) {
         let repository_list = repository.split('/')
         repository_list.push(repository_list[1])
         repository = repository_list.join('/')

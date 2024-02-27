@@ -1,11 +1,6 @@
 import { encode } from 'js-base64'
 
-import {
-  deserializeRepoKey,
-  fetcher,
-  getDefaultBranch,
-  isDomain
-} from './onboard-utils'
+import { deserializeRepoKey, fetcher, getDefaultBranch, isDomain } from './onboard-utils'
 import { API_BASE } from '../data/constants'
 import { Chat, RepositoryInfo } from '../types/chat'
 import type { Session } from '../types/session'

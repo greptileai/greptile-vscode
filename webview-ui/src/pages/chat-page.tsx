@@ -134,7 +134,7 @@ export default function ChatPage({}: ChatPageProps) {
       let successes = 0
       repoInfoAndPermission.forEach((promise) => {
         if (promise.status === 'fulfilled') {
-          const [repoKey, repoInformation] = promise.value
+          const [repoKey, repoInformation] = promise.value // todo: catch null
           if (!repoKey) return
 
           // setRepoInfo(repoInformation.responses[0]) // todo: support multiple repos and handle failed repos

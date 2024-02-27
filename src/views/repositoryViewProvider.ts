@@ -56,7 +56,14 @@ export class RepositoryViewProvider implements vscode.WebviewViewProvider {
             <meta name="viewport" content="width=device-width, initial-scale=1.0" />
             <meta http-equiv="Content-Security-Policy"
                   content="default-src 'none';
-                           connect-src 'self' http://localhost:3001 https://mcxeqf7hzekaahjdqpojzf4hya0aflwj.lambda-url.us-east-1.on.aws/ https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/ https://api.greptile.com/v1/ https://api.github.com/ https://us.posthog.com/ https://app.posthog.com/ https://api-js.mixpanel.com/;
+                           connect-src 'self' http://localhost:3001
+                                              https://mcxeqf7hzekaahjdqpojzf4hya0aflwj.lambda-url.us-east-1.on.aws/
+                                              https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/
+                                              https://api.greptile.com/v1/
+                                              https://api.github.com/
+                                              https://us.posthog.com/
+                                              https://app.posthog.com/
+                                              https://api-js.mixpanel.com/;
                            style-src ${webview.cspSource} 'unsafe-inline';
                            font-src ${webview.cspSource};
                            script-src 'nonce-${nonce}' https://us.posthog.com/ https://app.posthog.com/;">
@@ -78,15 +85,8 @@ export class RepositoryViewProvider implements vscode.WebviewViewProvider {
       const text = message.text
 
       switch (command) {
-        case 'hello':
-          // Code that should run in response to the hello message command
-          vscode.window.showInformationMessage(text)
-          return
-        // Add more switch case statements here as more webview message commands
-        // are created within the webview context (i.e. inside media/main.js)
         case 'login':
           vscode.commands.executeCommand('onboard.login')
-          // commands.executeCommand("workbench.action.webview.reloadWebviewAction"); // reloads all webviews
           return
 
         case 'reset':

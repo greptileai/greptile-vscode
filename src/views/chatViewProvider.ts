@@ -85,15 +85,8 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
       const text = message.text
 
       switch (command) {
-        case 'hello':
-          // Code that should run in response to the hello message command
-          vscode.window.showInformationMessage(text)
-          return
-        // Add more switch case statements here as more webview message commands
-        // are created within the webview context (i.e. inside media/main.js)
         case 'login':
           vscode.commands.executeCommand('onboard.login')
-          // commands.executeCommand("workbench.action.webview.reloadWebviewAction"); // reloads all webviews
           return
 
         case 'reset':

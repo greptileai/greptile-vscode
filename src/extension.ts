@@ -1,6 +1,5 @@
 import * as vscode from 'vscode'
-import { commands, ExtensionContext } from 'vscode'
-import { ChatPanel } from './panels/ChatPanel'
+import { ExtensionContext } from 'vscode'
 import { RepositoryViewProvider } from './views/repositoryViewProvider'
 import { ChatViewProvider } from './views/chatViewProvider'
 import { SessionManager } from './sessionManager'
@@ -14,15 +13,6 @@ export async function activate(context: ExtensionContext) {
   await credentials.initialize(context)
 
   const openChat = vscode.commands.registerCommand('onboard.chat', () => {
-    // // Toggle the chat panel
-    // if (ChatPanel.currentPanel) {
-    //   // If the panel is open, close it
-    //   ChatPanel.currentPanel.dispose();
-    // } else {
-    //   // If the panel is not open, create and show it
-    //   ChatPanel.render(context.extensionUri);
-    // }
-
     vscode.commands.executeCommand('repositoryView.focus')
     vscode.commands.executeCommand('chatView.focus')
   })
@@ -36,7 +26,7 @@ export async function activate(context: ExtensionContext) {
     vscode.commands.executeCommand('workbench.action.reloadWindow')
   })
 
-  const reset = vscode.commands.registerCommand('onboard.reset', async () => {
+  const sessionReset = vscode.commands.registerCommand('onboard.reset', async () => {
     SessionManager.setSession({
       user: SessionManager.getSession()?.user,
     } as Session)
@@ -60,5 +50,5 @@ export async function activate(context: ExtensionContext) {
   // Add command to the extension context
   context.subscriptions.push(openChat)
   context.subscriptions.push(githubAuth)
-  context.subscriptions.push(reset)
+  context.subscriptions.push(sessionReset)
 }
