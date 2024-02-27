@@ -27,10 +27,6 @@ export const NewChat = () => {
   // additional repos
   const { chatState, chatStateDispatch } = useChatState()
   const { chatLoadingStateDispatch } = useChatLoadingState()
-  const [repoKeys, setRepoKeys] = useState<string[]>(
-  // Object.keys(session?.state?.repoStates.map((repo) => repo.toLowerCase())) || // chatState.repoStates
-  []
-)
 
   const processRepo = async () => {
     // await new Promise((resolve) => setTimeout(resolve, 2000))
@@ -79,9 +75,6 @@ export const NewChat = () => {
           return
         }
       }
-
-      setRepoKeys([...repoKeys, parsedRepo]) // parse from repoUrl
-      await new Promise((resolve) => setTimeout(resolve, 2000))
 
       addRepos({
         session,
@@ -332,10 +325,31 @@ export const NewChat = () => {
                 <RepoChip key={repoKey} repoKey={repoKey}>
                   <RepoChipActions
                     deleteRepo={() => {
-                      if (repoKeys.length === 1) {
+                      if (session?.state?.repos?.length === 1) {
                         console.log('')
                       } else {
-                        setRepoKeys(repoKeys.filter((r) => r !== repoKey))
+                        setSession({
+                          ...session,
+                          state: {
+                            ...session?.state,
+                            chat: {
+                              ...session?.state?.chat,
+                              repos: session?.state?.chat?.repos?.filter((r) => r !== repoKey)
+                            },
+                            repos: session?.state?.repos?.filter((r) => r !== repoKey),
+                            repoStates: Object.keys(session?.state?.repoStates)
+                              .filter((r) => r !== repoKey)
+                              .reduce((newRepoStates, r) => {
+                                newRepoStates[r] = session?.state?.repoStates[r]
+                                return newRepoStates
+                              }, {}),
+                          },
+                        })
+                        
+                        vscode.postMessage({
+                          command: 'reload',
+                          text: '',
+                        })
                       }
                     }}
                   />
