@@ -59,6 +59,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
                            connect-src 'self' http://localhost:3001
                                               https://mcxeqf7hzekaahjdqpojzf4hya0aflwj.lambda-url.us-east-1.on.aws/
                                               https://dprnu1tro5.execute-api.us-east-1.amazonaws.com/prod/v1/
+                                              https://api.greptile.com/v1/
                                               https://api.github.com/
                                               https://us.posthog.com/
                                               https://app.posthog.com/
