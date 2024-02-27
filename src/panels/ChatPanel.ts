@@ -169,6 +169,10 @@ export class ChatPanel {
             // commands.executeCommand("workbench.action.webview.reloadWebviewAction"); // reloads all webviews
             return
 
+          case 'reset':
+            commands.executeCommand('onboard.reset')
+            return
+
           case 'chat':
             window.showInformationMessage(text)
             return

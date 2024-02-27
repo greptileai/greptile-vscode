@@ -50,6 +50,10 @@
       {
         "command": "onboard.login",
         "title": "Onboard AI: Login"
+      },
+      {
+        "command": "onboard.reset",
+        "title": "Onboard AI: Reset"
       }
     ],
     "keybindings": [
@@ -63,6 +67,18 @@
         "command": "onboard.chat",
         "key": "ctrl+l",
         "mac": "ctrl+l",
+        "when": "isWindows || isLinux"
+      },
+      {
+        "command": "onboard.reset",
+        "key": "cmd+shift+r",
+        "mac": "cmd+shift+r",
+        "when": "isMac"
+      },
+      {
+        "command": "onboard.reset",
+        "key": "ctrl+shift+r",
+        "mac": "ctrl+shift+r",
         "when": "isWindows || isLinux"
       }
     ]

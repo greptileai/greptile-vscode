@@ -89,6 +89,10 @@ export class RepositoryViewProvider implements vscode.WebviewViewProvider {
           // commands.executeCommand("workbench.action.webview.reloadWebviewAction"); // reloads all webviews
           return
 
+        case 'reset':
+          vscode.commands.executeCommand('onboard.reset')
+          return
+
         case 'chat':
           vscode.window.showInformationMessage(text)
           return
