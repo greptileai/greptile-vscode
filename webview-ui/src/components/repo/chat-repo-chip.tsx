@@ -20,8 +20,8 @@ export const RepoChip = ({ repoKey: sRepoKey }: RepoChipProps) => {
       case 'completed':
         return 'text-green'
       case 'submitted':
-      case 'processing':
       case 'cloning':
+      case 'processing':
         return 'text-yellow'
       case 'failed':
         return 'text-red'

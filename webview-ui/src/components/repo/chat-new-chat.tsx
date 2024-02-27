@@ -10,7 +10,7 @@ import mixpanel from 'mixpanel-browser'
 
 import { SAMPLE_REPOS, API_BASE } from '../../data/constants'
 import { vscode } from '../../lib/vscode-utils'
-import { deserializeRepoKey, parseIdentifier, serializeRepoKey } from '../../lib/onboard-utils'
+import { deserializeRepoKey, getDefaultBranch, parseIdentifier } from '../../lib/onboard-utils'
 import { SessionContext } from '../../providers/session-provider'
 import type { Session } from '../../types/session'
 import { RepositoryInfo } from '../../types/chat'
@@ -18,6 +18,9 @@ import { ChatStatus } from './chat-status'
 import { RepoChip } from './chat-repo-chip'
 
 import '../../App.css'
+import { useChatState } from '../../providers/chat-state-provider'
+import { useChatLoadingState } from '../../providers/chat-state-loading-provider'
+import { addRepos } from '../../lib/actions'
 
 interface NewChatProps {
   setDialogOpen?: React.Dispatch<React.SetStateAction<boolean>>
@@ -29,15 +32,94 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
   const { session, setSession } = useContext(SessionContext)
   const [isCloning, setIsCloning] = useState(false)
 
+  // additional repos
+  const { chatState, chatStateDispatch } = useChatState()
+  const { chatLoadingStateDispatch } = useChatLoadingState()
+  const [repoKeys, setRepoKeys] = useState<string[]>(
+    // Object.keys(session?.state?.repoStates.map((repo) => repo.toLowerCase())) || // chatState.repoStates
+    []
+  )
+
+  const processRepo = async () => {
+    if (!session?.state?.repos) {
+      // todo: add error handling
+      handleClone()
+    } else {
+      setIsCloning(true)
+      let parsedRepo = ''
+
+      const repoUrl = session?.state?.repoUrl
+      if (repoUrl) {
+        // Parse the repo URL to get the repo identifier
+        const identifier = parseIdentifier(repoUrl)
+
+        let branch = ''
+        if (session?.state?.branch) {
+          branch = session.state.branch
+        } else {
+          branch = await getDefaultBranch(identifier, session)
+        }
+
+        parsedRepo = identifier + `${branch}`
+        // console.log('parsed Repo: ', parsedRepo)
+
+        if (parsedRepo) {
+          if (!session?.state?.repos.includes(parsedRepo)) {
+            // If the repo is parsed successfully, update the session state
+            setSession({
+              ...session,
+              state: {
+                ...session?.state,
+                chat: undefined,
+                messages: [],
+                repos: [...session?.state?.repos, parsedRepo],
+                repoStates: {
+                  ...session?.state?.repoStates,
+                  [parsedRepo]: undefined,
+                },
+              },
+            } as Session)
+          }
+        } else {
+          console.log('Error: Invalid repository identifier')
+          return
+        }
+      }
+
+      setRepoKeys([...repoKeys, parsedRepo]) // parse from repoUrl
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+
+      addRepos({
+        session,
+        chatState,
+        chatStateDispatch,
+        chatLoadingStateDispatch,
+        repoKeys: [parsedRepo],
+      })
+      setIsCloning(false)
+    }
+  }
+
   const handleClone = async () => {
     setIsCloning(true)
 
     const repoUrl = session?.state?.repoUrl
-    const branch = session?.state?.branch
+
     let parsedRepo = ''
     if (repoUrl) {
       // Parse the repo URL to get the repo identifier
-      parsedRepo = parseIdentifier(repoUrl) + `${branch}`
+      const identifier = parseIdentifier(repoUrl)
+
+      let branch = ''
+      if (session?.state?.branch) {
+        branch = session.state.branch
+      } else {
+        branch = await getDefaultBranch(identifier, session)
+      }
+
+      parsedRepo = identifier + `${branch}`
+      // console.log('parsed Repo: ', parsedRepo)
+
       if (parsedRepo) {
         // If the repo is parsed successfully, update the session state
         setSession({
@@ -104,10 +186,11 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
       const dRepoKey = deserializeRepoKey(parsedRepo)
 
       return fetch(`${API_BASE}/repositories`, {
+        // submit repo for processing
         method: 'POST',
         body: JSON.stringify({
           remote: dRepoKey.remote,
-          repository: dRepoKey.repository.toLowerCase() || '',
+          repository: dRepoKey.repository.toLowerCase() || '', // todo: add branch
         }),
         headers: {
           'Content-Type': 'application/json',
@@ -241,7 +324,7 @@ export const NewChat = ({ setDialogOpen }: NewChatProps) => {
                 id='new-repo-submit'
                 appearance='primary'
                 aria-label='Submit repo'
-                onClick={handleClone}
+                onClick={processRepo}
                 disabled={!!session?.state?.error}
               >
                 {isCloning ? 'Loading...' : 'Submit'}

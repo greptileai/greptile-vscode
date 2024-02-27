@@ -1,18 +1,28 @@
 import { encode } from 'js-base64'
 
-import { fetcher } from './onboard-utils'
+import {
+  checkRepoAuthorization,
+  deserializeRepoKey,
+  fetcher,
+  getDefaultBranch,
+  isDomain,
+  parseIdentifier,
+} from './onboard-utils'
 import { API_BASE } from '../data/constants'
 import { Chat, RepositoryInfo } from '../types/chat'
 import type { Session } from '../types/session'
+import { ChatState, ChatStateAction } from '../providers/chat-state-provider'
+import axios from 'axios'
+import mixpanel from 'mixpanel-browser'
+import { vscode } from './vscode-utils'
 
-// note: for now, the vscode extension doesn't support getting recent chats, so getChat will never be called
 export async function getChat(
   session_id: string,
   user_id: string,
   session: Session
 ): Promise<Chat | null> {
   // check authorization here
-  // console.log("getting chat", session_id, user_id);
+  // console.log('getting chat', session_id, user_id)
 
   try {
     const chat: any = await fetcher(`${API_BASE}/chats/${session_id}`, {
@@ -22,6 +32,8 @@ export async function getChat(
         'Authorization': 'Bearer ' + session?.user?.tokens?.github.accessToken,
       },
     })
+
+    // console.log('results of getChat: ', chat)
 
     if (!chat || (user_id && chat.user_id !== user_id)) {
       throw new Error('Chat did not return anything or user_id does not match')
@@ -74,4 +86,124 @@ export async function getRepo(
     console.log(error)
     return null
   }
+}
+
+interface AddReposProps {
+  session: Session | null
+  chatState: ChatState
+  chatStateDispatch: React.Dispatch<ChatStateAction>
+  chatLoadingStateDispatch: React.Dispatch<ChatStateAction>
+  repoKeys: string[]
+}
+
+export const addRepos = async ({
+  session,
+  chatState,
+  chatStateDispatch,
+  chatLoadingStateDispatch,
+  repoKeys,
+}: AddReposProps) => {
+  const newAdditionalRepos: string[] = []
+
+  // console.log('REPO KEYS: ', repoKeys)
+
+  const newPossibleRepoStates = repoKeys.reduce((acc, repo) => {
+    if (chatState.repoStates[repo]) {
+      acc[repo] = chatState.repoStates[repo]
+    } else {
+      const repoKey = deserializeRepoKey(repo)
+      acc[repo] = {
+        source_id: `${repoKey?.remote || ''}:${repoKey?.branch || ''}`,
+        status: 'queued',
+        remote: repoKey?.remote || '',
+        repository: repoKey?.repository || '',
+        private: false,
+        indexId: '',
+        branch: repoKey?.branch || '',
+      }
+    }
+    return acc
+  }, {} as { [repo: string]: RepositoryInfo })
+
+  chatStateDispatch({
+    action: 'set_repo_states',
+    payload: newPossibleRepoStates,
+  })
+
+  const submitJobs = repoKeys.map(async (repoKey) => {
+    const dRepoKey = deserializeRepoKey(repoKey)
+
+    if (!dRepoKey.branch) dRepoKey.branch = await getDefaultBranch(repoKey, session)
+
+    return await fetch(`${API_BASE}/repositories`, {
+      // submit repo for processing
+      method: 'POST',
+      body: JSON.stringify({
+        remote: dRepoKey.remote,
+        repository: dRepoKey.repository.toLowerCase() || '', // todo: add branch
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + session?.user?.tokens?.github.accessToken,
+      },
+    }).then(async (res) => {
+      if (res.ok) {
+        return res
+      } else if (res.status === 404) {
+        console.log('Error: Needs refresh token or unauthorized')
+        vscode.postMessage({
+          command: 'error',
+          text: 'This repository was not found, or you do not have access to it. If this is your repo, please try logging in again. Reach out to us on Discord for support.',
+        })
+      } else {
+        return res
+      }
+    })
+  })
+
+  const results = (await Promise.allSettled(submitJobs)) || []
+  results.forEach((result, index) => {
+    if (result.status !== 'fulfilled' && !isDomain(repoKeys[index])) {
+      console.error(`Request for repo ${repoKeys[index]} failed with reason:`, result.reason)
+    } else {
+      // add to list to fetch info and poll
+      newAdditionalRepos.push(repoKeys[index])
+    }
+  })
+
+  const response: any =
+    (await fetcher(
+      `${API_BASE}/repositories/batch?repositories=${newAdditionalRepos
+        .map((repo) => encode(repo, true))
+        .join(',')}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + session?.user?.tokens?.github.accessToken,
+        },
+      }
+    )) || []
+
+  // console.log('newAdditionalRepos', newAdditionalRepos)
+  // console.log('response', response)
+
+  const responses = response.responses // todo: add error handling
+
+  const newRepos = responses.reduce((acc, repo) => {
+    acc[`${repo.remote}:${repo.repository}:${repo.branch}`] = repo
+    return acc
+  }, chatState.repoStates)
+
+  // console.log('newRepos', newRepos)
+
+  chatLoadingStateDispatch({
+    action: 'set_loading_repo_states',
+    payload: newRepos,
+  })
+
+  chatStateDispatch({
+    action: 'set_repo_states',
+    payload: newRepos,
+  })
 }
