@@ -1,17 +1,13 @@
 import { Message } from 'ai'
 
 export type Source = {
-  dist: number
-  createdAt: string
-  id: string
-  metadata: {
-    filepath: string
-    repository: string
-    remote?: string
-    branch?: string
-  }
-  text: string
-  lines: undefined | number[]
+  repository: string
+  remote: string
+  branch: string
+  filepath: string
+  linestart: number | null
+  lineend: number | null
+  summary: string
 }
 
 export type Message = {

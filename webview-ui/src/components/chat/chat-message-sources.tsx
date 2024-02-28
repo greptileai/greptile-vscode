@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { decode } from 'js-base64'
 
 import { ChatLoadingSkeleton } from './chat-loading-skeleton'
 import { getRepoUrlForAction } from '../../lib/onboard-utils'
@@ -17,7 +16,7 @@ export const ChatMessageSources = ({ sources, repoStates, isLoading }: IChatMess
   const skeletonArray = Array.from(Array(numberOfSourcesToDisplayWhenCollapsed + 1).keys())
 
   const getURL = (repoKey: string, repoState: RepositoryInfo, source: Source) => {
-    if (repoState?.external) return `https://${repoKey}${source?.metadata?.filepath}`
+    if (repoState?.external) return `https://${repoKey}${source?.filepath}`
 
     return getRepoUrlForAction(
       {
@@ -26,7 +25,11 @@ export const ChatMessageSources = ({ sources, repoStates, isLoading }: IChatMess
         remote: repoState?.remote,
       },
       'source',
-      { filepath: source?.metadata?.filepath, lines: source?.lines }
+      {
+        filepath: source?.filepath,
+        lines:
+          source?.linestart && source?.lineend ? [source?.linestart, source?.lineend] : undefined,
+      }
     )
   }
   const sourcesCount = sources?.length || 0
@@ -37,12 +40,9 @@ export const ChatMessageSources = ({ sources, repoStates, isLoading }: IChatMess
       <p>{sourcesCount} result(s)</p>
       {(expandedSources ? sources : sources.slice(0, numberOfSourcesToDisplayWhenCollapsed)).map(
         (source: Source, index: number) => {
-          const remote = source?.metadata?.remote || 'github'
-          const branch = source?.metadata?.branch || 'main'
-          const regex = /([a-zA-Z0-9\.-_])\/([a-zA-Z0-9\.-_])/
-          const match = source?.metadata?.repository?.match(regex)
-          let repo = source?.metadata?.repository
-          if (!match) repo = decode(source?.metadata?.repository)
+          const remote = source?.remote || 'github'
+          const branch = source?.branch || 'main'
+          const repo = source?.repository
 
           const urlRepoKey = `${remote}:${branch}:${repo}`
           const repoKey = `${remote}:${repo}:${branch}`
@@ -51,8 +51,10 @@ export const ChatMessageSources = ({ sources, repoStates, isLoading }: IChatMess
             <a key={index} href={getURL(urlRepoKey, repoStates[repoKey], source)} target='_blank'>
               <div>
                 {repo}:{branch}
-                <span>/{source?.metadata?.filepath}</span>{' '}
-                {source.lines ? `[${source.lines[0]}:${source.lines[1]}]` : ''}
+                <span>/{source?.filepath}</span>{' '}
+                {source?.linestart && source?.lineend
+                  ? `[${source?.linestart}:${source.lineend}]`
+                  : ''}
                 <div className='icon codicon codicon-link-external'></div>
               </div>
             </a>
@@ -76,11 +78,11 @@ export const ChatMessageSources = ({ sources, repoStates, isLoading }: IChatMess
         </div>
       )}
 
-      {skeletonArray.map((i) => {
+      {/* {skeletonArray.map((i) => {
         if (isLoading && sources.length < i + 1) {
           return <ChatLoadingSkeleton /> // <Skeleton key={i} className="w-full h-8" />;
         }
-      })}
+      })} */}
     </div>
   )
 }
