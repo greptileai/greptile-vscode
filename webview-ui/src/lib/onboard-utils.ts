@@ -439,3 +439,23 @@ async function getRemote(repoKey: string, action: string, token: string) {
     return { data: '', error: 'Error fetching external API', status: 500 }
   }
 }
+
+export async function parseRepoInput(session: Session) {
+  const repoUrl = session?.state?.repoUrl
+
+  let parsedRepo = undefined
+  if (repoUrl) {
+    const identifier = parseIdentifier(repoUrl)
+
+    let branch = ''
+    if (session?.state?.branch) {
+      branch = session.state.branch
+    } else {
+      branch = await getDefaultBranch(identifier, session)
+    }
+
+    parsedRepo = identifier + `${branch}`
+  }
+
+  return parsedRepo
+}

@@ -5,11 +5,8 @@ import mixpanel from 'mixpanel-browser'
 
 import { API_BASE } from '../../data/constants'
 import { vscode } from '../../lib/vscode-utils'
-import { deserializeRepoKey, getDefaultBranch, parseIdentifier } from '../../lib/onboard-utils'
-import { addRepos } from '../../lib/actions'
+import { deserializeRepoKey, parseRepoInput } from '../../lib/onboard-utils'
 import { SessionContext } from '../../providers/session-provider'
-import { useChatState } from '../../providers/chat-state-provider'
-import { useChatLoadingState } from '../../providers/chat-state-loading-provider'
 import type { Session } from '../../types/session'
 import { RepositoryInfo } from '../../types/chat'
 import { ChatStatus } from './chat-status'
@@ -24,120 +21,15 @@ export const NewChat = () => {
   const { session, setSession } = useContext(SessionContext)
   const [isCloning, setIsCloning] = useState(false)
 
-  // additional repos
-  const { chatState, chatStateDispatch } = useChatState()
-  const { chatLoadingStateDispatch } = useChatLoadingState()
-
-  const processRepo = async () => {
-    // await new Promise((resolve) => setTimeout(resolve, 2000))
-    // console.log('repos at processRepo: ', session?.state?.repos)
-    if (!session?.state?.repos) {
-      // todo: add error handling
-      handleClone()
-    } else {
-      setIsCloning(true)
-      let parsedRepo = ''
-
-      const repoUrl = session?.state?.repoUrl
-      if (repoUrl) {
-        // Parse the repo URL to get the repo identifier
-        const identifier = parseIdentifier(repoUrl)
-
-        let branch = ''
-        if (session?.state?.branch) {
-          branch = session.state.branch
-        } else {
-          branch = await getDefaultBranch(identifier, session)
-        }
-
-        parsedRepo = identifier + `${branch}`
-        // console.log('parsed Repo: ', parsedRepo)
-
-        if (parsedRepo) {
-          if (!session?.state?.repos.includes(parsedRepo)) {
-            // If the repo is parsed successfully, update the session state
-            setSession({
-              ...session,
-              state: {
-                ...session?.state,
-                chat: {
-                  ...session?.state?.chat,
-                  repos: [...session?.state?.chat?.repos, parsedRepo],
-                },
-                messages: [],
-                repos: [...session?.state?.repos, parsedRepo],
-                repoStates: {
-                  ...session?.state?.repoStates,
-                  [parsedRepo]: undefined,
-                },
-              },
-            } as Session)
-          }
-        } else {
-          console.log('Error: Invalid repository identifier')
-          return
-        }
-      }
-
-      addRepos({
-        session,
-        chatState,
-        chatStateDispatch,
-        chatLoadingStateDispatch,
-        repoKeys: [parsedRepo],
-      })
-      setIsCloning(false)
-    }
-  }
-
   const handleClone = async () => {
     setIsCloning(true)
 
-    const repoUrl = session?.state?.repoUrl
-
-    let parsedRepo = ''
-    if (repoUrl) {
-      // Parse the repo URL to get the repo identifier
-      const identifier = parseIdentifier(repoUrl)
-
-      let branch = ''
-      if (session?.state?.branch) {
-        branch = session.state.branch
-      } else {
-        branch = await getDefaultBranch(identifier, session)
-      }
-
-      parsedRepo = identifier + `${branch}`
-      // console.log('parsed Repo: ', parsedRepo)
-
-      if (parsedRepo) {
-        // If the repo is parsed successfully, update the session state
-        setSession({
-          ...session,
-          state: {
-            ...session?.state,
-            chat: undefined,
-            messages: [],
-            repos: [parsedRepo],
-            repoStates: {
-              [parsedRepo]: undefined,
-            },
-          },
-        } as Session)
-      } else {
-        console.log('Error: Invalid repository identifier')
-        return
-      }
+    console.log('Parsing user input')
+    const parsedRepo = await parseRepoInput(session)
+    if (!parsedRepo) {
+      console.log('Error: Invalid repository identifier')
+      return
     }
-
-    posthog.capture('Repository cloned', {
-      source: 'onboard-vscode',
-      repo: session?.state?.repo || '',
-    })
-    mixpanel.track('Repository cloned', {
-      source: 'onboard-vscode',
-      repo: session?.state?.repo || '',
-    })
 
     console.log('Checking membership')
     const checkMembership = async () => {
@@ -154,7 +46,6 @@ export const NewChat = () => {
       })
 
       if (response['membership'] !== session?.user?.membership) {
-        // update session
         setSession({
           ...session,
           user: {
@@ -165,7 +56,6 @@ export const NewChat = () => {
         } as Session)
       }
     }
-
     checkMembership()
 
     console.log('Handling clone')
@@ -175,7 +65,6 @@ export const NewChat = () => {
       const dRepoKey = deserializeRepoKey(parsedRepo)
 
       return fetch(`${API_BASE}/repositories`, {
-        // submit repo for processing
         method: 'POST',
         body: JSON.stringify({
           remote: dRepoKey.remote,
@@ -189,7 +78,7 @@ export const NewChat = () => {
       }).then(async (res) => {
         if (res.ok) {
           // console.log('yay');
-          return res // don't think is needed? probably needed tho
+          return res
         } else if (res.status === 404) {
           // && session?.user?.refreshToken) {
           console.log('Error: Needs refresh token or unauthorized')
@@ -207,10 +96,50 @@ export const NewChat = () => {
 
     if (parsedRepo) {
       // if session user token exists, set repoUrl to include token before github.com and after https:// with user session token + '@'
-
       submitJob().then(async (res) => {
         if (res.ok) {
-          console.log('Cloned repo and moving to: ', parsedRepo)
+          posthog.capture('Repository cloned', {
+            source: 'onboard-vscode',
+            repo: parsedRepo || '',
+          })
+          mixpanel.track('Repository cloned', {
+            source: 'onboard-vscode',
+            repo: parsedRepo || '',
+          })
+
+          if (!session?.state?.repos) {
+            setSession({
+              ...session,
+              state: {
+                ...session?.state,
+                chat: undefined,
+                messages: [],
+                repos: [parsedRepo],
+                repoStates: {
+                  [parsedRepo]: undefined,
+                },
+              },
+            } as Session)
+          } else {
+            if (!session?.state?.repos.includes(parsedRepo)) {
+              setSession({
+                ...session,
+                state: {
+                  ...session?.state,
+                  chat: {
+                    ...session?.state?.chat,
+                    repos: [...session?.state?.chat?.repos, parsedRepo],
+                  },
+                  messages: [],
+                  repos: [...session?.state?.repos, parsedRepo],
+                  repoStates: {
+                    ...session?.state?.repoStates,
+                    [parsedRepo]: undefined,
+                  },
+                },
+              } as Session)
+            }
+          }
 
           vscode.postMessage({
             command: 'reload',
@@ -314,7 +243,7 @@ export const NewChat = () => {
                 id='new-repo-submit'
                 appearance='primary'
                 aria-label='Submit repo'
-                onClick={processRepo}
+                onClick={handleClone}
                 disabled={!!session?.state?.error}
               >
                 {isCloning ? 'Loading...' : 'Submit'}
