@@ -14,6 +14,7 @@ import { RepoChip } from './chat-repo-chip'
 import { RepoChipActions } from './chat-repo-chip-actions'
 
 import '../../App.css'
+import { ChatLoadingStateProvider } from '../../providers/chat-state-loading-provider'
 
 export const NewChat = () => {
   const posthog = usePostHog()
@@ -254,38 +255,43 @@ export const NewChat = () => {
             {someValidRepos && session?.state?.repoStates ? (
               Object.keys(session?.state?.repoStates).map((repoKey) => (
                 // <ChatStatus key={} repoKey={} />
-                <RepoChip key={repoKey} repoKey={repoKey}>
-                  <RepoChipActions
-                    deleteRepo={() => {
-                      if (session?.state?.repos?.length === 1) {
-                        console.log('')
-                      } else {
-                        setSession({
-                          ...session,
-                          state: {
-                            ...session?.state,
-                            chat: {
-                              ...session?.state?.chat,
-                              repos: session?.state?.chat?.repos?.filter((r) => r !== repoKey),
+                <div>
+                  <RepoChip key={repoKey} repoKey={repoKey}>
+                    <RepoChipActions
+                      deleteRepo={() => {
+                        if (session?.state?.repos?.length === 1) {
+                          console.log('')
+                        } else {
+                          setSession({
+                            ...session,
+                            state: {
+                              ...session?.state,
+                              chat: {
+                                ...session?.state?.chat,
+                                repos: session?.state?.chat?.repos?.filter((r) => r !== repoKey),
+                              },
+                              repos: session?.state?.repos?.filter((r) => r !== repoKey),
+                              repoStates: Object.keys(session?.state?.repoStates)
+                                .filter((r) => r !== repoKey)
+                                .reduce((newRepoStates, r) => {
+                                  newRepoStates[r] = session?.state?.repoStates[r]
+                                  return newRepoStates
+                                }, {}),
                             },
-                            repos: session?.state?.repos?.filter((r) => r !== repoKey),
-                            repoStates: Object.keys(session?.state?.repoStates)
-                              .filter((r) => r !== repoKey)
-                              .reduce((newRepoStates, r) => {
-                                newRepoStates[r] = session?.state?.repoStates[r]
-                                return newRepoStates
-                              }, {}),
-                          },
-                        })
+                          })
 
-                        vscode.postMessage({
-                          command: 'reload',
-                          text: '',
-                        })
-                      }
-                    }}
-                  />
-                </RepoChip>
+                          vscode.postMessage({
+                            command: 'reload',
+                            text: '',
+                          })
+                        }
+                      }}
+                    />
+                  </RepoChip>
+                  <ChatLoadingStateProvider>
+                    <ChatStatus key={repoKey} repoKey={repoKey} />
+                  </ChatLoadingStateProvider>
+                </div>
               ))
             ) : (
               <></>

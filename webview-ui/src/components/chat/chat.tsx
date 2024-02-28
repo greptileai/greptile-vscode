@@ -126,11 +126,11 @@ export const Chat = function ChatComponent({ initialMessages, sessionId, repoSta
       ) : (
         <div>
           <div>
-            <ChatLoadingStateProvider>
+            {/* <ChatLoadingStateProvider>
               {Object.keys(chatState.repoStates).map((repoKey) => {
                 return <ChatStatus key={repoKey} repoKey={repoKey} />
               })}
-            </ChatLoadingStateProvider>
+            </ChatLoadingStateProvider> */}
             <p>
               We will email you at {session?.user?.userId} once your repository has finished
               processing.

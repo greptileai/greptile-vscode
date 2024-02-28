@@ -17,7 +17,7 @@ export const ChatStatus = ({ repoKey }: ChatStatusProps) => {
   const { chatLoadingState, chatLoadingStateDispatch } = useChatLoadingState()
   const { chatState, chatStateDispatch } = useChatState()
 
-  const repoInfo = chatLoadingState.loadingRepoStates[repoKey] || {
+  const repoInfo = session?.state?.repoStates[repoKey] || {
     status: 'submitted',
     repository: repoKey,
     branch: '',
@@ -40,14 +40,16 @@ export const ChatStatus = ({ repoKey }: ChatStatusProps) => {
     return () => clearInterval(interval)
   }, [repoInfo?.numFiles])
   const currentStep = repoInfo?.status ? steps.indexOf(repoInfo.status) : 0
-  return (
+  return repoInfo?.status === 'completed' ? (
+    <div></div>
+  ) : (
     <div>
-      <span className='processing-title'>
-        Processing{' '}
-        <code>
-          {repoInfo.repository} ({repoInfo.branch})
-        </code>
-      </span>
+      {/* <span className='processing-title'>
+      Processing{' '}
+      <code>
+        {repoInfo.repository} ({repoInfo.branch})
+      </code>
+    </span> */}
       <div className='processing-body'>
         <div id='submitted' className='processing-grid'>
           <CircularProgressBar
