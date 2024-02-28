@@ -60,7 +60,10 @@ export const NewChat = () => {
               ...session,
               state: {
                 ...session?.state,
-                chat: undefined,
+                chat: {
+                  ...session?.state?.chat,
+                  repos: [...session?.state?.chat?.repos, parsedRepo],
+                },
                 messages: [],
                 repos: [...session?.state?.repos, parsedRepo],
                 repoStates: {
@@ -115,9 +118,8 @@ export const NewChat = () => {
             ...session?.state,
             chat: undefined,
             messages: [],
-            repos: [...session?.state?.repos, parsedRepo],
+            repos: [parsedRepo],
             repoStates: {
-              ...session?.state?.repoStates,
               [parsedRepo]: undefined,
             },
           },
@@ -177,7 +179,8 @@ export const NewChat = () => {
         method: 'POST',
         body: JSON.stringify({
           remote: dRepoKey.remote,
-          repository: dRepoKey.repository.toLowerCase() || '', // todo: add branch
+          repository: dRepoKey.repository.toLowerCase() || '',
+          branch: dRepoKey.branch.toLowerCase() || '',
         }),
         headers: {
           'Content-Type': 'application/json',
@@ -334,7 +337,7 @@ export const NewChat = () => {
                             ...session?.state,
                             chat: {
                               ...session?.state?.chat,
-                              repos: session?.state?.chat?.repos?.filter((r) => r !== repoKey)
+                              repos: session?.state?.chat?.repos?.filter((r) => r !== repoKey),
                             },
                             repos: session?.state?.repos?.filter((r) => r !== repoKey),
                             repoStates: Object.keys(session?.state?.repoStates)
@@ -345,7 +348,7 @@ export const NewChat = () => {
                               }, {}),
                           },
                         })
-                        
+
                         vscode.postMessage({
                           command: 'reload',
                           text: '',

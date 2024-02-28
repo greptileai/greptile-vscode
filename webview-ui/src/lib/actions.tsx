@@ -129,7 +129,8 @@ export const addRepos = async ({
       method: 'POST',
       body: JSON.stringify({
         remote: dRepoKey.remote,
-        repository: dRepoKey.repository.toLowerCase() || '', // todo: add branch
+        repository: dRepoKey.repository.toLowerCase() || '',
+        branch: dRepoKey.branch.toLowerCase() || '',
       }),
       headers: {
         'Content-Type': 'application/json',

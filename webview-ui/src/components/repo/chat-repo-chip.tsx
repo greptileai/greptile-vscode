@@ -36,7 +36,10 @@ export const RepoChip = ({ repoKey: sRepoKey, children }: RepoChipProps) => {
 
   return (
     <div className='repo-chip'>
-      <span className={`${getStatusColor(chipState)}`}>●</span> <p>{repoKey.repository}</p>
+      <span className={`${getStatusColor(chipState)}`}>●</span>{' '}
+      <p>
+        {repoKey.repository} ({repoKey.branch})
+      </p>
       {children}
     </div>
   )

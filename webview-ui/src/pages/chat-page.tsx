@@ -143,20 +143,23 @@ export default function ChatPage({}: ChatPageProps) {
 
       let successes = 0
       repoInfoAndPermission.forEach((promise) => {
+        // console.log('promise: ', promise)
         if (promise.status === 'fulfilled') {
-          const [repoKey, repoInformation] = promise.value // todo: catch null
+          const [repoKey, repoInformation] = promise.value
           if (!repoKey) return
 
-          // setRepoInfo(repoInformation.responses[0]) // todo: support multiple repos and handle failed repos
+          // todo: handle failed repos
           // console.log('repoInformation: ', repoInformation)
 
-          setRepoStates({
-            ...repoStates,
-            [repoKey]: {
-              ...repoInformation.responses[0],
-              status: repoInformation.responses[0].status || 'submitted',
-            },
-          })
+          if (repoInformation?.responses?.length > 0) {
+            setRepoStates({
+              ...repoStates,
+              [repoKey]: {
+                ...repoInformation.responses[0],
+                status: repoInformation.responses[0].status || 'submitted',
+              },
+            })
+          }
 
           successes++
         } else {

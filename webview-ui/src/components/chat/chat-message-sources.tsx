@@ -51,7 +51,7 @@ export const ChatMessageSources = ({ sources, repoStates, isLoading }: IChatMess
             <a key={index} href={getURL(urlRepoKey, repoStates[repoKey], source)} target='_blank'>
               <div>
                 {repo}:{branch}
-                <span>/{source?.filepath}</span>{' '}
+                <span>{source?.filepath}</span>{' '}
                 {source?.linestart && source?.lineend
                   ? `[${source?.linestart}:${source.lineend}]`
                   : ''}
