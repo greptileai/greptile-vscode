@@ -66,11 +66,23 @@ export default function ChatPage({}: ChatPageProps) {
       let chat: Chat | undefined = undefined
 
       if (!session?.state?.chat) {
-        chat = session_id
-          ? await getChat(session_id, user_id, session)
-          : await getNewChat(user_id, session?.state?.repos)
+        chat = await getNewChat(user_id, session?.state?.repos)
 
-        if (!chat && !session_id) {
+        setSession({
+          ...session,
+          state: {
+            ...session?.state,
+            chat: chat,
+          },
+        })
+      } else {
+        chat = await getChat(
+          session?.state?.chat?.session_id,
+          session?.state?.chat?.user_id,
+          session
+        )
+
+        if (!chat) {
           chat = await getNewChat(user_id, session?.state?.repos)
         }
 
@@ -81,8 +93,6 @@ export default function ChatPage({}: ChatPageProps) {
             chat: chat,
           },
         })
-      } else {
-        chat = session.state.chat
       }
 
       if (!chat) console.log('no chat found')
@@ -184,7 +194,7 @@ export default function ChatPage({}: ChatPageProps) {
     click [here](https://calendly.com/dakshgupta/free-coffee).`,
   } as Message
 
-  const formatted_chat_log = session?.state?.messages || []
+  const formatted_chat_log = session?.state?.chat?.chat_log || []
 
   return (
     <>
