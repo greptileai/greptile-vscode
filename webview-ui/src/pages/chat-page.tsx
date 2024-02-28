@@ -180,7 +180,16 @@ export default function ChatPage({}: ChatPageProps) {
 
   const getRepositories = () => {
     if (repos.length === 1) return deserializeRepoKey(repos[0]).repository
-    const repoNames = repos.map((repo) => deserializeRepoKey(repo).repository).join(', ')
+
+    const repoNames: string = repos
+      .reduce((completed, repo) => {
+        if (session?.state?.repoStates[repo]?.status === 'completed') {
+          completed.push(deserializeRepoKey(repo).repository)
+        }
+        return completed
+      }, [])
+      .join(', ')
+
     return (
       repoNames.slice(0, repoNames.lastIndexOf(', ')) +
       ' and ' +
