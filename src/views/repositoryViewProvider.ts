@@ -90,8 +90,12 @@ export class RepositoryViewProvider implements vscode.WebviewViewProvider {
           vscode.commands.executeCommand('greptile.login')
           return
 
-        case 'reset':
-          vscode.commands.executeCommand('greptile.reset')
+        case 'resetRepositories':
+          vscode.commands.executeCommand('greptile.resetRepositories')
+          return
+
+        case 'resetChat':
+          vscode.commands.executeCommand('greptile.resetChat')
           return
 
         case 'chat':

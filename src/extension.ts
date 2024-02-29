@@ -26,11 +26,25 @@ export async function activate(context: ExtensionContext) {
     vscode.commands.executeCommand('workbench.action.reloadWindow')
   })
 
-  const sessionReset = vscode.commands.registerCommand('greptile.reset', async () => {
+  const repoReset = vscode.commands.registerCommand('greptile.resetRepositories', async () => {
+    const session = SessionManager.getSession()
     SessionManager.setSession({
-      user: SessionManager.getSession()?.user,
+      user: session?.user,
     } as Session)
-    vscode.window.showInformationMessage('Greptile session reset')
+    vscode.window.showInformationMessage('Greptile repositories reset')
+    vscode.commands.executeCommand('workbench.action.webview.reloadWebviewAction')
+  })
+
+  const chatReset = vscode.commands.registerCommand('greptile.resetChat', async () => {
+    const session = SessionManager.getSession()
+    SessionManager.setSession({
+      ...session,
+      state: {
+        ...session?.state,
+        chat: null,
+      },
+    } as Session)
+    vscode.window.showInformationMessage('Greptile chat reset')
     vscode.commands.executeCommand('workbench.action.webview.reloadWebviewAction')
   })
 
@@ -50,5 +64,6 @@ export async function activate(context: ExtensionContext) {
   // Add command to the extension context
   context.subscriptions.push(openChat)
   context.subscriptions.push(githubAuth)
-  context.subscriptions.push(sessionReset)
+  context.subscriptions.push(repoReset)
+  context.subscriptions.push(chatReset)
 }
