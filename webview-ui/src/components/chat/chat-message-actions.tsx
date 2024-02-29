@@ -38,7 +38,7 @@ export function ChatMessageActions({
         )}
         <span className='sr-only'>Copy message</span>
       </VSCodeButton>
-      {message.role == 'assistant' && !readonly && (
+      {/* {message.role == 'assistant' && !readonly && (
         <>
           <VSCodeButton
             appearance='icon'
@@ -75,14 +75,14 @@ export function ChatMessageActions({
             <div className='icon codicon codicon-thumbsdown'></div>
           </VSCodeButton>
         </>
-      )}
-      {message.role === 'user' && !readonly && (
+      )} */}
+      {/* {message.role === 'user' && !readonly && (
         <>
           <VSCodeButton appearance='icon' aria-label='Delete message' onClick={deleteMessage}>
             <div className='icon codicon codicon-trash'></div>
           </VSCodeButton>
         </>
-      )}
+      )} */}
     </div>
   )
 }
