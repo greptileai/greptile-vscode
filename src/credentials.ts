@@ -35,6 +35,16 @@ export class Credentials {
         return res.data.email
       })
 
+      const response = await fetch('https://api.greptile.com/v1/membership', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + session.accessToken,
+        },
+      }).then(async (res) => {
+        return res.json()
+      })
+
       const existingSession = SessionManager.getSession()
       await SessionManager.setSession({
         ...existingSession,
@@ -42,10 +52,10 @@ export class Credentials {
           ...existingSession?.user,
           tokens: { ['github']: { accessToken: session.accessToken } },
           userId: email,
+          membership: response['membership'],
         },
       } as Session)
       // console.log(SessionManager.getSession());
-
       return
     }
 
@@ -85,6 +95,16 @@ export class Credentials {
       return res.data.email
     })
 
+    const response = await fetch('https://api.greptile.com/v1/membership', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + session.accessToken,
+      },
+    }).then(async (res) => {
+      return res.json()
+    })
+
     const existingSession = SessionManager.getSession()
     await SessionManager.setSession({
       ...existingSession,
@@ -92,6 +112,7 @@ export class Credentials {
         ...existingSession?.user,
         tokens: { ['github']: { accessToken: session.accessToken } },
         userId: email,
+        membership: response['membership']
       },
     } as Session)
     // console.log(SessionManager.getSession);
