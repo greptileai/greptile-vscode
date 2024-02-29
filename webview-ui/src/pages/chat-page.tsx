@@ -192,6 +192,8 @@ export default function ChatPage({}: ChatPageProps) {
       }, [])
       .join(', ')
 
+    if (repoNames.length === 1) return repoNames[0]
+
     return (
       repoNames.slice(0, repoNames.lastIndexOf(', ')) +
       ' and ' +

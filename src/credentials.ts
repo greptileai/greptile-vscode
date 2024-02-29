@@ -112,7 +112,7 @@ export class Credentials {
         ...existingSession?.user,
         tokens: { ['github']: { accessToken: session.accessToken } },
         userId: email,
-        membership: response['membership']
+        membership: response['membership'],
       },
     } as Session)
     // console.log(SessionManager.getSession);
