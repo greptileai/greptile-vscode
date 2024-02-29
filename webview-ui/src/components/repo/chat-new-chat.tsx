@@ -29,6 +29,11 @@ export const NewChat = () => {
     const parsedRepo = await parseRepoInput(session)
     if (!parsedRepo) {
       console.log('Error: Invalid repository identifier')
+      vscode.postMessage({
+        command: 'error',
+        text: 'Error: Invalid repository identifier',
+      })
+      setIsCloning(false)
       return
     }
 
@@ -157,7 +162,7 @@ export const NewChat = () => {
           } else if (res.status === 404) {
             vscode.postMessage({
               command: 'error',
-              text: 'This repository was not found, or you do not have access to it. If this is your repo, please try logging in again. Reach out to us on Discord for support.',
+              text: 'This repository/branch was not found, or you do not have access to it. If this is your repo, please try logging in again. Reach out to us on Discord for support.',
             })
             console.log('Repo not found')
           } else {

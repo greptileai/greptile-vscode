@@ -99,9 +99,6 @@ export default function ChatPage({}: ChatPageProps) {
 
       // **************** get repo info *******************
 
-      // const repos: string[] = (
-      //   chat?.repos.map((repo) => parseIdentifier(repo) || "") || []
-      // ).concat(repoKeys || []);
       const repoKeys: string[] = session?.state?.repos
       setRepos(repoKeys)
 
@@ -148,7 +145,7 @@ export default function ChatPage({}: ChatPageProps) {
           const [repoKey, repoInformation] = promise.value
           if (!repoKey) return
 
-          // todo: handle failed repos
+          // todo: better error handling
           // console.log('repoInformation: ', repoInformation)
 
           if (repoInformation?.responses?.length > 0) {
@@ -159,15 +156,20 @@ export default function ChatPage({}: ChatPageProps) {
                 status: repoInformation.responses[0].status || 'submitted',
               },
             })
-          }
 
-          successes++
+            successes++
+          }
         } else {
           console.error(promise.reason)
         }
       })
 
-      if (successes === 0) console.log('not found')
+      if (successes === 0) {
+        vscode.postMessage({
+          command: 'error',
+          text: 'There was an error processing your repo. Please try again or reach out to us on Discord for support.',
+        })
+      }
     }
 
     fetchInfo()

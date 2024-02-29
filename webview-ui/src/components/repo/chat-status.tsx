@@ -5,6 +5,7 @@ import { SessionContext } from '../../providers/session-provider'
 import { useChatLoadingState } from '../../providers/chat-state-loading-provider'
 import { useChatState } from '../../providers/chat-state-provider'
 import { API_BASE } from '../../data/constants'
+import { vscode } from '../../lib/vscode-utils'
 
 interface ChatStatusProps {
   repoKey: string
@@ -14,6 +15,7 @@ export const ChatStatus = ({ repoKey }: ChatStatusProps) => {
   const { session, setSession } = useContext(SessionContext)
 
   const [progress, setProgress] = useState(0)
+  const [isRetrying, setIsRetrying] = useState(false)
   const { chatLoadingState, chatLoadingStateDispatch } = useChatLoadingState()
   const { chatState, chatStateDispatch } = useChatState()
 
@@ -101,14 +103,17 @@ export const ChatStatus = ({ repoKey }: ChatStatusProps) => {
             <div className='processing-status'>Complete</div>
           </div>
         ) : (
-          // todo: test
-          <div id='failed' className='processing-grid'>
-            <CircularProgressBar progress={100} size={16} />
-            <div className='processing-status'>Failed to process</div>
+          <>
+            <div id='failed' className='processing-grid'>
+              <CircularProgressBar progress={100} size={16} />
+              <div className='processing-status'>Failed to process</div>
+            </div>
             <div>
               <VSCodeButton
-                onClick={(target) => {
+                className='retry-button'
+                onClick={() => {
                   console.log('retrying')
+                  setIsRetrying(true)
                   chatLoadingStateDispatch({
                     action: 'set_loading_repo_states',
                     payload: {
@@ -134,19 +139,36 @@ export const ChatStatus = ({ repoKey }: ChatStatusProps) => {
                     body: JSON.stringify({
                       remote: repoInfo?.remote,
                       repository: repoInfo?.repository,
-                      branch: repoInfo?.branch
+                      branch: repoInfo?.branch,
                     }),
                     headers: {
                       'Content-Type': 'application/json',
                       'Authorization': 'Bearer ' + session?.user?.tokens?.github.accessToken,
                     },
+                  }).then(async (res) => {
+                    setIsRetrying(false)
+                    if (res.ok) {
+                      return res
+                    } else if (res.status === 404) {
+                      console.log('Error: Needs refresh token or unauthorized')
+                      vscode.postMessage({
+                        command: 'error',
+                        text: 'This repository/branch was not found, or you do not have access to it. If this is your repo, please try logging in again. Reach out to us on Discord for support.',
+                      })
+                    } else {
+                      vscode.postMessage({
+                        command: 'error',
+                        text: 'Please reach out to us on Discord for support.',
+                      })
+                    }
+                    return res
                   })
                 }}
               >
-                Retry
+                {isRetrying ? 'Loading...' : 'Retry'}
               </VSCodeButton>
             </div>
-          </div>
+          </>
         )}
       </div>
     </div>

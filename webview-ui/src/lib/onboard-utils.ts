@@ -273,6 +273,7 @@ export const getNewSessionId = () => {
 }
 
 export function deserializeRepoKey(repoKey: string): RepoKey {
+  if (!repoKey) return
   let [remote, repository, branch] = repoKey.split(':')
   if (remote !== 'github' && remote !== 'gitlab' && remote !== 'azure') {
     remote = 'github'
@@ -446,6 +447,9 @@ export async function parseRepoInput(session: Session) {
   let parsedRepo = undefined
   if (repoUrl) {
     const identifier = parseIdentifier(repoUrl)
+    if (!identifier) {
+      return null
+    }
 
     let branch = ''
     if (session?.state?.branch) {

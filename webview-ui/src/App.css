@@ -219,7 +219,6 @@ code {
 .processing-body {
   display: flex;
   flex-direction: column;
-  width: 100%;
   padding: 0.5rem 1rem;
 }
 
@@ -277,6 +276,10 @@ code {
   fill: transparent;
   stroke: var(--vscode-progressBar-background);
   transition: 'stroke-dashoffset 0.35s';
+}
+
+.retry-button {
+  margin-top: 0.5rem;
 }
 
 /* Login */
