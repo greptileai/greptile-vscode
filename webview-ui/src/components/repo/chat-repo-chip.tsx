@@ -1,7 +1,7 @@
 import { useContext } from 'react'
 
 import { SessionContext } from '../../providers/session-provider'
-import { deserializeRepoKey } from '../../lib/onboard-utils'
+import { deserializeRepoKey } from '../../lib/greptile-utils'
 import { RepositoryInfo } from '../../types/chat'
 
 interface RepoChipProps {

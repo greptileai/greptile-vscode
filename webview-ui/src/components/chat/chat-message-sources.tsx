@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 import { ChatLoadingSkeleton } from './chat-loading-skeleton'
-import { getRepoUrlForAction } from '../../lib/onboard-utils'
+import { getRepoUrlForAction } from '../../lib/greptile-utils'
 import { Source, RepositoryInfo } from '../../types/chat'
 
 interface IChatMessageSources {

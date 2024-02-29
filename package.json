@@ -1,15 +1,15 @@
 {
-  "name": "onboard-vscode",
-  "displayName": "Onboard AI",
+  "name": "greptile-vscode",
+  "displayName": "Greptile",
   "description": "Search and understand any repo in English.",
-  "publisher": "OnboardAI",
+  "publisher": "Greptile",
   "version": "0.0.5",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/onboardai/onboard-vscode"
+    "url": "https://github.com/greptileai/greptile-vscode"
   },
-  "icon": "images/logo.png",
+  "icon": "images/greptile/logo.png",
   "galleryBanner": {
     "color": "#000",
     "theme": "dark"
@@ -20,7 +20,7 @@
   "main": "./out/extension.js",
   "contributes": {
     "views": {
-      "onboardView": [
+      "greptileView": [
         {
           "type": "webview",
           "id": "repositoryView",
@@ -36,47 +36,47 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "icon": "images/logo.svg",
-          "id": "onboardView",
-          "title": "Onboard"
+          "icon": "images/greptile/logo.svg",
+          "id": "greptileView",
+          "title": "Greptile"
         }
       ]
     },
     "commands": [
       {
-        "command": "onboard.chat",
-        "title": "Onboard AI: Chat"
+        "command": "greptile.chat",
+        "title": "Greptile: Chat"
       },
       {
-        "command": "onboard.login",
-        "title": "Onboard AI: Login"
+        "command": "greptile.login",
+        "title": "Greptile: Login"
       },
       {
-        "command": "onboard.reset",
-        "title": "Onboard AI: Reset"
+        "command": "greptile.reset",
+        "title": "Greptile: Reset"
       }
     ],
     "keybindings": [
       {
-        "command": "onboard.chat",
+        "command": "greptile.chat",
         "key": "cmd+l",
         "mac": "cmd+l",
         "when": "isMac"
       },
       {
-        "command": "onboard.chat",
+        "command": "greptile.chat",
         "key": "ctrl+l",
         "mac": "ctrl+l",
         "when": "isWindows || isLinux"
       },
       {
-        "command": "onboard.reset",
+        "command": "greptile.reset",
         "key": "cmd+shift+r",
         "mac": "cmd+shift+r",
         "when": "isMac"
       },
       {
-        "command": "onboard.reset",
+        "command": "greptile.reset",
         "key": "ctrl+shift+r",
         "mac": "ctrl+shift+r",
         "when": "isWindows || isLinux"
@@ -114,9 +114,5 @@
     "mixpanel-browser": "^2.48.1",
     "posthog-js": "^1.96.1",
     "react": "^18.2.0"
-  },
-  "activationEvents": [
-    "onCommand:onboard.chat",
-    "onCommand:onboard.login"
-  ]
+  }
 }

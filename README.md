@@ -1,10 +1,10 @@
-# Onboard AI VS Code Extension
+# Greptile VS Code Extension
 
 ## Overview
 
-Onboard AI is a developer tool for understanding and navigating codebases in English.
+Greptile is a developer tool for understanding and navigating codebases in English.
 
-This extension for VS Code brings Onboard AI's capabilities directly into your development environment, enhancing productivity and code comprehension.
+This extension for VS Code brings Greptile's capabilities directly into your development environment, enhancing productivity and code comprehension.
 
 ## Features
 
@@ -18,7 +18,7 @@ This extension for VS Code brings Onboard AI's capabilities directly into your d
 
 1. Open VS Code.
 2. Navigate to Extensions (Ctrl+Shift+X).
-3. Search for "Onboard AI".
+3. Search for "Greptile".
 4. Click "Install".
 
 ## Usage
@@ -28,12 +28,12 @@ This extension for VS Code brings Onboard AI's capabilities directly into your d
 
 ## Support
 
-For more information and support, visit [Onboard AI](https://www.getonboardai.com/).
+For more information and support, visit [Greptile](https://greptile.com).
 
 ## Feedback
 
-We value your feedback. Please submit any issues or suggestions via our [Discord](https://discord.com/invite/xZhUcFKzu7) or via [email](founders@getonboardai.com).
+We value your feedback. Please submit any issues or suggestions via our [Discord](https://discord.com/invite/xZhUcFKzu7) or via [email](founders@greptile.com).
 
 ---
 
-_Onboard AI - Chat with your codebase, generate complex code changes, and onboard faster._
+_Greptile - Ship more features, faster._

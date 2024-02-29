@@ -47,7 +47,7 @@ export function ChatMessageActions({
               posthog.capture('Feedback', {
                 user: userId!,
                 feedback: 'thumbs up',
-                source: 'onboard-vscode',
+                source: 'greptile-vscode',
               })
               mixpanel.track('Feedback', {
                 user: userId!,
@@ -64,7 +64,7 @@ export function ChatMessageActions({
               posthog.capture('Feedback', {
                 user: userId!,
                 feedback: 'thumbs down',
-                source: 'onboard-vscode',
+                source: 'greptile-vscode',
               })
               mixpanel.track('Feedback', {
                 user: userId!,

@@ -5,7 +5,7 @@ import mixpanel from 'mixpanel-browser'
 
 import { API_BASE } from '../../data/constants'
 import { vscode } from '../../lib/vscode-utils'
-import { deserializeRepoKey, parseRepoInput } from '../../lib/onboard-utils'
+import { deserializeRepoKey, parseRepoInput } from '../../lib/greptile-utils'
 import { SessionContext } from '../../providers/session-provider'
 import type { Session } from '../../types/session'
 import { RepositoryInfo } from '../../types/chat'
@@ -105,11 +105,11 @@ export const NewChat = () => {
       submitJob().then(async (res) => {
         if (res.ok) {
           posthog.capture('Repository cloned', {
-            source: 'onboard-vscode',
+            source: 'greptile-vscode',
             repo: parsedRepo || '',
           })
           mixpanel.track('Repository cloned', {
-            source: 'onboard-vscode',
+            source: 'greptile-vscode',
             repo: parsedRepo || '',
           })
 
@@ -179,7 +179,7 @@ export const NewChat = () => {
       console.log('Invalid GitHub URL')
       vscode.postMessage({
         command: 'error',
-        text: 'Please enter a valid GitHub repository URL, like https://github.com/onboardai/onboard.',
+        text: 'Please enter a valid GitHub repository URL, like https://github.com/greptileai/greptile-vscode.',
       })
       setIsCloning(false)
     }
@@ -308,8 +308,8 @@ export const NewChat = () => {
         <div id='login-container'>
           <VSCodeButton
             onClick={() => {
-              posthog.capture('Github Login Clicked', { source: 'onboard-vscode' })
-              mixpanel.track('Github Login Clicked', { source: 'onboard-vscode' })
+              posthog.capture('Github Login Clicked', { source: 'greptile-vscode' })
+              mixpanel.track('Github Login Clicked', { source: 'greptile-vscode' })
               vscode.postMessage({ command: 'login', text: 'github login' })
             }}
           >

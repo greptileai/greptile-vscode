@@ -70,7 +70,7 @@ export class RepositoryViewProvider implements vscode.WebviewViewProvider {
                            script-src 'nonce-${nonce}' https://us.posthog.com/ https://app.posthog.com/;">
             <link rel="stylesheet" type="text/css" href="${stylesUri}">
             <link rel="stylesheet" href="${codiconsUri}">
-            <title>Onboard AI Chat</title>
+            <title>Greptile</title>
           </head>
           <body>
             <div id="root" viewType="${RepositoryViewProvider.viewType}"></div>
@@ -87,11 +87,11 @@ export class RepositoryViewProvider implements vscode.WebviewViewProvider {
 
       switch (command) {
         case 'login':
-          vscode.commands.executeCommand('onboard.login')
+          vscode.commands.executeCommand('greptile.login')
           return
 
         case 'reset':
-          vscode.commands.executeCommand('onboard.reset')
+          vscode.commands.executeCommand('greptile.reset')
           return
 
         case 'chat':

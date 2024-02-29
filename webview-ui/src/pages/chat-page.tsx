@@ -9,7 +9,7 @@ import {
   deserializeRepoKey,
   getDefaultBranch,
   serializeRepoKey,
-} from '../lib/onboard-utils'
+} from '../lib/greptile-utils'
 import { vscode } from '../lib/vscode-utils'
 import { ChatStateProvider } from '../providers/chat-state-provider'
 import { SessionContext } from '../providers/session-provider'

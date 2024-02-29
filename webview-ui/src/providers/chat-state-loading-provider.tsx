@@ -4,7 +4,7 @@ import { encode } from 'js-base64'
 import { useChatState } from './chat-state-provider'
 import { SessionContext } from './session-provider'
 import { API_BASE } from '../data/constants'
-import { fetcher, getLatestCommit, serializeRepoKey } from '../lib/onboard-utils'
+import { fetcher, getLatestCommit, serializeRepoKey } from '../lib/greptile-utils'
 import { RepositoryInfo, RepoKey } from '../types/chat'
 
 export type ChatLoadingState = {

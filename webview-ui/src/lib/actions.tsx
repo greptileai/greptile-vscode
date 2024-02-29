@@ -1,6 +1,6 @@
 import { encode } from 'js-base64'
 
-import { fetcher } from './onboard-utils'
+import { fetcher } from './greptile-utils'
 import { API_BASE } from '../data/constants'
 import { Chat, RepositoryInfo } from '../types/chat'
 import type { Session } from '../types/session'

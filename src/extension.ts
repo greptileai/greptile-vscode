@@ -12,12 +12,12 @@ export async function activate(context: ExtensionContext) {
   const credentials = new Credentials()
   await credentials.initialize(context)
 
-  const openChat = vscode.commands.registerCommand('onboard.chat', () => {
+  const openChat = vscode.commands.registerCommand('greptile.chat', () => {
     vscode.commands.executeCommand('repositoryView.focus')
     vscode.commands.executeCommand('chatView.focus')
   })
 
-  const githubAuth = vscode.commands.registerCommand('onboard.login', async () => {
+  const githubAuth = vscode.commands.registerCommand('greptile.login', async () => {
     const octokit = await credentials.getOctokit()
     const userInfo = await octokit.users.getAuthenticated()
 
@@ -26,11 +26,11 @@ export async function activate(context: ExtensionContext) {
     vscode.commands.executeCommand('workbench.action.reloadWindow')
   })
 
-  const sessionReset = vscode.commands.registerCommand('onboard.reset', async () => {
+  const sessionReset = vscode.commands.registerCommand('greptile.reset', async () => {
     SessionManager.setSession({
       user: SessionManager.getSession()?.user,
     } as Session)
-    vscode.window.showInformationMessage('Onboard session reset')
+    vscode.window.showInformationMessage('Greptile session reset')
     vscode.commands.executeCommand('workbench.action.webview.reloadWebviewAction')
   })
 

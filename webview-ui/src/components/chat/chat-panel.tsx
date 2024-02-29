@@ -57,10 +57,10 @@ export function ChatPanel({
         onSubmit={async (value) => {
           console.log('Chat message sent', value)
           posthog.capture('Chat message sent', {
-            source: 'onboard-vscode',
+            source: 'greptile-vscode',
           })
           mixpanel.track('Chat message sent', {
-            source: 'onboard-vscode',
+            source: 'greptile-vscode',
           })
 
           await append({
@@ -81,10 +81,10 @@ export function ChatPanel({
               aria-label='Stop generating'
               onClick={() => {
                 posthog.capture('Response stopped', {
-                  source: 'onboard-vscode',
+                  source: 'greptile-vscode',
                 })
                 mixpanel.track('Response stopped', {
-                  source: 'onboard-vscode',
+                  source: 'greptile-vscode',
                 })
                 stop()
               }}
@@ -99,10 +99,10 @@ export function ChatPanel({
                 aria-label='Regenerate response'
                 onClick={() => {
                   posthog.capture('Response regenerated', {
-                    source: 'onboard-vscode',
+                    source: 'greptile-vscode',
                   })
                   mixpanel.track('Response regenerated', {
-                    source: 'onboard-vscode',
+                    source: 'greptile-vscode',
                   })
                   reload()
                 }}

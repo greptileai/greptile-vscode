@@ -3,4 +3,4 @@ out
 node_modules
 .env.local
 *.local
-onboard-*.vsix
+greptile-*.vsix
