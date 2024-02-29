@@ -249,11 +249,11 @@ export const NewChat = () => {
               <VSCodeButton
                 id='new-repo-submit'
                 appearance='primary'
-                aria-label='Submit repo'
+                aria-label='Add repo'
                 onClick={handleClone}
                 disabled={!!session?.state?.error}
               >
-                {isCloning ? 'Loading...' : 'Submit'}
+                {isCloning ? 'Loading...' : 'Add'}
               </VSCodeButton>
             </div>
           </div>
