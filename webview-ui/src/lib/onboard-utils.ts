@@ -244,7 +244,7 @@ export function cleanMessage(message: Message): Message {
       }
 
       // can't parse as JSON, so it's probably a string
-      contentChunks.push(segment)
+      contentChunks.push(segment + '\n')
       continue
     }
 
