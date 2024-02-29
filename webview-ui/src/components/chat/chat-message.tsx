@@ -48,7 +48,7 @@ export function ChatMessage({
         <></>
       )}
       <div className='message-content'>
-        {message.agentStatus && <div className='bold'>{message.agentStatus}</div>}
+        {message.agentStatus && <div className='agent-status'>{message.agentStatus}</div>}
 
         <div>
           <ChatMessageSources

@@ -3,7 +3,7 @@
 
 import { FC, memo } from 'react'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { coldarkDark, coldarkCold } from 'react-syntax-highlighter/dist/cjs/styles/prism'
+import { coldarkDark } from 'react-syntax-highlighter/dist/cjs/styles/prism'
 
 interface Props {
   language: string
@@ -51,31 +51,6 @@ export const generateRandomString = (length: number, lowercase = false) => {
 }
 
 const CodeBlock: FC<Props> = memo(({ language, value }) => {
-  const downloadAsFile = () => {
-    if (typeof window === 'undefined') {
-      return
-    }
-    const fileExtension = programmingLanguages[language] || '.file'
-    const suggestedFileName = `file-${generateRandomString(3, true)}${fileExtension}`
-    const fileName = window.prompt('Enter file name' || '', suggestedFileName)
-
-    if (!fileName) {
-      // User pressed cancel on prompt.
-      return
-    }
-
-    const blob = new Blob([value], { type: 'text/plain' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.download = fileName
-    link.href = url
-    link.style.display = 'none'
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    URL.revokeObjectURL(url)
-  }
-
   return (
     <div>
       <div>
@@ -86,17 +61,20 @@ const CodeBlock: FC<Props> = memo(({ language, value }) => {
         language={language}
         style={coldarkDark}
         PreTag='div'
-        showLineNumbers
+        // showLineNumbers
+        wrapLines
+        lineProps={{style: {wordBreak: 'break-all', whiteSpace: 'pre-wrap'}}}
         customStyle={{
           margin: 0,
-          width: '100%',
-          background: 'transparent',
-          padding: '1rem 1rem',
+          width: 'var(--vscode-workbench-sidebar-defaultWidth)',
+          background: 'var(--vscode-editor-background)',
+          borderRadius: '0.375rem',
         }}
         codeTagProps={{
           style: {
             fontSize: '0.8rem',
             fontFamily: 'var(--font-mono)',
+            background: 'transparent',
           },
         }}
       >

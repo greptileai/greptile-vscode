@@ -3,7 +3,6 @@ body {
   font-size: var(--vscode-font-size);
   font-weight: var(--vscode-font-weight);
   font-family: var(--vscode-font-family);
-  background-color: var(--vscode-editor-background);
 }
 
 main {
@@ -45,6 +44,11 @@ a:active {
 }
 
 /* Chat Message */
+
+.agent-status {
+  margin-top: 0.5rem;
+  font-weight: bold;
+}
 
 .message-container {
   display: flex;
@@ -258,10 +262,6 @@ a:active {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border-width: 0;
-}
-
-.bold {
-  font-weight: bold;
 }
 
 .icon {
