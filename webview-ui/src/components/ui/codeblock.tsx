@@ -63,8 +63,8 @@ const CodeBlock: FC<Props> = memo(({ language, value }) => {
 
   return (
     <div>
-      <div>
-        <span>{language}</span>
+      <div className='code-copy'>
+        <span className='code-language'>{language}</span>
         <VSCodeButton appearance='icon' aria-label='Copy Code' onClick={onCopy}>
           {isCopied ? (
             <div className='icon codicon codicon-check'></div>
@@ -89,8 +89,8 @@ const CodeBlock: FC<Props> = memo(({ language, value }) => {
         }}
         codeTagProps={{
           style: {
-            fontSize: '0.8rem',
-            fontFamily: 'var(--font-mono)',
+            fontSize: 'var(--vscode-editor-font-size)',
+            fontFamily: 'var(--vscode-editor-font-family)',
             background: 'transparent',
           },
         }}

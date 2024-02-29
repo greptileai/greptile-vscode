@@ -90,7 +90,7 @@ export function ChatPanel({
                     })
                     stop()
                   }}
-                  className='button'
+                  className='secondary-button'
                 >
                   Stop generating
                 </VSCodeButton>
@@ -108,7 +108,7 @@ export function ChatPanel({
                       })
                       reload()
                     }}
-                    className='button'
+                    className='secondary-button'
                   >
                     Regenerate response
                   </VSCodeButton>

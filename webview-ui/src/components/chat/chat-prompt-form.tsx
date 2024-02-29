@@ -48,36 +48,36 @@ export function PromptForm({
       ref={formRef}
     >
       <div>
-        <VSCodeTextArea
-          autofocus
-          ref={textAreaRef}
-          defaultValue={null}
-          tabIndex={0}
-          onKeyDown={onKeyDown}
-          rows={3}
-          cols={60}
-          value={input}
-          disabled={isLoading || chatState.disabled.value || !someValidRepos}
-          resize={'both'}
-          onInput={(e) => setInput(e.target.value)}
-          placeholder={
-            someValidRepos ? 'Ask a question' : 'Please wait while we process your repositories'
-          }
-          spellCheck={false}
-          className='text-area'
-        />
-        <div>
+        <div id='chat-prompt'>
+          <VSCodeTextArea
+            autofocus
+            ref={textAreaRef}
+            defaultValue={null}
+            tabIndex={0}
+            onKeyDown={onKeyDown}
+            rows={1} // 3
+            cols={120} // 60
+            value={input}
+            disabled={isLoading || chatState.disabled.value || !someValidRepos}
+            resize={'both'}
+            onInput={(e) => setInput(e.target.value)}
+            placeholder={
+              someValidRepos ? 'Ask a question' : 'Please wait while we process your repositories'
+            }
+            spellCheck={false}
+            id='chat-input'
+          />
           <VSCodeButton
             appearance='primary'
+            aria-label='Submit chat'
             type='submit'
-            aria-label='Submit'
             disabled={isLoading || input === ''} // isStreaming?
-            className='button'
+            id='chat-submit'
           >
-            Send message
+            <div className='icon codicon codicon-send'></div>
           </VSCodeButton>
-          {renderButton()}
         </div>
+        <div>{renderButton()}</div>
       </div>
     </form>
   )

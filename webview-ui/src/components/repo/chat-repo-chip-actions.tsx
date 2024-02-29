@@ -6,7 +6,7 @@ interface RepoChipActionProps {
 
 export const RepoChipActions = ({ deleteRepo }: RepoChipActionProps) => {
   return (
-    <VSCodeButton className='' appearance='icon' aria-label='Delete Repo' onClick={deleteRepo}>
+    <VSCodeButton appearance='icon' aria-label='Delete Repo' onClick={deleteRepo}>
       <span className='icon codicon codicon-trash'></span>
     </VSCodeButton>
   )

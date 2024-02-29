@@ -25,6 +25,11 @@ a:active {
   /* color: #388bfd; */
 }
 
+code {
+  font-size: var(--vscode-editor-font-size);
+  font-family: var(--vscode-editor-font-family);
+}
+
 /* Webview UI Toolkit */
 
 .divider {
@@ -33,40 +38,54 @@ a:active {
   margin: 0;
 }
 
-.button {
+/* Chat Panel */
+
+#chat-prompt {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+#chat-input {
+  margin-top: 0.75rem;
+  margin-bottom: 0.5rem;
+  padding-right: 0.75rem;
+}
+
+#chat-submit {
+  height: 2.2rem;
+}
+
+.secondary-button {
   margin-right: 0.75rem;
   margin-bottom: 1rem;
 }
 
-.text-area {
-  margin-top: 0.75rem;
-  margin-bottom: 0.5rem;
-}
-
 /* Chat Message */
-
-.agent-status {
-  margin-top: 0.5rem;
-  font-weight: bold;
-}
 
 .message-container {
   display: flex;
   flex-direction: column;
   position: relative;
   align-items: flex-start;
-  margin-bottom: 0.25rem;
+  padding-bottom: 0.25rem;
 }
 
-.message-header {
+.message-header,
+.message-body {
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: space-between;
+  width: 100%;
 }
 
-.message-header > div {
-  margin-top: 0.875rem;
-  margin-right: 0.5rem;
+.role {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.75rem;
   font-weight: 700;
 }
 
@@ -91,11 +110,30 @@ a:active {
   width: 16px;
 }
 
+/* .role-title {
+  font-size: calc(var(--vscode-font-size) * 1.2);
+} */
+
 .message-content {
   flex: 1 1 0%;
-  padding: 0 0.25rem;
-  /* margin: 0 1rem; */
+  padding: 0 0.25rem 0.25rem 0.25rem;
   line-height: 1.25rem;
+}
+
+.agent-status {
+  margin-top: 0.5rem;
+  font-weight: bold;
+}
+
+.code-copy {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.code-language {
+  font-size: var(--vscode-editor-font-size);
+  font-family: var(--vscode-editor-font-family);
 }
 
 /* Sample Repos */

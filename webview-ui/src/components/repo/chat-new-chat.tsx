@@ -210,6 +210,7 @@ export const NewChat = () => {
               <VSCodeTextField
                 placeholder=''
                 value={session?.state?.repoUrl || ''}
+                size={75}
                 onKeyDown={handleKeyDown}
                 onInput={(event) => {
                   setSession({
@@ -227,6 +228,7 @@ export const NewChat = () => {
                 id='new-repo-branch'
                 placeholder='default'
                 value={session?.state?.branch || ''}
+                size={35}
                 onKeyDown={handleKeyDown}
                 onInput={(event) => {
                   setSession({
