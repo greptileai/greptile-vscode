@@ -4,6 +4,9 @@
 import { FC, memo } from 'react'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { coldarkDark } from 'react-syntax-highlighter/dist/cjs/styles/prism'
+import { VSCodeButton } from '@vscode/webview-ui-toolkit/react'
+
+import { useCopyToClipboard } from '../../lib/hooks/use-copy-to-clipboard'
 
 interface Props {
   language: string
@@ -51,11 +54,25 @@ export const generateRandomString = (length: number, lowercase = false) => {
 }
 
 const CodeBlock: FC<Props> = memo(({ language, value }) => {
+  const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 })
+
+  const onCopy = () => {
+    if (isCopied) return
+    copyToClipboard(value)
+  }
+
   return (
     <div>
       <div>
         <span>{language}</span>
-        <div></div>
+        <VSCodeButton appearance='icon' aria-label='Copy Code' onClick={onCopy}>
+          {isCopied ? (
+            <div className='icon codicon codicon-check'></div>
+          ) : (
+            <div className='icon codicon codicon-copy'></div>
+          )}
+          <span className='sr-only'>Copy code</span>
+        </VSCodeButton>
       </div>
       <SyntaxHighlighter
         language={language}
@@ -63,7 +80,7 @@ const CodeBlock: FC<Props> = memo(({ language, value }) => {
         PreTag='div'
         // showLineNumbers
         wrapLines
-        lineProps={{style: {wordBreak: 'break-all', whiteSpace: 'pre-wrap'}}}
+        lineProps={{ style: { wordBreak: 'break-all', whiteSpace: 'pre-wrap' } }}
         customStyle={{
           margin: 0,
           width: 'var(--vscode-workbench-sidebar-defaultWidth)',

@@ -7,8 +7,8 @@ import { VSCodeDivider } from '@vscode/webview-ui-toolkit/react'
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '../ui/dialog'
 import { MemoizedReactMarkdown } from './markdown'
 import { CodeBlock } from '../ui/codeblock'
-
 import { ChatMessageSources } from './chat-message-sources'
+import { ChatMessageActions } from './chat-message-actions'
 import { Message, RepositoryInfo } from '../../types/chat'
 
 import '../../App.css'
@@ -19,6 +19,8 @@ export interface ChatMessageProps {
   repoStates: { [repo: string]: RepositoryInfo }
   readonly?: boolean
   displayDivider?: boolean
+  firstMessage?: boolean
+  deleteMessage: () => void
 }
 
 export function ChatMessage({
@@ -27,6 +29,8 @@ export function ChatMessage({
   repoStates,
   readonly = false,
   displayDivider = false,
+  firstMessage = false,
+  deleteMessage,
   ...props
 }: ChatMessageProps) {
   const [sourcesLoading, setSourcesLoading] = useState(true)
@@ -166,6 +170,17 @@ export function ChatMessage({
           )}
         </div>
       </div>
+      {}
+      {!firstMessage && (
+        <div>
+          <ChatMessageActions
+            message={message}
+            userId={userId}
+            readonly={readonly}
+            deleteMessage={deleteMessage}
+          />
+        </div>
+      )}
       {displayDivider && <VSCodeDivider role='separator' className='divider' />}
     </div>
   )

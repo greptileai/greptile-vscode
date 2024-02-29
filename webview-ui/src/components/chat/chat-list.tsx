@@ -30,6 +30,14 @@ export function ChatList({
     return null
   }
 
+  const deleteMessage = (index: number) => {
+    // delete messages at index (query) and index + 1 (response)
+    const newMessages = messages.slice(0, index).concat(messages.slice(index + 2))
+    setMessages(newMessages)
+
+    // todo: send api request to update backend
+  }
+
   return (
     <div>
       {messages.map((message, index) => {
@@ -41,6 +49,10 @@ export function ChatList({
               repoStates={chatState.repoStates}
               readonly={readonly}
               displayDivider={index < messages.length - 1}
+              firstMessage={index === 0}
+              deleteMessage={() => {
+                deleteMessage(index)
+              }}
             />
           </div>
         )
