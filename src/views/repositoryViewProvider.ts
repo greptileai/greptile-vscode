@@ -66,6 +66,7 @@ export class RepositoryViewProvider implements vscode.WebviewViewProvider {
                                               https://api-js.mixpanel.com/;
                            style-src ${webview.cspSource} 'unsafe-inline';
                            font-src ${webview.cspSource};
+                           img-src ${webview.cspSource};
                            script-src 'nonce-${nonce}' https://us.posthog.com/ https://app.posthog.com/;">
             <link rel="stylesheet" type="text/css" href="${stylesUri}">
             <link rel="stylesheet" href="${codiconsUri}">

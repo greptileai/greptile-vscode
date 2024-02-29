@@ -48,6 +48,13 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
 
     const nonce = getNonce()
 
+    const greptileIcon = getUri(webview, this.eUri, [
+      'webview-ui',
+      'build',
+      'assets',
+      'greptile-icon.png',
+    ])
+
     return /*html*/ `
         <!DOCTYPE html>
         <html lang="en">
@@ -66,12 +73,23 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
                                               https://api-js.mixpanel.com/;
                            style-src ${webview.cspSource} 'unsafe-inline';
                            font-src ${webview.cspSource};
+                           img-src ${webview.cspSource};
                            script-src 'nonce-${nonce}' https://us.posthog.com/ https://app.posthog.com/;">
             <link rel="stylesheet" type="text/css" href="${stylesUri}">
             <link rel="stylesheet" href="${codiconsUri}">
             <title>Onboard AI Chat</title>
           </head>
           <body>
+          <style nonce="${nonce}">
+              .greptile-icon {
+                background-image: url("${greptileIcon}");
+                background-size: contain;
+                background-repeat: no-repeat;
+                background-position: center;
+                height: 16px;
+                width: 16px;
+              }
+            </style>
             <div id="root" viewType="${ChatViewProvider.viewType}"></div>
             <script type="module" nonce="${nonce}" src="${scriptUri}"></script>
           </body>

@@ -39,7 +39,14 @@ export function ChatMessage({
 
   return (
     <div {...props} className='message-container'>
-      <div className='role-icon'>{message.role === 'user' ? '🫵' : '🤖'}</div>
+      {message.role === 'assistant' ? (
+        <div className='message-header'>
+          <div className='role-icon greptile-icon'></div>
+          <div>Greptile</div>
+        </div>
+      ) : (
+        <></>
+      )}
       <div className='message-content'>
         {message.agentStatus && <div className='bold'>{message.agentStatus}</div>}
 
@@ -158,9 +165,8 @@ export function ChatMessage({
             <div>{/* Loading Skeleton */}</div>
           )}
         </div>
-        <div></div>
-        {displayDivider && <VSCodeDivider role='separator' className='divider' />}
       </div>
+      {displayDivider && <VSCodeDivider role='separator' className='divider' />}
     </div>
   )
 }
