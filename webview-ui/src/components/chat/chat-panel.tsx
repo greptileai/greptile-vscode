@@ -53,71 +53,67 @@ export function ChatPanel({
 
   return (
     <div>
-      <div>
-        <div>
-          <PromptForm
-            onSubmit={async (value) => {
-              console.log('Chat message sent', value)
-              posthog.capture('Chat message sent', {
-                source: 'onboard-vscode',
-              })
-              mixpanel.track('Chat message sent', {
-                source: 'onboard-vscode',
-              })
+      <PromptForm
+        onSubmit={async (value) => {
+          console.log('Chat message sent', value)
+          posthog.capture('Chat message sent', {
+            source: 'onboard-vscode',
+          })
+          mixpanel.track('Chat message sent', {
+            source: 'onboard-vscode',
+          })
 
-              await append({
-                id: chatState.session_id,
-                content: value,
-                role: 'user',
-              })
-            }}
-            input={input}
-            setInput={setInput}
-            isLoading={isLoading}
-            isStreaming={isStreaming}
-            someValidRepos={someValidRepos}
-            renderButton={() =>
-              isLoading ? (
-                <VSCodeButton
-                  appearance='secondary'
-                  aria-label='Stop generating'
-                  onClick={() => {
-                    posthog.capture('Response stopped', {
-                      source: 'onboard-vscode',
-                    })
-                    mixpanel.track('Response stopped', {
-                      source: 'onboard-vscode',
-                    })
-                    stop()
-                  }}
-                  className='secondary-button'
-                >
-                  Stop generating
-                </VSCodeButton>
-              ) : (
-                messages?.length > 2 && (
-                  <VSCodeButton
-                    appearance='secondary'
-                    aria-label='Regenerate response'
-                    onClick={() => {
-                      posthog.capture('Response regenerated', {
-                        source: 'onboard-vscode',
-                      })
-                      mixpanel.track('Response regenerated', {
-                        source: 'onboard-vscode',
-                      })
-                      reload()
-                    }}
-                    className='secondary-button'
-                  >
-                    Regenerate response
-                  </VSCodeButton>
-                )
-              )
-            }
-          />
-        </div>
-      </div>
+          await append({
+            id: chatState.session_id,
+            content: value,
+            role: 'user',
+          })
+        }}
+        input={input}
+        setInput={setInput}
+        isLoading={isLoading}
+        isStreaming={isStreaming}
+        someValidRepos={someValidRepos}
+        renderButton={() =>
+          isLoading ? (
+            <VSCodeButton
+              appearance='secondary'
+              aria-label='Stop generating'
+              onClick={() => {
+                posthog.capture('Response stopped', {
+                  source: 'onboard-vscode',
+                })
+                mixpanel.track('Response stopped', {
+                  source: 'onboard-vscode',
+                })
+                stop()
+              }}
+              className='secondary-button'
+            >
+              Stop generating
+            </VSCodeButton>
+          ) : (
+            messages?.length > 2 && (
+              <VSCodeButton
+                appearance='secondary'
+                aria-label='Regenerate response'
+                onClick={() => {
+                  posthog.capture('Response regenerated', {
+                    source: 'onboard-vscode',
+                  })
+                  mixpanel.track('Response regenerated', {
+                    source: 'onboard-vscode',
+                  })
+                  reload()
+                }}
+                className='secondary-button'
+              >
+                Regenerate response
+              </VSCodeButton>
+            )
+          )
+        }
+      />
       {/* <div ref={messagesEndRef} /> */}
     </div>
   )

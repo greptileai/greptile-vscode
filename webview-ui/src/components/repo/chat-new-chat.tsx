@@ -172,7 +172,6 @@ export const NewChat = () => {
             })
             console.log('Unknown Error', res.status, res.statusText)
           }
-          // todo: catch bad branches
           setIsCloning(false)
         }
       })
