@@ -132,8 +132,9 @@ export const ChatStatus = ({ repoKey }: ChatStatusProps) => {
                   fetch(`${API_BASE}/prod/v1/repositories`, {
                     method: 'POST',
                     body: JSON.stringify({
-                      remote: 'github', // todo: support others
-                      repository: repoInfo.repository,
+                      remote: repoInfo?.remote,
+                      repository: repoInfo?.repository,
+                      branch: repoInfo?.branch
                     }),
                     headers: {
                       'Content-Type': 'application/json',

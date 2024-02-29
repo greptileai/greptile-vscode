@@ -74,8 +74,9 @@ export function ChatLoadingStateProvider({ children }: { children: React.ReactNo
           fetch(`${API_BASE}/prod/v1/repositories`, {
             method: 'POST',
             body: JSON.stringify({
-              remote: 'github', // todo: support others
+              remote: newRepoStates[repoKey].remote,
               repository: newRepoStates[repoKey].repository,
+              branch: newRepoStates[repoKey].branch,
               notify: false,
             }),
             headers: {
