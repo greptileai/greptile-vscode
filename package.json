@@ -52,11 +52,6 @@
         "title": "Greptile: Login"
       },
       {
-        "command": "greptile.resetRepositories",
-        "title": "Greptile: Reset Repositories",
-        "icon": "$(clear-all)"
-      },
-      {
         "command": "greptile.resetChat",
         "title": "Greptile: Reset Chat",
         "icon": "$(clear-all)"
@@ -64,11 +59,6 @@
     ],
     "menus": {
       "view/title": [
-        {
-          "command": "greptile.resetRepositories",
-          "when": "view == repositoryView",
-          "group": "navigation"
-        },
         {
           "command": "greptile.resetChat",
           "when": "view == chatView",
@@ -90,27 +80,15 @@
         "when": "isWindows || isLinux"
       },
       {
-        "command": "greptile.resetRepositories",
-        "key": "cmd+shift+r",
-        "mac": "cmd+shift+r",
-        "when": "isMac"
-      },
-      {
-        "command": "greptile.resetRepositories",
-        "key": "ctrl+shift+r",
-        "mac": "ctrl+shift+r",
-        "when": "isWindows || isLinux"
-      },
-      {
         "command": "greptile.resetChat",
-        "key": "cmd+shift+e",
-        "mac": "cmd+shift+e",
+        "key": "cmd+shift+l",
+        "mac": "cmd+shift+l",
         "when": "isMac"
       },
       {
         "command": "greptile.resetChat",
-        "key": "ctrl+shift+e",
-        "mac": "ctrl+shift+e",
+        "key": "ctrl+shift+l",
+        "mac": "ctrl+shift+l",
         "when": "isWindows || isLinux"
       }
     ]
