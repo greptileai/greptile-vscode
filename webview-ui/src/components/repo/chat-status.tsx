@@ -41,6 +41,7 @@ export const ChatStatus = ({ repoKey }: ChatStatusProps) => {
     }, 100)
     return () => clearInterval(interval)
   }, [repoInfo?.numFiles])
+
   const currentStep = repoInfo?.status ? steps.indexOf(repoInfo.status) : 0
   return repoInfo?.status === 'completed' ? (
     <div></div>
@@ -94,7 +95,11 @@ export const ChatStatus = ({ repoKey }: ChatStatusProps) => {
               : 'Repository processed'}
           </div>
           <div>
-            {(((repoInfo?.filesProcessed || 0) / (repoInfo?.numFiles || 1)) * 100).toFixed(0)}%
+            {(repoInfo?.status === 'completed'
+              ? 100
+              : Math.min((repoInfo?.filesProcessed || 0) / (repoInfo?.numFiles || 1), 0.99) * 100
+            ).toFixed(0)}
+            %
           </div>
         </div>
         {repoInfo.status !== 'failed' ? (

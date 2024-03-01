@@ -85,7 +85,7 @@ export const parseIdentifier = (input: string): string | null => {
     if (keys.length === 1)
       return serializeRepoKey({
         remote: 'github',
-        repository: keys[0],
+        repository: keys[0].toLowerCase(),
         branch: '',
       })
     if (keys.length === 3) {
@@ -98,9 +98,9 @@ export const parseIdentifier = (input: string): string | null => {
         repository = repository_list.join('/')
       }
       return serializeRepoKey({
-        remote: remote,
-        repository: repository,
-        branch: branch,
+        remote: remote?.toLowerCase(),
+        repository: repository?.toLowerCase(),
+        branch: branch?.toLowerCase(),
       })
     }
     return null // only 2 entries may be ambiguous (1 might be as well...)
@@ -145,9 +145,9 @@ export const parseIdentifier = (input: string): string | null => {
     }
     if (!repository) return null
     return serializeRepoKey({
-      remote: remote,
-      repository: repository,
-      branch: branch || '',
+      remote: remote?.toLowerCase(),
+      repository: repository?.toLowerCase(),
+      branch: (branch || '').toLowerCase(),
     })
   } catch (e) {
     return null

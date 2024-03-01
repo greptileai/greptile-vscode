@@ -70,6 +70,19 @@ export async function getRepo(
     return repoInfo
   } catch (error) {
     console.log(error)
-    return null
+
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(
+          fetcher(`${API_BASE}/repositories/batch?repositories=${encode(repoKey, true)}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + session?.user?.tokens?.github.accessToken,
+            },
+          })
+        )
+      }, 1000)
+    })
   }
 }

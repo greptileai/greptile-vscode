@@ -65,6 +65,7 @@ export function ChatLoadingStateProvider({ children }: { children: React.ReactNo
       let newRepoStates = chatState.repoStates
 
       const submitReposProcessing = Object.keys(newRepoStates).map(async (repoKey) => {
+        if (!newRepoStates[repoKey]) return
         const version = await getLatestCommit(repoKey, session) // todo: ensure branch exists
         if (
           newRepoStates[repoKey].sha &&
@@ -100,16 +101,17 @@ export function ChatLoadingStateProvider({ children }: { children: React.ReactNo
 
       let maxTries = 1000000000 // lol
       const repoFailureCount: { [key: string]: number } = {}
-      const clonedReposWaitingForUnarchive: string[] = []
-      while (!isCancelled.current && maxTries-- > 0) {
+      while (
+        !isCancelled.current &&
+        maxTries-- > 0 &&
+        Object.keys(newRepoStates).some((repo) => newRepoStates[repo]?.status !== 'completed')
+      ) {
         // console.log('polling', newRepoStates, isCancelled.current);
         let repos = Object.keys(newRepoStates).filter(
           (repo) =>
-            !newRepoStates[repo].indexId ||
-            !newRepoStates[repo].repository ||
-            (newRepoStates[repo].status !== 'completed' &&
-              (repoFailureCount[repo] || 0) < 3 &&
-              !clonedReposWaitingForUnarchive.includes(repo))
+            !newRepoStates[repo]?.indexId ||
+            !newRepoStates[repo]?.repository ||
+            (newRepoStates[repo]?.status !== 'completed' && (repoFailureCount[repo] || 0) < 3)
         )
 
         // potential problem: initialAdditionalRepos is deleted during chat
@@ -140,16 +142,9 @@ export function ChatLoadingStateProvider({ children }: { children: React.ReactNo
           newRepoStates[repoKey] = {
             ...newRepoStates[repoKey],
             ...repoStatus,
-            numFiles: repoStatus.numFiles,
-            filesProcessed: repoStatus.filesProcessed,
-            status: repoStatus.status,
-          }
-          // console.log('newRepoStates2: ', newRepoStates)
-          if (
-            repoStatus.status === 'completed' &&
-            !clonedReposWaitingForUnarchive.includes(repoKey)
-          ) {
-            clonedReposWaitingForUnarchive.push(repoKey)
+            numFiles: repoStatus.numFiles, //
+            filesProcessed: repoStatus.filesProcessed, //
+            status: repoStatus.status, //
           }
           if (repoStatus.status === 'failed') {
             repoFailureCount[repoKey] = (repoFailureCount[repoKey] || 0) + 1
@@ -169,11 +164,6 @@ export function ChatLoadingStateProvider({ children }: { children: React.ReactNo
         payload: { ...chatLoadingState.loadingRepoStates, ...newRepoStates },
       })
 
-      // console.log('polling set loading repos 4')
-      chatLoadingStateDispatch({
-        action: 'set_loading_repo_states',
-        payload: { ...chatLoadingState.loadingRepoStates, ...newRepoStates },
-      })
       // console.log('done polling, pushing changes to context above')
       // this update will trigger the poll again, but it should exit if done
       chatStateDispatch({
