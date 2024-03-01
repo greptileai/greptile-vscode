@@ -1,15 +1,14 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { useChat } from 'ai/react'
 
-import { ChatLoadingStateProvider } from '../../providers/chat-state-loading-provider'
 import { useChatState } from '../../providers/chat-state-provider'
 import { SessionContext } from '../../providers/session-provider'
 import { cleanMessage } from '../../lib/greptile-utils'
 import { vscode } from '../../lib/vscode-utils'
-import { ChatStatus } from '../repo/chat-status'
+import { Message, RepositoryInfo } from '../../types/chat'
+import { API_BASE } from '../../data/constants'
 import { ChatList } from './chat-list'
 import { ChatPanel } from './chat-panel'
-import { Message, RepositoryInfo } from '../../types/chat'
 
 export interface ChatProps extends React.ComponentProps<'div'> {
   initialMessages: Message[]
@@ -33,7 +32,7 @@ export const Chat = function ChatComponent({ initialMessages, sessionId, repoSta
 
   // vercel's ai useChat
   const { messages, input, isLoading, append, reload, stop, setInput, setMessages } = useChat({
-    api: 'https://mcxeqf7hzekaahjdqpojzf4hya0aflwj.lambda-url.us-east-1.on.aws/',
+    api: `${API_BASE}/query`,
     initialMessages,
     id: sessionId,
     headers: {
@@ -126,11 +125,6 @@ export const Chat = function ChatComponent({ initialMessages, sessionId, repoSta
       ) : (
         <div>
           <div>
-            {/* <ChatLoadingStateProvider>
-              {Object.keys(chatState.repoStates).map((repoKey) => {
-                return <ChatStatus key={repoKey} repoKey={repoKey} />
-              })}
-            </ChatLoadingStateProvider> */}
             <p>
               We will email you at {session?.user?.userId} once your repository has finished
               processing.
