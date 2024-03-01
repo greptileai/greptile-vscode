@@ -116,7 +116,6 @@ export const NewChat = () => {
             source: 'greptile-vscode',
             repo: parsedRepo || '',
           })
-
           if (!session?.state?.repos) {
             setSession({
               ...session,
@@ -139,29 +138,51 @@ export const NewChat = () => {
             } as Session)
           } else {
             if (!session?.state?.repos.includes(parsedRepo)) {
-              setSession({
-                ...session,
-                state: {
-                  ...session?.state,
-                  chat: {
-                    ...session?.state?.chat,
-                    repos: [...session?.state?.chat?.repos, parsedRepo],
-                  },
-                  messages: [],
-                  repos: [...session?.state?.repos, parsedRepo],
-                  repoStates: {
-                    ...session?.state?.repoStates,
-                    [parsedRepo]: {
-                      status: 'submitted',
-                      repository: parsedRepo,
-                      branch: '',
-                      remote: '',
-                      numFiles: 1,
-                      filesProcessed: 0,
+              if (!session?.state?.chat) {
+                setSession({
+                  ...session,
+                  state: {
+                    ...session?.state,
+                    messages: [],
+                    repos: [...session?.state?.repos, parsedRepo],
+                    repoStates: {
+                      ...session?.state?.repoStates,
+                      [parsedRepo]: {
+                        status: 'submitted',
+                        repository: parsedRepo,
+                        branch: '',
+                        remote: '',
+                        numFiles: 1,
+                        filesProcessed: 0,
+                      },
                     },
                   },
-                },
-              } as Session)
+                } as Session)
+              } else {
+                setSession({
+                  ...session,
+                  state: {
+                    ...session?.state,
+                    chat: {
+                      ...session?.state?.chat,
+                      repos: [...session?.state?.chat?.repos, parsedRepo],
+                    },
+                    messages: [],
+                    repos: [...session?.state?.repos, parsedRepo],
+                    repoStates: {
+                      ...session?.state?.repoStates,
+                      [parsedRepo]: {
+                        status: 'submitted',
+                        repository: parsedRepo,
+                        branch: '',
+                        remote: '',
+                        numFiles: 1,
+                        filesProcessed: 0,
+                      },
+                    },
+                  },
+                } as Session)
+              }
             }
           }
         } else {
@@ -299,6 +320,11 @@ export const NewChat = () => {
                                   return newRepoStates
                                 }, {}),
                             },
+                          })
+
+                          vscode.postMessage({
+                            command: 'reload',
+                            text: '',
                           })
                         }
                       }}
