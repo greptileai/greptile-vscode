@@ -52,6 +52,10 @@
         "title": "Greptile: Login"
       },
       {
+        "command": "greptile.resetSession",
+        "title": "Greptile: Reset Session"
+      },
+      {
         "command": "greptile.resetChat",
         "title": "Greptile: Reset Chat",
         "icon": "$(clear-all)"
