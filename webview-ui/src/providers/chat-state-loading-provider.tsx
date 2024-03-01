@@ -129,6 +129,13 @@ export function ChatLoadingStateProvider({ children }: { children: React.ReactNo
             },
           }
         )
+          .then((res) => {
+            if (!res?.responses) return { ['responses']: [] }
+            return res
+          })
+          .catch((e) => {
+            console.log(e)
+          })
 
         for (const repoStatus of response.responses) {
           // TODO: handle error in some

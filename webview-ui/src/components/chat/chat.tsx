@@ -6,6 +6,7 @@ import { SessionContext } from '../../providers/session-provider'
 import { cleanMessage } from '../../lib/greptile-utils'
 import { vscode } from '../../lib/vscode-utils'
 import { Message, RepositoryInfo } from '../../types/chat'
+import { Session } from '../../types/session'
 import { API_BASE } from '../../data/constants'
 import { ChatList } from './chat-list'
 import { ChatPanel } from './chat-panel'
@@ -50,7 +51,7 @@ export const Chat = function ChatComponent({ initialMessages, sessionId, repoSta
           ...session?.state,
           isStreaming: true,
         },
-      })
+      } as Session)
       setIsStreaming(true)
       if (response.status === 401 || response.status === 500) {
         console.log(`${response.status} Chat Error`)
@@ -71,7 +72,7 @@ export const Chat = function ChatComponent({ initialMessages, sessionId, repoSta
           ...session?.state,
           isStreaming: false,
         },
-      })
+      } as Session)
       setIsStreaming(false)
     },
   })

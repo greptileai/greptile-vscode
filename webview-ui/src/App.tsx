@@ -37,7 +37,7 @@ function App({ viewType }: AppProps) {
   const posthog = usePostHog()
 
   // useEffect(() => {
-    // console.log('Navigated to', window.location)
+  // console.log('Navigated to', window.location)
   // }, [window?.location])
 
   useEffect(() => {
@@ -51,7 +51,7 @@ function App({ viewType }: AppProps) {
   }, [session])
 
   useEffect(() => {
-    console.log('Identifying user', session?.user?.userId)
+    // console.log('Identifying user', session?.user?.userId)
     if (session?.user?.userId) {
       posthog.identify(session?.user?.userId, {
         email: session?.user?.userId,

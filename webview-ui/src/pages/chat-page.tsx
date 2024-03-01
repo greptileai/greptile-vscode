@@ -74,7 +74,7 @@ export default function ChatPage({}: ChatPageProps) {
             ...session?.state,
             chat: chat,
           },
-        })
+        } as Session)
       } else {
         chat = await getChat(
           session?.state?.chat?.session_id,
@@ -92,7 +92,7 @@ export default function ChatPage({}: ChatPageProps) {
             ...session?.state,
             chat: chat,
           },
-        })
+        } as Session)
       }
 
       // if (!chat) console.log('no chat found')

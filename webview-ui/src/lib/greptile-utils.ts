@@ -58,7 +58,7 @@ export const getDefaultBranch = async (repoKey: string, session: Session | null)
 export const getLatestCommit = async (repoKey: string, session: Session | null) => {
   const repoKeyObj = deserializeRepoKey(repoKey)
 
-  console.log('Getting latest commit')
+  // console.log('Getting latest commit')
   const result = await getRemote(
     repoKey,
     'commit',

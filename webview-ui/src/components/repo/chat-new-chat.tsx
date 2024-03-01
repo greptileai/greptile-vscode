@@ -86,7 +86,7 @@ export const NewChat = () => {
           // console.log('yay');
           vscode.postMessage({
             command: 'info',
-            text: `Repository submitted. We will email you at ${session?.user?.userId} once it has finished processing.`,
+            text: `Repository submitted. If this is a new repository, we will email you at ${session?.user?.userId} once it has finished processing.`,
           })
           return res
         } else if (res.status === 404) {
@@ -215,6 +215,8 @@ export const NewChat = () => {
         text: 'Please enter a valid GitHub repository URL, like https://github.com/greptileai/greptile-vscode.',
       })
     }
+
+    await new Promise((resolve) => setTimeout(resolve, 2000))
     setIsCloning(false)
   }
 
@@ -256,7 +258,7 @@ export const NewChat = () => {
                       ...session?.state,
                       repoUrl: event.currentTarget.value,
                     },
-                  })
+                  } as Session)
                 }}
               >
                 Github URL
@@ -274,7 +276,7 @@ export const NewChat = () => {
                       ...session?.state,
                       branch: event.currentTarget.value,
                     },
-                  })
+                  } as Session)
                 }}
               >
                 Branch
@@ -320,7 +322,7 @@ export const NewChat = () => {
                                   return newRepoStates
                                 }, {}),
                             },
-                          })
+                          } as Session)
 
                           vscode.postMessage({
                             command: 'reload',
