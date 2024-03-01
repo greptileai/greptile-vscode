@@ -122,7 +122,14 @@ export const NewChat = () => {
                 messages: [],
                 repos: [parsedRepo],
                 repoStates: {
-                  [parsedRepo]: undefined,
+                  [parsedRepo]: {
+                    status: 'submitted',
+                    repository: parsedRepo,
+                    branch: '',
+                    remote: '',
+                    numFiles: 1,
+                    filesProcessed: 0,
+                  },
                 },
               },
             } as Session)
@@ -140,17 +147,19 @@ export const NewChat = () => {
                   repos: [...session?.state?.repos, parsedRepo],
                   repoStates: {
                     ...session?.state?.repoStates,
-                    [parsedRepo]: undefined,
+                    [parsedRepo]: {
+                      status: 'submitted',
+                      repository: parsedRepo,
+                      branch: '',
+                      remote: '',
+                      numFiles: 1,
+                      filesProcessed: 0,
+                    },
                   },
                 },
               } as Session)
             }
           }
-
-          vscode.postMessage({
-            command: 'reload',
-            text: '',
-          })
         } else {
           if (res.status === 401) {
             const message = await res.json().then((data) => data.response)
@@ -172,7 +181,6 @@ export const NewChat = () => {
             })
             console.log('Unknown Error', res.status, res.statusText)
           }
-          setIsCloning(false)
         }
       })
     } else {
@@ -181,8 +189,8 @@ export const NewChat = () => {
         command: 'error',
         text: 'Please enter a valid GitHub repository URL, like https://github.com/greptileai/greptile-vscode.',
       })
-      setIsCloning(false)
     }
+    setIsCloning(false)
   }
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -284,11 +292,6 @@ export const NewChat = () => {
                                   return newRepoStates
                                 }, {}),
                             },
-                          })
-
-                          vscode.postMessage({
-                            command: 'reload',
-                            text: '',
                           })
                         }
                       }}

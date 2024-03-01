@@ -6,6 +6,7 @@ import { SessionContext } from './session-provider'
 import { API_BASE } from '../data/constants'
 import { fetcher, getLatestCommit, serializeRepoKey } from '../lib/greptile-utils'
 import { RepositoryInfo, RepoKey } from '../types/chat'
+import { Session } from '../types/session'
 
 export type ChatLoadingState = {
   loadingRepoStates: { [repo: string]: RepositoryInfo }
@@ -50,19 +51,18 @@ export const useChatLoadingState = () => {
 
 export function ChatLoadingStateProvider({ children }: { children: React.ReactNode }) {
   const { chatState, chatStateDispatch } = useChatState()
+  const { session, setSession } = useContext(SessionContext)
   const [chatLoadingState, chatLoadingStateDispatch] = useReducer(chatLoadingStateReducer, {
     ...initialChatState,
-    loadingRepoStates: chatState.repoStates,
+    loadingRepoStates: session?.state?.repoStates, // chatState.repoStates,
   })
-
-  const { session, setSession } = useContext(SessionContext)
   const isCancelled = useRef(false)
   useEffect(() => {
-    // console.log('useEffect for polling', chatState.repoStates);
+    // console.log('useEffect for polling', session?.state?.repoStates)
     isCancelled.current = false
     const poll = async () => {
       // console.log('polling repo states')
-      let newRepoStates = chatState.repoStates
+      let newRepoStates = session?.state?.repoStates
 
       const submitReposProcessing = Object.keys(newRepoStates).map(async (repoKey) => {
         if (!newRepoStates[repoKey]) return
@@ -106,7 +106,7 @@ export function ChatLoadingStateProvider({ children }: { children: React.ReactNo
         maxTries-- > 0 &&
         Object.keys(newRepoStates).some((repo) => newRepoStates[repo]?.status !== 'completed')
       ) {
-        // console.log('polling', newRepoStates, isCancelled.current);
+        // console.log('polling', newRepoStates, isCancelled.current)
         let repos = Object.keys(newRepoStates).filter(
           (repo) =>
             !newRepoStates[repo]?.indexId ||
@@ -130,9 +130,9 @@ export function ChatLoadingStateProvider({ children }: { children: React.ReactNo
           }
         )
 
-        for (const repoStatus of response) {
+        for (const repoStatus of response.responses) {
           // TODO: handle error in some
-          // console.log("repo status: ", repoStatus);
+          // console.log('repo status: ', repoStatus)
 
           const repoKey = serializeRepoKey({
             remote: repoStatus.remote,
@@ -150,6 +150,14 @@ export function ChatLoadingStateProvider({ children }: { children: React.ReactNo
             repoFailureCount[repoKey] = (repoFailureCount[repoKey] || 0) + 1
           }
         }
+
+        setSession({
+          ...session,
+          state: {
+            ...session?.state,
+            repoStates: newRepoStates,
+          },
+        } as Session)
 
         // console.log('polling set loading repos 1')
         chatLoadingStateDispatch({
@@ -176,7 +184,7 @@ export function ChatLoadingStateProvider({ children }: { children: React.ReactNo
       // TODO: this is not exiting properly
       isCancelled.current = true
     }
-  }, [chatState.repoStates, chatStateDispatch])
+  }, [session?.state?.repoStates, chatState.repoStates, chatStateDispatch])
 
   return (
     <ChatLoadingStateContext.Provider value={{ chatLoadingState, chatLoadingStateDispatch }}>

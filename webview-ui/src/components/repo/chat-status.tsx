@@ -95,16 +95,15 @@ export const ChatStatus = ({ repoKey }: ChatStatusProps) => {
               : 'Repository processed'}
           </div>
           <div>
-            {(repoInfo?.status === 'completed'
-              ? 100
-              : Math.min((repoInfo?.filesProcessed || 0) / (repoInfo?.numFiles || 1), 0.99) * 100
+            {(
+              Math.min((repoInfo?.filesProcessed || 0) / (repoInfo?.numFiles || 1), 0.99) * 100
             ).toFixed(0)}
             %
           </div>
         </div>
         {repoInfo.status !== 'failed' ? (
           <div id='completed' className='processing-grid'>
-            <CircularProgressBar progress={repoInfo.status === 'completed' ? 100 : 0} size={16} />
+            <CircularProgressBar progress={0} size={16} />
             <div className='processing-status'>Complete</div>
           </div>
         ) : (
