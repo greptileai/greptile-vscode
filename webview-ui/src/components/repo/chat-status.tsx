@@ -116,7 +116,7 @@ export const ChatStatus = ({ repoKey }: ChatStatusProps) => {
               <VSCodeButton
                 className='retry-button'
                 onClick={() => {
-                  console.log('retrying')
+                  console.log('Retrying repository submission')
                   setIsRetrying(true)
                   chatLoadingStateDispatch({
                     action: 'set_loading_repo_states',
@@ -154,7 +154,7 @@ export const ChatStatus = ({ repoKey }: ChatStatusProps) => {
                     if (res.ok) {
                       return res
                     } else if (res.status === 404) {
-                      console.log('Error: Needs refresh token or unauthorized')
+                      console.log('Error: Needs refresh or unauthorized')
                       vscode.postMessage({
                         command: 'error',
                         text: 'This repository/branch was not found, or you do not have access to it. If this is your repo, please try logging in again. Reach out to us on Discord for support.',

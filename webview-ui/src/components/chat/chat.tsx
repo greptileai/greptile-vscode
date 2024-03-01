@@ -53,14 +53,14 @@ export const Chat = function ChatComponent({ initialMessages, sessionId, repoSta
       })
       setIsStreaming(true)
       if (response.status === 401 || response.status === 500) {
-        console.log('Error')
+        console.log(`${response.status} Chat Error`)
         vscode.postMessage({
           command: 'error',
-          text: 'Error - Please reach out to us on Discord for support.',
+          text: 'Chat Error - Please reach out to us on Discord for support.',
         })
       } else if (response.status === 404) {
         // && session?.user?.refreshToken) {
-        console.log('Error: Needs refresh and reload or unauthorized')
+        console.log('Error: Needs refresh or unauthorized')
         // todo: refresh and reload
       }
     },
@@ -81,7 +81,7 @@ export const Chat = function ChatComponent({ initialMessages, sessionId, repoSta
     setDisplayMessages(newDisplayMessages)
     if (messages.length === 0) return
     if (!session?.user && messages.length > 2) {
-      console.log('max messages reached')
+      // console.log('Max messages reached')
       chatStateDispatch({
         action: 'set_disabled',
         payload: {

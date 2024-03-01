@@ -34,13 +34,13 @@ export default function ChatPage({}: ChatPageProps) {
 
   useEffect(() => {
     if (!repoStates) return
-    console.log('Trying to set session to', {
-      ...session,
-      state: {
-        ...session?.state,
-        repoStates: { ...repoStates },
-      },
-    } as Session)
+    // console.log('Trying to set session to', {
+    //   ...session,
+    //   state: {
+    //     ...session?.state,
+    //     repoStates: { ...repoStates },
+    //   },
+    // } as Session)
     setSession({
       ...session,
       state: {
@@ -52,7 +52,7 @@ export default function ChatPage({}: ChatPageProps) {
 
   useEffect(() => {
     async function fetchInfo() {
-      console.log('Running fetchInfo for', session?.state?.repos, session)
+      // console.log('Running fetchInfo for', session?.state?.repos, session)
 
       // check with GitHub if user has access to repo
       // const status = await checkRepoAuthorization(repo, session);
@@ -95,7 +95,7 @@ export default function ChatPage({}: ChatPageProps) {
         })
       }
 
-      if (!chat) console.log('no chat found')
+      // if (!chat) console.log('no chat found')
 
       // **************** get repo info *******************
 
@@ -120,14 +120,14 @@ export default function ChatPage({}: ChatPageProps) {
           ? 200
           : await checkRepoAuthorization(completeRepoKey, session)
         if (status !== 200 && status !== 426) throw new Error('Unauthorized or Does not exist')
-        console.log('verified permission')
+        // console.log('verified permission')
 
         let repoInfos = await getRepo(completeRepoKey, session) // returns [failed, responses]
           .catch((e) => {
             console.error(e)
           })
         if (!repoInfos) {
-          console.log('no repo info')
+          // console.log('No repo info')
           return
         }
         return [completeRepoKey, repoInfos] as [

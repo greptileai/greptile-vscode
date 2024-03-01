@@ -92,11 +92,7 @@ export class RepositoryViewProvider implements vscode.WebviewViewProvider {
           vscode.commands.executeCommand('greptile.resetChat')
           return
 
-        case 'chat':
-          vscode.window.showInformationMessage(text)
-          return
-
-        case 'upgrade':
+        case 'info':
           vscode.window.showInformationMessage(text)
           return
 

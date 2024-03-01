@@ -36,13 +36,13 @@ function App({ viewType }: AppProps) {
   const [session, setSession] = useState<Session | undefined>(undefined)
   const posthog = usePostHog()
 
-  useEffect(() => {
-    console.log('Navigated to', window.location)
-  }, [window?.location])
+  // useEffect(() => {
+    // console.log('Navigated to', window.location)
+  // }, [window?.location])
 
   useEffect(() => {
     // write session to extension
-    console.log('Writing session to extension', session)
+    // console.log('Writing session to extension', session)
     if (!session) return
     vscode.postMessage({
       command: 'setSession',
@@ -64,12 +64,12 @@ function App({ viewType }: AppProps) {
   }, [posthog, session?.user])
 
   useEffect(() => {
-    console.log('Setting up event listener')
+    // console.log('Setting up event listener')
     const eventListener = async (event) => {
       const message = event.data
       switch (message.command) {
         case 'session':
-          console.log('Loaded session from extension', message.value)
+          // console.log('Loaded session from extension', message.value)
           setSession(message.value)
       }
     }
@@ -77,7 +77,7 @@ function App({ viewType }: AppProps) {
     // listen for response from extension
     window.addEventListener('message', eventListener)
 
-    console.log('Requesting session from extension')
+    // console.log('Requesting session from extension')
     // make call to extension
     vscode.postMessage({
       command: 'getSession',

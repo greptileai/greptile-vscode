@@ -37,7 +37,7 @@ export const NewChat = () => {
       return
     }
 
-    console.log('Checking membership')
+    // console.log('Checking membership')
     const checkMembership = async () => {
       if (!session?.user) return
 
@@ -84,13 +84,17 @@ export const NewChat = () => {
       }).then(async (res) => {
         if (res.ok) {
           // console.log('yay');
+          vscode.postMessage({
+            command: 'info',
+            text: `Repository submitted. We will email you at ${session?.user?.userId} once it has finished processing.`,
+          })
           return res
         } else if (res.status === 404) {
           // && session?.user?.refreshToken) {
-          console.log('Error: Needs refresh token or unauthorized')
+          console.log('Error: Needs refresh or unauthorized')
           vscode.postMessage({
             command: 'error',
-            text: 'This repository was not found, or you do not have access to it. If this is your repo, please try logging in again. Reach out to us on Discord for support.',
+            text: 'This repository/branch was not found, or you do not have access to it. If this is your repo, please try logging in again. Reach out to us on Discord for support.',
           })
           setIsCloning(false)
           // todo: get refresh token
@@ -165,21 +169,21 @@ export const NewChat = () => {
             const message = await res.json().then((data) => data.response)
             vscode.postMessage({
               command: 'error',
-              text: `Permission error. ${message}`,
+              text: `Permission error: ${message}`,
             })
-            console.log('Permission error', message)
+            console.log('Permission error: ', message)
           } else if (res.status === 404) {
             vscode.postMessage({
               command: 'error',
               text: 'This repository/branch was not found, or you do not have access to it. If this is your repo, please try logging in again. Reach out to us on Discord for support.',
             })
-            console.log('Repo not found')
+            console.log('Repository not found')
           } else {
             vscode.postMessage({
               command: 'error',
               text: `Unknown Error ${res.status} ${res.statusText}`,
             })
-            console.log('Unknown Error', res.status, res.statusText)
+            console.log(`Unknown Error: ${res.status} ${res.statusText}`)
           }
         }
       })
@@ -274,7 +278,10 @@ export const NewChat = () => {
                     <RepoChipActions
                       deleteRepo={() => {
                         if (session?.state?.repos?.length === 1) {
-                          console.log('')
+                          vscode.postMessage({
+                            command: 'info',
+                            text: 'If you would like a clean reset, please use Greptile: Reset Session in the command palette.',
+                          })
                         } else {
                           setSession({
                             ...session,

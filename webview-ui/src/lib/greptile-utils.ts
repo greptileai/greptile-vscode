@@ -10,7 +10,7 @@ export const checkRepoAuthorization = async (
   repoKeyInput: string, // serialized repoKey
   session: Session | null
 ) => {
-  console.log('checking repo auth: ', repoKeyInput)
+  // console.log('Checking repo auth: ', repoKeyInput)
   const repoKey = deserializeRepoKey(repoKeyInput)
 
   repoKey.branch = ''
@@ -27,7 +27,7 @@ export const checkRepoAuthorization = async (
     })
     .then((json) => {
       const visibility = json?.['visibility'] || 'public'
-      console.log('check auth visibility', visibility, 'membership', session?.user?.membership)
+      // console.log('Checking auth visibility', visibility, 'membership', session?.user?.membership)
       if (visibility !== 'public' && session?.user?.membership !== 'pro') return 402
       const size = json?.['size'] ? json['size'] : json?.['statistics']?.['repository_size']
       if (size > 10000 && session?.user?.membership !== 'pro') return 426
@@ -38,7 +38,7 @@ export const checkRepoAuthorization = async (
       return 404
     })
 
-  console.log('check repo auth returning ', statusCode)
+  // console.log('check repo auth returning ', statusCode)
   return statusCode
 }
 
@@ -58,7 +58,7 @@ export const getDefaultBranch = async (repoKey: string, session: Session | null)
 export const getLatestCommit = async (repoKey: string, session: Session | null) => {
   const repoKeyObj = deserializeRepoKey(repoKey)
 
-  console.log('getting latest commit')
+  console.log('Getting latest commit')
   const result = await getRemote(
     repoKey,
     'commit',
@@ -433,10 +433,10 @@ async function getRemote(repoKey: string, action: string, token: string) {
 
     const externalResponse = await axios.get(url, { headers })
     const data = await externalResponse.data
-    console.log('data retrieved')
+    // console.log('data retrieved')
     return { data: data, status: 200 }
   } catch (error) {
-    console.log('error fetching external api')
+    console.log('Error fetching external api')
     return { data: '', error: 'Error fetching external API', status: 500 }
   }
 }

@@ -22,12 +22,13 @@ export async function getChat(
     })
     // console.log('results of getChat: ', chat)
     if (!chat || (user_id && chat.user_id !== user_id)) {
-      throw new Error('Chat did not return anything or user_id does not match')
+      // throw new Error('Chat did not return anything or user_id does not match')
+      return null
     }
 
     return chat
   } catch (error) {
-    console.log('Error getting chat', error)
+    console.log('Error getting chat: ', error)
     return null
   }
 }
@@ -66,10 +67,10 @@ export async function getRepo(
         },
       }
     )
-    // console.log('REPOINFO: ', repoInfo)
+    // console.log('repoinfo: ', repoInfo)
     return repoInfo
   } catch (error) {
-    console.log(error)
+    // console.log(error)
 
     return new Promise((resolve) => {
       setTimeout(() => {
