@@ -167,7 +167,7 @@ export default function ChatPage({}: ChatPageProps) {
       if (successes === 0) {
         vscode.postMessage({
           command: 'error',
-          text: 'There was an error processing your repo. Please try again or reach out to us on Discord for support.',
+          text: 'There was an error processing your repo. Please try again or reach out to us on [Discord](https://discord.com/invite/xZhUcFKzu7) for support.',
         })
       }
     }

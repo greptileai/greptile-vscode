@@ -57,7 +57,7 @@ export const Chat = function ChatComponent({ initialMessages, sessionId, repoSta
         console.log(`${response.status} Chat Error`)
         vscode.postMessage({
           command: 'error',
-          text: 'Chat Error - Please reach out to us on Discord for support.',
+          text: 'Chat Error - Please reach out to us on [Discord](https://discord.com/invite/xZhUcFKzu7) for support.',
         })
       } else if (response.status === 404) {
         // && session?.user?.refreshToken) {

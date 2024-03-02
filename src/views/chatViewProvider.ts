@@ -110,11 +110,11 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
           return
 
         case 'info':
-          vscode.window.showInformationMessage(text)
+          vscode.window.showInformationMessage(new vscode.MarkdownString(text).value)
           return
 
         case 'error':
-          vscode.window.showErrorMessage(text)
+          vscode.window.showErrorMessage(new vscode.MarkdownString(text).value)
           return
 
         case 'getSession':
