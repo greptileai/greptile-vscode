@@ -3,7 +3,7 @@
   "displayName": "Greptile",
   "description": "Search and understand any repo in English.",
   "publisher": "Greptile",
-  "version": "0.0.5",
+  "version": "1.0.0",
   "license": "MIT",
   "repository": {
     "type": "git",
