@@ -136,6 +136,12 @@ code {
   font-family: var(--vscode-editor-font-family);
 }
 
+.source {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
 /* Sample Repos */
 
 #sample-repos {

@@ -48,16 +48,21 @@ export const ChatMessageSources = ({ sources, repoStates, isLoading }: IChatMess
           const repoKey = `${remote}:${repo}:${branch}`
 
           return (
-            <a key={index} href={getURL(urlRepoKey, repoStates[repoKey], source)} target='_blank'>
-              <div>
-                {repo}:{branch}
-                <span>{source?.filepath}</span>{' '}
-                {source?.linestart && source?.lineend
-                  ? `[${source?.linestart}:${source.lineend}]`
-                  : ''}
-                <div className='icon codicon codicon-link-external'></div>
-              </div>
-            </a>
+            <div className='source'>
+              <div className='icon codicon codicon-github'></div>
+              <span>&nbsp;</span>
+              <a key={index} href={getURL(urlRepoKey, repoStates[repoKey], source)} target='_blank'>
+                <div className='source'>
+                  {repo}:{branch}
+                  <span>{source?.filepath}</span>{' '}
+                  {source?.linestart && source?.lineend
+                    ? `[${source?.linestart}:${source.lineend}]`
+                    : ''}
+                  <span>&nbsp;</span>
+                  <div className='icon codicon codicon-link-external'></div>
+                </div>
+              </a>
+            </div>
           )
         }
       )}
