@@ -101,9 +101,13 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
       const text = message.text
 
       switch (command) {
-        case 'login':
-          vscode.commands.executeCommand('greptile.login')
+        case 'logIn':
+          vscode.commands.executeCommand('greptile.logIn')
           return
+
+        // case 'logOut':
+        //   vscode.commands.executeCommand('greptile.logOut')
+        //   return
 
         case 'resetChat':
           vscode.commands.executeCommand('greptile.resetChat')

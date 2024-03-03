@@ -48,8 +48,8 @@
         "title": "Greptile: Chat"
       },
       {
-        "command": "greptile.login",
-        "title": "Greptile: Login"
+        "command": "greptile.logIn",
+        "title": "Greptile: Log In"
       },
       {
         "command": "greptile.resetSession",

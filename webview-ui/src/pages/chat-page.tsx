@@ -25,6 +25,11 @@ export default function ChatPage({}: ChatPageProps) {
 
   const session_id = session?.state?.chat?.session_id
   const user_id = session?.user?.userId // session?.state?.chat?.user_id
+
+  if (!session?.user) {
+    return <div>Log in to get started.</div>
+  }
+
   if (!session?.state?.repos) {
     return (
       <div>
@@ -60,10 +65,6 @@ export default function ChatPage({}: ChatPageProps) {
   useEffect(() => {
     async function fetchInfo() {
       // console.log('Running fetchInfo for', session?.state?.repos, session)
-
-      // check with GitHub if user has access to repo
-      // const status = await checkRepoAuthorization(repo, session);
-      // if (status !== 200) return;
 
       // **************** get chat info *******************
 
@@ -126,7 +127,14 @@ export default function ChatPage({}: ChatPageProps) {
         const status = SAMPLE_REPOS.map((repo) => repo.repo).includes(dRepoKey.repository)
           ? 200
           : await checkRepoAuthorization(completeRepoKey, session)
-        if (status !== 200 && status !== 426) throw new Error('Unauthorized or Does not exist')
+        if (status !== 200 && status !== 426) {
+          vscode.postMessage({
+            command: 'error',
+            text: `You are unauthorized to access ${dRepoKey.repository} (${dRepoKey.branch}) or it does not exist. If you believe this is a mistake, please reach out to us on [Discord](https://discord.com/invite/xZhUcFKzu7) for support.`,
+          })
+          throw new Error('Unauthorized or does not exist')
+        }
+
         // console.log('verified permission')
 
         let repoInfos = await getRepo(completeRepoKey, session) // returns [failed, responses]

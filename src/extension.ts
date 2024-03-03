@@ -17,22 +17,21 @@ export async function activate(context: ExtensionContext) {
     vscode.commands.executeCommand('chatView.focus')
   })
 
-  const githubAuth = vscode.commands.registerCommand('greptile.login', async () => {
+  const githubAuth = vscode.commands.registerCommand('greptile.logIn', async () => {
     const octokit = await credentials.getOctokit()
     const userInfo = await octokit.users.getAuthenticated()
 
-    vscode.window.showInformationMessage(`Logged into GitHub as ${userInfo.data.login}`)
+    vscode.window.showInformationMessage(`Logged into Greptile as ${userInfo.data.login}`)
     // reload the window to update
     vscode.commands.executeCommand('workbench.action.reloadWindow')
   })
 
-  // const repoReset = vscode.commands.registerCommand('greptile.resetRepositories', async () => {
+  // const logOut = vscode.commands.registerCommand('greptile.logOut', async () => {
   //   const session = SessionManager.getSession()
-  //   SessionManager.setSession({
-  //     user: session?.user,
-  //   } as Session)
-  //   vscode.window.showInformationMessage('Greptile repositories reset')
-  //   vscode.commands.executeCommand('workbench.action.webview.reloadWebviewAction')
+  //   SessionManager.setSession({} as Session)
+
+  //   vscode.window.showInformationMessage('Logged out of Greptile')
+  //   vscode.commands.executeCommand('workbench.action.reloadWindow')
   // })
 
   const sessionReset = vscode.commands.registerCommand('greptile.resetSession', async () => {
@@ -77,6 +76,7 @@ export async function activate(context: ExtensionContext) {
   // Add command to the extension context
   context.subscriptions.push(openChat)
   context.subscriptions.push(githubAuth)
+  // context.subscriptions.push(logOut)
   context.subscriptions.push(sessionReset)
   context.subscriptions.push(chatReset)
   context.subscriptions.push(reload)

@@ -69,6 +69,7 @@ export const NewChat = () => {
         command: 'info',
         text: `Upgrade to pro to use this extension!`,
       })
+      setIsCloning(false)
       return
     }
 
@@ -248,7 +249,7 @@ export const NewChat = () => {
 
   return (
     <div>
-      {session ? (
+      {session?.user ? (
         <div>
           <div>
             <p>Enter a Repo:</p>
@@ -355,10 +356,10 @@ export const NewChat = () => {
             onClick={() => {
               posthog.capture('Github Login Clicked', { source: 'greptile-vscode' })
               mixpanel.track('Github Login Clicked', { source: 'greptile-vscode' })
-              vscode.postMessage({ command: 'login', text: 'github login' })
+              vscode.postMessage({ command: 'logIn', text: 'github' })
             }}
           >
-            Login
+            Log In
           </VSCodeButton>
         </div>
       )}
