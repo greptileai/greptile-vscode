@@ -62,8 +62,8 @@
       },
       {
         "command": "greptile.reload",
-        "title": "Greptile: Reload",
-        "icon": "$(refresh)"
+        "title": "Greptile: Sync Repositories",
+        "icon": "$(repo-sync)"
       }
     ],
     "menus": {
@@ -71,12 +71,12 @@
         {
           "command": "greptile.resetChat",
           "when": "view == chatView",
-          "group": "navigation"
+          "group": "navigation@1"
         },
         {
           "command": "greptile.reload",
           "when": "view == chatView",
-          "group": "navigation"
+          "group": "navigation@0"
         }
       ]
     },

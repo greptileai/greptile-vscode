@@ -25,7 +25,14 @@ export default function ChatPage({}: ChatPageProps) {
 
   const session_id = session?.state?.chat?.session_id
   const user_id = session?.user?.userId // session?.state?.chat?.user_id
-  if (!session?.state?.repos) return <div>No repository chosen</div>
+  if (!session?.state?.repos) {
+    return (
+      <div>
+        <p>No repository submitted.</p>
+        <p>Note: To sync this chat with your repositories, you may need to reload this view.</p>
+      </div>
+    )
+  }
 
   const [repos, setRepos] = useState<string[]>(session?.state?.repos)
   const [repoStates, setRepoStates] = useState<{ [repoKey: string]: RepositoryInfo }>(

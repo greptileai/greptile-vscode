@@ -64,6 +64,14 @@ export const NewChat = () => {
     }
     checkMembership()
 
+    if (session?.user?.membership !== 'pro') {
+      vscode.postMessage({
+        command: 'info',
+        text: `Upgrade to pro to use this extension!`,
+      })
+      return
+    }
+
     console.log('Handling clone')
     const submitJob = async () => {
       console.log('Submitting ', parsedRepo)
