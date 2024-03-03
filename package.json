@@ -59,12 +59,22 @@
         "command": "greptile.resetChat",
         "title": "Greptile: Reset Chat",
         "icon": "$(clear-all)"
+      },
+      {
+        "command": "greptile.reload",
+        "title": "Greptile: Reload",
+        "icon": "$(refresh)"
       }
     ],
     "menus": {
       "view/title": [
         {
           "command": "greptile.resetChat",
+          "when": "view == chatView",
+          "group": "navigation"
+        },
+        {
+          "command": "greptile.reload",
           "when": "view == chatView",
           "group": "navigation"
         }

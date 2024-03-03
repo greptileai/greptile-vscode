@@ -323,11 +323,6 @@ export const NewChat = () => {
                                 }, {}),
                             },
                           } as Session)
-
-                          vscode.postMessage({
-                            command: 'reload',
-                            text: '',
-                          })
                         }
                       }}
                     />

@@ -57,6 +57,10 @@ export async function activate(context: ExtensionContext) {
     vscode.commands.executeCommand('workbench.action.webview.reloadWebviewAction')
   })
 
+  const reload = vscode.commands.registerCommand('greptile.reload', async () => {
+    vscode.commands.executeCommand('workbench.action.webview.reloadWebviewAction')
+  })
+
   const repositoryViewProvider = new RepositoryViewProvider(context.extensionUri)
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(
@@ -75,4 +79,5 @@ export async function activate(context: ExtensionContext) {
   context.subscriptions.push(githubAuth)
   context.subscriptions.push(sessionReset)
   context.subscriptions.push(chatReset)
+  context.subscriptions.push(reload)
 }

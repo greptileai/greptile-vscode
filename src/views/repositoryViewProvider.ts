@@ -113,7 +113,7 @@ export class RepositoryViewProvider implements vscode.WebviewViewProvider {
           return
 
         case 'reload':
-          vscode.commands.executeCommand('workbench.action.webview.reloadWebviewAction')
+          vscode.commands.executeCommand('greptile.reload')
           return
       }
     })
