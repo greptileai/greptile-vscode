@@ -8,6 +8,9 @@
 .vscode-test/**
 out/test/**
 
+# Ignore docs
+docs/**
+
 # Ignore source code
 src/**
 
@@ -28,6 +31,8 @@ vsc-extension-quickstart.md
 **/tsconfig.json
 **/vite.config.ts
 **/.eslintrc.json
+**/.prettierrc
+**/.prettierignore
 **/*.map
 **/*.ts
 
