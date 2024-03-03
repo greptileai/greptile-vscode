@@ -43,7 +43,8 @@ export const ChatStatus = ({ repoKey }: ChatStatusProps) => {
   }, [repoInfo?.numFiles])
 
   const currentStep = repoInfo?.status ? steps.indexOf(repoInfo.status) : 0
-  return repoInfo?.status === 'completed' ? (
+  return repoInfo?.status === 'completed' ||
+    (repoInfo?.status === 'processing' && repoInfo?.numFiles === repoInfo?.filesProcessed) ? (
     <div></div>
   ) : (
     <div>

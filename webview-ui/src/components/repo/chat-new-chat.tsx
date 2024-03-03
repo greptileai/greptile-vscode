@@ -106,7 +106,7 @@ export const NewChat = () => {
 
     if (parsedRepo) {
       // if session user token exists, set repoUrl to include token before github.com and after https:// with user session token + '@'
-      submitJob().then(async (res) => {
+      await submitJob().then(async (res) => {
         if (res.ok) {
           posthog.capture('Repository cloned', {
             source: 'greptile-vscode',
@@ -216,7 +216,6 @@ export const NewChat = () => {
       })
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 2000))
     setIsCloning(false)
   }
 
@@ -323,6 +322,11 @@ export const NewChat = () => {
                                 }, {}),
                             },
                           } as Session)
+
+                          // vscode.postMessage({
+                          //   command: 'reload',
+                          //   text: '',
+                          // })
                         }
                       }}
                     />

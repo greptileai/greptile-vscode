@@ -26,7 +26,7 @@ export const Chat = function ChatComponent({ initialMessages, sessionId, repoSta
   const [isStreaming, setIsStreaming] = useState(false)
   const { chatState, chatStateDispatch } = useChatState()
 
-  let repos = Object.values(chatState.repoStates).map((repoState) => ({
+  let repos = Object.values(session?.state?.repoStates).map((repoState: RepositoryInfo) => ({
     name: repoState.repository,
     branch: repoState.branch,
   }))
@@ -102,10 +102,12 @@ export const Chat = function ChatComponent({ initialMessages, sessionId, repoSta
     }
   }, [messages, session?.user])
 
-  const someValidRepos = Object.values(chatState.repoStates).some((repoState) => {
-    // console.log('repo state: ', repoState)
-    return (repoState.status !== 'completed' && repoState.sha) || repoState.status === 'completed'
-  })
+  const someValidRepos = Object.values(session?.state?.repoStates).some(
+    (repoState: RepositoryInfo) => {
+      // console.log('repo state: ', repoState)
+      return (repoState.status !== 'completed' && repoState.sha) || repoState.status === 'completed'
+    }
+  )
 
   return (
     <div>
@@ -120,7 +122,7 @@ export const Chat = function ChatComponent({ initialMessages, sessionId, repoSta
             sessionId={sessionId}
           />
           {displayMessages.length <= 1 &&
-            Object.keys(chatState.repoStates).length > 0 &&
+            Object.keys(session?.state?.repoStates).length > 0 &&
             !isLoading && <div>{/* Sample Questions */}</div>}
         </div>
       ) : (

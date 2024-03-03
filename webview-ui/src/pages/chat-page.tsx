@@ -25,9 +25,9 @@ export default function ChatPage({}: ChatPageProps) {
 
   const session_id = session?.state?.chat?.session_id
   const user_id = session?.user?.userId // session?.state?.chat?.user_id
-  if (!session?.state?.repos) return <div>No repo chosen</div>
+  if (!session?.state?.repos) return <div>No repository chosen</div>
 
-  const [repos, setRepos] = useState<string[]>([])
+  const [repos, setRepos] = useState<string[]>(session?.state?.repos)
   const [repoStates, setRepoStates] = useState<{ [repoKey: string]: RepositoryInfo }>(
     session?.state?.repoStates
   )
@@ -99,8 +99,8 @@ export default function ChatPage({}: ChatPageProps) {
 
       // **************** get repo info *******************
 
-      const repoKeys: string[] = session?.state?.repos
-      setRepos(repoKeys)
+      const repoKeys: string[] = repos // session?.state?.repos
+      // setRepos(repoKeys)
 
       // get empty branches and set them in new db
       const getRepoInfoAndPermission = repoKeys.map(async (repoKey: string) => {
@@ -185,7 +185,11 @@ export default function ChatPage({}: ChatPageProps) {
 
     const repoNames: string = repos
       .reduce((completed, repo) => {
-        if (session?.state?.repoStates[repo]?.status === 'completed') {
+        const repoInfo = repoStates[repo]
+        if (
+          repoInfo?.status === 'completed' ||
+          (repoInfo?.status === 'processing' && repoInfo?.numFiles === repoInfo?.filesProcessed)
+        ) {
           completed.push(deserializeRepoKey(repo).repository)
         }
         return completed
