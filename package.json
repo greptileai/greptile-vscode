@@ -36,7 +36,7 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "icon": "images/greptile/logo.svg",
+          "icon": "images/greptile/ab-logo.png",
           "id": "greptileView",
           "title": "Greptile"
         }
