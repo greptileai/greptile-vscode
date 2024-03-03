@@ -26,8 +26,7 @@ webview-ui/node_modules/**
 
 # Ignore Misc
 .yarnrc
-vsc-extension-quickstart.md
-**/.gitignore
+.gitignore
 **/tsconfig.json
 **/vite.config.ts
 **/.eslintrc.json
