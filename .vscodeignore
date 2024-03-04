@@ -14,6 +14,9 @@ docs/**
 # Ignore source code
 src/**
 
+# Ignore dependencies
+node_modules
+
 # Ignore all webview-ui files except the build directory
 webview-ui/src/**
 webview-ui/public/**
@@ -27,11 +30,11 @@ webview-ui/node_modules/**
 # Ignore Misc
 .yarnrc
 .gitignore
-**/tsconfig.json
+tsconfig.json
+.eslintrc.json
+.prettierrc
+.prettierignore
 **/vite.config.ts
-**/.eslintrc.json
-**/.prettierrc
-**/.prettierignore
 **/*.map
 **/*.ts
 
