@@ -21,7 +21,9 @@ export async function activate(context: ExtensionContext) {
     const octokit = await credentials.getOctokit()
     const userInfo = await octokit.users.getAuthenticated()
 
-    vscode.window.showInformationMessage(`Logged into Greptile as ${userInfo.data.login}`)
+    vscode.window.showInformationMessage('Logging in with Github...')
+    await new Promise((resolve) => setTimeout(resolve, 2000))
+
     // reload the window to update
     vscode.commands.executeCommand('workbench.action.reloadWindow')
   })
