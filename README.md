@@ -9,10 +9,10 @@ This extension for VS Code brings Greptile's capabilities directly into your dev
 ## Features
 
 - **Natural Language Queries:** Ask questions about your codebase in plain English.
-- **Supports 500+ Languages:** Works with a wide range of programming languages.
+- **Supports 500+ Languages:** Work with a wide range of programming languages.
 - **Bug Solving:** Describe bugs and find solutions quickly.
 - **Legacy Code Handling:** Easily navigate and understand legacy code.
-- **[COMING SOON] Multi-Repository Search:** Search across multiple repositories simultaneously.
+- **Multi-Repository Search:** Search across multiple repositories simultaneously.
 
 ## Installation
 
