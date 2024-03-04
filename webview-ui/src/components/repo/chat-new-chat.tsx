@@ -117,11 +117,11 @@ export const NewChat = () => {
       // if session user token exists, set repoUrl to include token before github.com and after https:// with user session token + '@'
       await submitJob().then(async (res) => {
         if (res.ok) {
-          posthog.capture('Repository cloned', {
+          posthog.capture('Repository submitted', {
             source: 'greptile-vscode',
             repo: parsedRepo || '',
           })
-          mixpanel.track('Repository cloned', {
+          mixpanel.track('Repository submitted', {
             source: 'greptile-vscode',
             repo: parsedRepo || '',
           })

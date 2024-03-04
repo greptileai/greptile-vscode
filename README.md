@@ -2,7 +2,7 @@
 
 ## Overview
 
-Greptile is a developer tool for understanding and navigating codebases in English.
+Greptile is a developer tool for understanding and navigating codebases in plain English.
 
 This extension for VS Code brings Greptile's capabilities directly into your development environment, enhancing productivity and code comprehension.
 
@@ -28,11 +28,11 @@ This extension for VS Code brings Greptile's capabilities directly into your dev
 
 ## Support
 
-For more information and support, visit [Greptile](https://greptile.com).
+For more information and support, visit [greptile.com](https://greptile.com).
 
 ## Feedback
 
-We value your feedback. Please submit any issues or suggestions via our [Discord](https://discord.com/invite/xZhUcFKzu7) or via [email](founders@greptile.com).
+We value your feedback. Please submit any issues or suggestions via our [Discord](https://discord.com/invite/xZhUcFKzu7) or via [email](mailto:founders@greptile.com).
 
 ---
 

@@ -1,13 +1,16 @@
 {
   "name": "greptile-vscode",
   "displayName": "Greptile",
-  "description": "Search and understand any repo in English.",
+  "description": "Search and understand any repo in plain English.",
   "publisher": "Greptile",
   "version": "1.0.1",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/greptileai/greptile-vscode"
+  },
+  "bugs": {
+    "url": "https://github.com/greptileai/greptile-vscode/issues"
   },
   "icon": "images/greptile/logo.png",
   "galleryBanner": {
