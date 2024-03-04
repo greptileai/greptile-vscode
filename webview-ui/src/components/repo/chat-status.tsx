@@ -158,7 +158,7 @@ export const ChatStatus = ({ repoKey }: ChatStatusProps) => {
                       console.log('Error: Needs refresh or unauthorized')
                       vscode.postMessage({
                         command: 'error',
-                        text: 'This repository/branch was not found, or you do not have access to it. If this is your repo, please try logging in again. Reach out to us on [Discord](https://discord.com/invite/xZhUcFKzu7) for support.',
+                        text: 'This repository/branch was not found, or you do not have access to it. If this is your repo, please try signing in again. Reach out to us on [Discord](https://discord.com/invite/xZhUcFKzu7) for support.',
                       })
                     } else {
                       vscode.postMessage({

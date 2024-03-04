@@ -84,12 +84,12 @@ export class RepositoryViewProvider implements vscode.WebviewViewProvider {
       const text = message.text
 
       switch (command) {
-        case 'logIn':
-          vscode.commands.executeCommand('greptile.logIn')
+        case 'signIn':
+          vscode.commands.executeCommand('greptile.signIn')
           return
 
-        // case 'logOut':
-        //   vscode.commands.executeCommand('greptile.logOut')
+        // case 'signOut':
+        //   vscode.commands.executeCommand('greptile.signOut')
         //   return
 
         case 'resetChat':

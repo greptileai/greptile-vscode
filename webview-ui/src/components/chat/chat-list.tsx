@@ -63,7 +63,9 @@ export function ChatList({
           <ChatLoadingSkeleton />
         </>
       )}
-      {chatState.disabled.value && !isStreaming && !isLoading && <p> Please Log In to Continue </p>}
+      {chatState.disabled.value && !isStreaming && !isLoading && (
+        <p> Please Sign In to Continue </p>
+      )}
     </div>
   )
 }

@@ -103,7 +103,7 @@ export const NewChat = () => {
           console.log('Error: Needs refresh or unauthorized')
           vscode.postMessage({
             command: 'error',
-            text: 'This repository/branch was not found, or you do not have access to it. If this is your repo, please try logging in again. Reach out to us on [Discord](https://discord.com/invite/xZhUcFKzu7) for support.',
+            text: 'This repository/branch was not found, or you do not have access to it. If this is your repo, please try signing in again. Reach out to us on [Discord](https://discord.com/invite/xZhUcFKzu7) for support.',
           })
           setIsCloning(false)
           // todo: get refresh token
@@ -205,7 +205,7 @@ export const NewChat = () => {
           } else if (res.status === 404) {
             vscode.postMessage({
               command: 'error',
-              text: 'This repository/branch was not found, or you do not have access to it. If this is your repo, please try logging in again. Reach out to us on [Discord](https://discord.com/invite/xZhUcFKzu7) for support.',
+              text: 'This repository/branch was not found, or you do not have access to it. If this is your repo, please try signing in again. Reach out to us on [Discord](https://discord.com/invite/xZhUcFKzu7) for support.',
             })
             console.log('Repository not found')
           } else {
@@ -351,15 +351,16 @@ export const NewChat = () => {
           </div>
         </div>
       ) : (
-        <div id='login-container'>
+        <div id='sign-in-container'>
           <VSCodeButton
             onClick={() => {
-              posthog.capture('Github Login Clicked', { source: 'greptile-vscode' })
-              mixpanel.track('Github Login Clicked', { source: 'greptile-vscode' })
-              vscode.postMessage({ command: 'logIn', text: 'github' })
+              posthog.capture('Github Sign-in Clicked', { source: 'greptile-vscode' })
+              mixpanel.track('Github Sign-in Clicked', { source: 'greptile-vscode' })
+              vscode.postMessage({ command: 'signIn', text: 'github' })
             }}
           >
-            Log In
+            {/* <div className='icon codicon codicon-github sign-in-icon'></div> */}
+            Sign In
           </VSCodeButton>
         </div>
       )}

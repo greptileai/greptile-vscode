@@ -27,12 +27,12 @@ export default function ChatPage({}: ChatPageProps) {
   const user_id = session?.user?.userId // session?.state?.chat?.user_id
 
   if (!session?.user) {
-    return <div>Log in to get started.</div>
+    return <div className='chat-page'>Sign in with GitHub to get started.</div>
   }
 
   if (!session?.state?.repos) {
     return (
-      <div>
+      <div className='chat-page'>
         <p>No repository submitted.</p>
         <p>Note: To sync this chat with your repositories, you may need to reload this view.</p>
       </div>
@@ -232,7 +232,7 @@ export default function ChatPage({}: ChatPageProps) {
   const formatted_chat_log = session?.state?.chat?.chat_log || []
 
   return (
-    <>
+    <div className='chat-page'>
       <ChatStateProvider
         initialProvidedState={{
           sessionId: session?.state?.chat?.session_id,
@@ -245,6 +245,6 @@ export default function ChatPage({}: ChatPageProps) {
           repoStates={repoStates}
         />
       </ChatStateProvider>
-    </>
+    </div>
   )
 }

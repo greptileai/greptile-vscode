@@ -288,13 +288,17 @@ code {
   margin-top: 0.5rem;
 }
 
-/* Login */
+/* Sign-in */
 
-#login-container {
+#sign-in-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100%;
+  height: 100vh;
+}
+
+.sign-in-icon {
+  padding-right: 0.5rem;
 }
 
 /* Other */
@@ -313,4 +317,8 @@ code {
 
 .icon {
   font-size: var(--vscode-font-size);
+}
+
+.chat-page {
+  margin-top: 0.5rem;
 }
