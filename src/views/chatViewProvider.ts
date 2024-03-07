@@ -68,7 +68,6 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
                                               https://api.github.com/
                                               https://us.posthog.com/
                                               https://app.posthog.com/
-                                              https://api-js.mixpanel.com/;
                            style-src ${webview.cspSource} 'unsafe-inline';
                            font-src ${webview.cspSource};
                            img-src ${webview.cspSource};

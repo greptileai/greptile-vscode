@@ -1,5 +1,4 @@
 import { type Message } from 'ai'
-import mixpanel from 'mixpanel-browser'
 import { usePostHog } from 'posthog-js/react'
 import { VSCodeButton } from '@vscode/webview-ui-toolkit/react'
 
@@ -49,10 +48,6 @@ export function ChatMessageActions({
                 feedback: 'thumbs up',
                 source: 'greptile-vscode',
               })
-              mixpanel.track('Feedback', {
-                user: userId!,
-                feedback: 'thumbs up',
-              })
             }}
           >
             <div className='icon codicon codicon-thumbsup'></div>
@@ -65,10 +60,6 @@ export function ChatMessageActions({
                 user: userId!,
                 feedback: 'thumbs down',
                 source: 'greptile-vscode',
-              })
-              mixpanel.track('Feedback', {
-                user: userId!,
-                feedback: 'thumbs down',
               })
             }}
           >

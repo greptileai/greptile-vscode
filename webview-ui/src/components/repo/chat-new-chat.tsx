@@ -1,7 +1,6 @@
 import React, { useState, useContext } from 'react'
 import { VSCodeTextField, VSCodeButton } from '@vscode/webview-ui-toolkit/react'
 import { usePostHog } from 'posthog-js/react'
-import mixpanel from 'mixpanel-browser'
 
 import { API_BASE } from '../../data/constants'
 import { vscode } from '../../lib/vscode-utils'
@@ -118,10 +117,6 @@ export const NewChat = () => {
       await submitJob().then(async (res) => {
         if (res.ok) {
           posthog.capture('Repository submitted', {
-            source: 'greptile-vscode',
-            repo: parsedRepo || '',
-          })
-          mixpanel.track('Repository submitted', {
             source: 'greptile-vscode',
             repo: parsedRepo || '',
           })
@@ -355,7 +350,6 @@ export const NewChat = () => {
           <VSCodeButton
             onClick={() => {
               posthog.capture('Github Sign-in Clicked', { source: 'greptile-vscode' })
-              mixpanel.track('Github Sign-in Clicked', { source: 'greptile-vscode' })
               vscode.postMessage({ command: 'signIn', text: 'github' })
             }}
           >

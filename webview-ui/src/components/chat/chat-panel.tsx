@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { VSCodeButton } from '@vscode/webview-ui-toolkit/react'
 import { usePostHog } from 'posthog-js/react'
-import mixpanel from 'mixpanel-browser'
 
 import { PromptForm } from './chat-prompt-form'
 import { useChatState } from '../../providers/chat-state-provider'
@@ -59,10 +58,6 @@ export function ChatPanel({
           posthog.capture('Chat message sent', {
             source: 'greptile-vscode',
           })
-          mixpanel.track('Chat message sent', {
-            source: 'greptile-vscode',
-          })
-
           await append({
             id: chatState.session_id,
             content: value,
@@ -83,9 +78,6 @@ export function ChatPanel({
                 posthog.capture('Response stopped', {
                   source: 'greptile-vscode',
                 })
-                mixpanel.track('Response stopped', {
-                  source: 'greptile-vscode',
-                })
                 stop()
               }}
               className='secondary-button'
@@ -99,9 +91,6 @@ export function ChatPanel({
                 aria-label='Regenerate response'
                 onClick={() => {
                   posthog.capture('Response regenerated', {
-                    source: 'greptile-vscode',
-                  })
-                  mixpanel.track('Response regenerated', {
                     source: 'greptile-vscode',
                   })
                   reload()
