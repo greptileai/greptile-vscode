@@ -266,6 +266,10 @@ export const NewChat = () => {
               >
                 Github URL
               </VSCodeTextField>
+              <div style={{
+                "display": "flex",
+                "alignItems": "end",
+              }}>
               <VSCodeTextField
                 id='new-repo-branch'
                 placeholder='default'
@@ -293,13 +297,16 @@ export const NewChat = () => {
               >
                 {isCloning ? 'Loading...' : 'Add'}
               </VSCodeButton>
+              </div>
             </div>
           </div>
-          <div id='repo-chips'>
+          <div id='repo-chips' style={{
+            "paddingTop": "2rem",
+            "paddingBottom": "1rem"
+          }}>
             {someValidRepos && session?.state?.repoStates ? (
               Object.keys(session?.state?.repoStates).map((repoKey) => (
-                // <ChatStatus key={} repoKey={} />
-                <div>
+                <>
                   <RepoChip key={repoKey} repoKey={repoKey}>
                     <RepoChipActions
                       deleteRepo={() => {
@@ -326,11 +333,6 @@ export const NewChat = () => {
                                 }, {}),
                             },
                           } as Session)
-
-                          // vscode.postMessage({
-                          //   command: 'reload',
-                          //   text: '',
-                          // })
                         }
                       }}
                     />
@@ -338,10 +340,10 @@ export const NewChat = () => {
                   <ChatLoadingStateProvider>
                     <ChatStatus key={repoKey} repoKey={repoKey} />
                   </ChatLoadingStateProvider>
-                </div>
+                </>
               ))
             ) : (
-              <></>
+              null
             )}
           </div>
         </div>

@@ -167,15 +167,19 @@ code {
 #new-repo-container {
   display: flex;
   flex-direction: row;
+  align-items: end;
 }
-
+#new-repo-branch-submit {
+  display: flex;
+  align-items: end;
+}
 #new-repo-branch {
   margin-left: 0.5rem;
 }
 
 #new-repo-submit {
-  align-self: flex-end;
-  margin-left: 0.5rem;
+  /* align-self: flex-end; */
+  margin-left: auto;
 }
 
 /* Loading Skeleton */
@@ -264,7 +268,8 @@ code {
 }
 
 #repo-chips {
-  margin-top: 0.5rem;
+  padding-top: 2rem;
+  margin-top: 2rem;
 }
 
 /* Progress Bar */
