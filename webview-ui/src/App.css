@@ -179,7 +179,7 @@ code {
 
 #new-repo-submit {
   /* align-self: flex-end; */
-  margin-left: auto;
+  margin-left: 1rem;
 }
 
 /* Loading Skeleton */
@@ -268,8 +268,9 @@ code {
 }
 
 #repo-chips {
-  padding-top: 2rem;
+  /* padding-top: 2rem; */
   margin-top: 2rem;
+  padding-bottom: 1rem;
 }
 
 /* Progress Bar */

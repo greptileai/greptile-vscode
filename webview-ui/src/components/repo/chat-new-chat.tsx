@@ -300,10 +300,7 @@ export const NewChat = () => {
               </div>
             </div>
           </div>
-          <div id='repo-chips' style={{
-            "paddingTop": "2rem",
-            "paddingBottom": "1rem"
-          }}>
+          <div id='repo-chips'>
             {someValidRepos && session?.state?.repoStates ? (
               Object.keys(session?.state?.repoStates).map((repoKey) => (
                 <>
@@ -337,9 +334,11 @@ export const NewChat = () => {
                       }}
                     />
                   </RepoChip>
-                  <ChatLoadingStateProvider>
-                    <ChatStatus key={repoKey} repoKey={repoKey} />
-                  </ChatLoadingStateProvider>
+                  {session?.state?.repoStates[repoKey].status !== 'completed' && (
+                    <ChatLoadingStateProvider>
+                      <ChatStatus key={repoKey} repoKey={repoKey} />
+                    </ChatLoadingStateProvider>
+                  )}
                 </>
               ))
             ) : (
