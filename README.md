@@ -29,10 +29,6 @@ npm run install:all
 
 2. Build and start webview 
 ```
-cd webview-ui
-```
-
-```
 npm run build:webview
 npm run start:webview
 ```
