@@ -37,4 +37,4 @@ export const SAMPLE_REPOS: ISampleRepo[] = [
   },
 ]
 
-export const API_BASE = 'https://api.greptile.com/v1'
+export const API_BASE = 'https://api.greptile.com/v2'

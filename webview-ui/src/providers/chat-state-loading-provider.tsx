@@ -118,7 +118,8 @@ export function ChatLoadingStateProvider({ children }: { children: React.ReactNo
         // but once new repos are set it still polls for the repos as well.
         if (repos.length === 0) break
         const response: any = await fetcher(
-          `${API_BASE}/repositories/batch?repositories=${repos
+          // TODO: replace the base api url witrh API_BASE when v2 have this API
+          `https://api.greptile.com/v1/repositories/batch?repositories=${repos
             .map((repo) => encode(repo, true))
             .join(',')}`,
           {

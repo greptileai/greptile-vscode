@@ -39,8 +39,10 @@ export const NewChat = () => {
     // console.log('Checking membership')
     const checkMembership = async () => {
       if (!session?.user) return
+      
 
-      const response = await fetch(`${API_BASE}/membership`, {
+      // TODO: replace the base api url witrh API_BASE when v2 have this API 
+      const response = await fetch(`https://api.greptile.com/v1/membership`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -49,7 +51,10 @@ export const NewChat = () => {
       }).then(async (res) => {
         return res.json()
       })
-
+      vscode.postMessage({
+        command: 'info',
+        text: `${response['membership']}`,
+      })
       if (response['membership'] !== session?.user?.membership) {
         setSession({
           ...session,
@@ -66,7 +71,7 @@ export const NewChat = () => {
     if (session?.user?.membership !== 'pro') {
       vscode.postMessage({
         command: 'info',
-        text: `Upgrade to pro to use this extension!`,
+        text: `Upgrade to pro to use this extension! ${session?.user}`,
       })
       setIsCloning(false)
       return
@@ -355,7 +360,7 @@ export const NewChat = () => {
             }}
           >
             {/* <div className='icon codicon codicon-github sign-in-icon'></div> */}
-            Sign In
+            Sign In with Github
           </VSCodeButton>
         </div>
       )}

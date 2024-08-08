@@ -390,6 +390,7 @@ export const ChatStatus = ({ repoKey }: ChatStatusProps) => {
                       },
                     },
                   });
+                  // not sure if this API is real
                   fetch(`${API_BASE}/prod/v1/repositories`, {
                     method: 'POST',
                     body: JSON.stringify({

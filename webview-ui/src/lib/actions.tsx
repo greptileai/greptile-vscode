@@ -58,7 +58,8 @@ export async function getRepo(
   // console.log(repoKey)
   try {
     const repoInfo: any = await fetcher(
-      `${API_BASE}/repositories/batch?repositories=${encode(repoKey, true)}`,
+      // TODO: replace the base api url witrh API_BASE when v2 have this API
+      `https://api.greptile.com/v1/repositories/batch?repositories=${encode(repoKey, true)}`,
       {
         method: 'GET',
         headers: {
@@ -75,7 +76,8 @@ export async function getRepo(
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve(
-          fetcher(`${API_BASE}/repositories/batch?repositories=${encode(repoKey, true)}`, {
+          // TODO: replace the base api url witrh API_BASE when v2 have this API
+          fetcher(`https://api.greptile.com/v1/repositories/batch?repositories=${encode(repoKey, true)}`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',

@@ -14,7 +14,7 @@ This extension for VS Code brings Greptile's capabilities directly into your dev
 - **Legacy Code Handling:** Easily navigate and understand legacy code.
 - **Multi-Repository Search:** Search across multiple repositories simultaneously.
 
-## Run Locally
+## Local development
 1. Install dependencies
 ```
 npm run install:all
