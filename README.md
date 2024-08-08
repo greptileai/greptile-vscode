@@ -14,6 +14,25 @@ This extension for VS Code brings Greptile's capabilities directly into your dev
 - **Legacy Code Handling:** Easily navigate and understand legacy code.
 - **Multi-Repository Search:** Search across multiple repositories simultaneously.
 
+## Run Locally
+1. Install dependencies
+```
+npm run install:all
+```
+
+2. Build and start webview 
+```
+npm run build:webview
+npm run start:webview
+```
+
+3. Compile VS Code extension
+```
+npm run compile
+```
+
+Then, press `F5` in `extension.ts` tab
+
 ## Installation
 
 1. Open VS Code.
