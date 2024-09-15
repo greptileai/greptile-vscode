@@ -1,3 +1,5 @@
+NOTE: The Greptile VS Code extension has been **deprecated** until further notice. If you are interested in taking over the project as a maintainer, you can reach us at **hello@greptile.com**.
+
 # Greptile VS Code Extension
 
 ## Overview
