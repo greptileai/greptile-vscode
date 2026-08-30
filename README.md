@@ -23,6 +23,25 @@ This extension for VS Code brings Greptile's capabilities directly into your dev
 3. Search for "Greptile".
 4. Click "Install".
 
+## Run Locally
+1. Install dependencies
+```
+npm run install:all
+```
+
+2. Build and start webview 
+```
+npm run build:webview
+npm run start:webview
+```
+
+3. Compile VS Code extension
+```
+npm run compile
+```
+
+Then, press `F5` in `extension.ts` tab
+
 ## Usage
 
 - Press CMD+L
